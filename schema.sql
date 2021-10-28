@@ -49,9 +49,9 @@ CREATE TABLE Departments (
 );
  
 CREATE TABLE Meeting_Rooms (
-   room INTEGER,
    floor INTEGER,
-   rname TEXT,
+   room INTEGER,
+   rname varchar(50),
    did INTEGER NOT NULL REFERENCES Departments,
    PRIMARY KEY (room, floor)
 );
@@ -59,13 +59,21 @@ CREATE TABLE Meeting_Rooms (
  
 CREATE TABLE Updates (
    date DATE,
-   room INTEGER,
    floor INTEGER,
+   room INTEGER,
    new_cap INTEGER,
    eid INTEGER REFERENCES Manager ON DELETE CASCADE,
    PRIMARY KEY (date, room, floor),
    FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor)
 );
+
+
+date
+floor
+room
+new_cap
+did
+eid
  
 CREATE TABLE Sessions (
    date DATE,

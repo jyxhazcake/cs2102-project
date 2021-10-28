@@ -1,3 +1,8 @@
+/* 
+    ###################
+    # Wei Howe's Code #
+    ###################  */
+
 CREATE OR REPLACE FUNCTION add_employee
     -- This assumes that the employee will always have minimally a mobilenum
     (IN e_name VARCHAR(50), IN mobilenum VARCHAR(50), IN kind VARCHAR(50), IN d_id INTEGER)
@@ -66,6 +71,8 @@ BEGIN
 END;
 $$LANGUAGE plpgsql
 
+--Comment by Wei Xuan: Did not use start_date in function yet
+
 CREATE OR REPLACE FUNCTION view_manager_report
     (IN start_date, IN e_id INTEGER)
 RETURN TABLE (date DATE, time TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
@@ -96,3 +103,68 @@ BEGIN
     ORDER BY all_na.date, all_na.time ASC;
 END:
 $$LANGUAGE plpgsql
+
+
+/* 
+    ###################
+    # Wei Xuan's Code #
+    ###################  */
+
+--add_room routine
+CREATE OR REPLACE PROCEDURE add_room
+	(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
+AS $$
+-- should i create a variable 'mid' assigned to 0? 
+-- DECLARE mid INT := 0;
+BEGIN
+    INSERT INTO Meeting_Rooms(floor, room, rname, did);
+    INSERT INTO Updates(date, floor, room, room_capacity, mid);
+END;
+$$LANGUAGE plpgsql;
+
+
+--change_capacity routine
+CREATE OR REPLACE PROCEDURE change_capacity
+    (floor INTEGER, room INTEGER, new_capacity INTEGER, date DATE)
+AS $$
+BEGIN
+    INSERT INTO Updates(date, room, floor, room_capacity, mid);
+END;
+$$LANGUAGE plpgsql;
+
+
+/* search_room routine: 
+1st step: get all entries in Updates where date is before query_date
+2nd step: filter out Updates so that only the max(date) for each (floor,room) remains --> latest update
+3rd step: filter out Updates where new_cap >= required_cap 
+4th step: check if exists each date, time, floor, room in Books --> time from start_hour increments by 1 until (end_hour-1) --> while loop*/
+
+CREATE OR REPLACE FUNCTION search_room
+    (IN required_cap INTEGER, IN query_date DATE, IN start_hour INTEGER, IN end_hour INTEGER)
+RETURNS TABLE(floor INTEGER, room INTEGER, did INTEGER, available_capacity INTEGER) AS $$
+
+BEGIN
+    SELECT floor, room, did, new_cap
+    --checks if meeting room has the required capacity set before and nearest to the query_date
+    FROM Meeting_Rooms AS mr, Updates AS u, Books AS b
+    WHERE date < query_date
+        AND new_cap >= required_capacity
+
+
+    WITH latest_updates AS (
+        SELECT floor, room, MAX(date)
+        FROM Updates
+        WHERE date <= query_date
+        GROUP BY floor, room
+    )
+    
+    SELECT floor, room, new_cap
+    FROM Updates
+    WHERE (floor, room, date) IN latest_updates
+
+    WHERE (floor, room) IN (SELECT (floor, room), MAX(date)
+                            FROM Updates 
+                            WHERE date <)
+    
+END;
+$$ LANGUAGE plpgsql;
