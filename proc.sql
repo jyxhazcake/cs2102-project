@@ -234,3 +234,39 @@ BEGIN
     INSERT INTO Approves VALUES (eid, date, time, room, floor);
 END;
 $$ LANGUAGE plpgsql;
+
+/* 
+    ###################
+    # Zhen Hong's Code #
+    ###################  */
+
+CREATE OR REPLACE FUNCTION add_department
+    (IN did INTEGER, IN dname VARCHAR(50))
+RETURN VOID AS $$
+BEGIN
+    INSERT INTO departments
+    VALUES (did, dname);
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION remove_department
+    (IN d_id INTEGER)
+RETURN VOID AS $$
+BEGIN
+    DELETE FROM departments
+    WHERE (did = d_id)
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION declare_health
+    (IN eid INTEGER, IN current_date date, IN temp INTEGER)
+RETURN VOID AS $$
+BEGIN
+    INSERT INTO Health_Declaration
+    VALUES (eid, current_date, temp);
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION contact_tracing
+    (IN eid INTEGER)
+
