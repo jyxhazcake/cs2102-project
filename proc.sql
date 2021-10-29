@@ -137,13 +137,55 @@ $$LANGUAGE plpgsql;
 1st step: get all entries in Updates where date is before query_date
 2nd step: filter out Updates so that only the max(date) for each (floor,room) remains --> latest update
 3rd step: filter out Updates where new_cap >= required_cap 
-4th step: check if exists each date, time, floor, room in Books --> time from start_hour increments by 1 until (end_hour-1) --> while loop*/
+4th step: check if exists each date, time, floor, room in Books
+        - For each floor, room in filtered out updates list
+        - time from start_hour increments by 1 until (end_hour-1) --> while loop*/
 
 CREATE OR REPLACE FUNCTION search_room
     (IN required_cap INTEGER, IN query_date DATE, IN start_hour INTEGER, IN end_hour INTEGER)
 RETURNS TABLE(floor INTEGER, room INTEGER, did INTEGER, available_capacity INTEGER) AS $$
 
 BEGIN
+    --get the latest updates: step 1 and 2
+    WITH latest_updates AS (
+        SELECT floor, room, MAX(date)
+        FROM Updates
+        WHERE date <= query_date
+        GROUP BY floor, room, new_cap
+    )
+
+    --get the rooms with capactity >= required capacity: step 3
+    -- e.g. 3 floor, room which meets the required capacity
+    cap_available AS (
+        SELECT floor, room, did, new_cap,
+        FROM Updates as u JOIN Meeting_Rooms as m
+        ON u.floor = m.floor
+            AND u.room = m.room 
+        WHERE (floor, room, date) IN latest_updates
+            AND new_cap >= required_cap
+        ORDER BY new_cap ASC;
+    )
+
+    SELECT floor, room, did, new_cap
+    FROM cap_available
+    WHERE floor, room NOT IN (SELECT floor, room
+                                FROM Books
+                                WHERE time >= start_hour
+                                    AND time < end_hour)
+
+    SELECT c.floor, c.room, c.did, c.new_cap
+    FROM cap_available as c, Books as b
+    WHERE (c.floor, c.room) NOT IN (b.floor, b.room)
+        OR (c.floor = b.floor
+        AND c.room = b.room
+        AND (b < start_hour
+        OR b > end_hour));
+
+
+END;
+$$ LANGUAGE plpgsql;
+
+/*
     SELECT floor, room, did, new_cap
     --checks if meeting room has the required capacity set before and nearest to the query_date
     FROM Meeting_Rooms AS mr, Updates AS u, Books AS b
@@ -151,23 +193,15 @@ BEGIN
         AND new_cap >= required_capacity
 
 
-    WITH latest_updates AS (
-        SELECT floor, room, MAX(date)
-        FROM Updates
-        WHERE date <= query_date
-        GROUP BY floor, room
-    )
-    
-    SELECT floor, room, new_cap
-    FROM Updates
-    WHERE (floor, room, date) IN latest_updates
-
     WHERE (floor, room) IN (SELECT (floor, room), MAX(date)
                             FROM Updates 
                             WHERE date <)
     
-END;
-$$ LANGUAGE plpgsql;
+        FOR r IN cap_available
+    LOOP
+        
+    END LOOP;
+*/
 
 /*
     ###################
@@ -269,4 +303,5 @@ $$LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN eid INTEGER)
+
 
