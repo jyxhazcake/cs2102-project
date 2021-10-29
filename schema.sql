@@ -36,11 +36,11 @@ CREATE TABLE Manager (
 );
  
 CREATE TABLE Health_Declaration (
-   date DATE,
-   temp DOUBLE CHECK (temp < 43 AND temp > 34),
-   fever BOOLEAN AS (temp > 37.5),
-   eid INTEGER REFERENCES Employees ON DELETE CASCADE,
-   PRIMARY KEY (date, eid)
+    eid INTEGER REFERENCES Employees ON DELETE CASCADE,
+    date DATE,
+    temp DOUBLE CHECK (temp < 43 AND temp > 34),
+    fever BOOLEAN AS (temp > 37.5),
+    PRIMARY KEY (date, eid)
 );
  
 CREATE TABLE Departments (
