@@ -11,27 +11,27 @@ CREATE TABLE Employees (
    resigned_date DATE,
    role VARCHAR(50) NOT NULL,
    did INTEGER NOT NULL,
-PRIMARY KEY (eid)
+   PRIMARY KEY (eid),
    FOREIGN KEY (did) REFERENCES Departments (did) ON UPDATE CASCADE
 );
  
 CREATE TABLE Junior (
-   eid INTEGER PRIMARY KEY,
+   jid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Employees (eid) ON UPDATE CASCADE
 );
  
 CREATE TABLE Booker (
-   eid INTEGER PRIMARY KEY,
+   bid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Employees (eid) ON UPDATE CASCADE
 );
  
 CREATE TABLE Senior (
-   eid INTEGER PRIMARY KEY,
+   sid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Booker (eid) ON UPDATE CASCADE
 ); 
  
 CREATE TABLE Manager (
-   eid INTEGER PRIMARY KEY,
+   mid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Booker (eid) ON UPDATE CASCADE
 );
  
@@ -89,13 +89,13 @@ CREATE TABLE Books (
 );
  
 CREATE TABLE Approves (
-   eid INTEGER REFERENCES Manager ON DELETE CASCADE,
+   aid INTEGER REFERENCES Manager ON DELETE CASCADE,
    date DATE,
    time TIME,
    room INTEGER,
    floor INTEGER,
    PRIMARY KEY(date, time, room, floor),
-   FOREIGN KEY (date, time, room, floor) REFERENCES Sessions (date, time, room, floor) ON DELETE CASCADE
+   FOREIGN KEY (date, time, room, floor) REFERENCES Books (date, time, room, floor) ON DELETE CASCADE
 );
 
 --FIXES 12
