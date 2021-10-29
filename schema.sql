@@ -67,23 +67,6 @@ CREATE TABLE Updates (
    FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor)
 );
 
-
-date
-floor
-room
-new_cap
-did
-eid
- 
-CREATE TABLE Sessions (
-   date DATE,
-   time TIME,
-   room INTEGER,
-   floor INTEGER,
-   PRIMARY KEY(date, time, room, floor),
-   FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor) ON DELETE CASCADE
-);
- 
 CREATE TABLE Joins (
    eid INTEGER REFERENCES Employees ON DELETE CASCADE,
    date DATE,
@@ -102,8 +85,7 @@ CREATE TABLE Books (
    room INTEGER,
    floor INTEGER,
    PRIMARY KEY(date, time, room, floor),
-   FOREIGN KEY (date, time, room, floor) REFERENCES Sessions (date, time, room, floor)                 
-   ON DELETE CASCADE
+   FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor) ON DELETE CASCADE
 );
  
 CREATE TABLE Approves (
@@ -113,8 +95,7 @@ CREATE TABLE Approves (
    room INTEGER,
    floor INTEGER,
    PRIMARY KEY(date, time, room, floor),
-   FOREIGN KEY (date, time, room, floor) REFERENCES Sessions (date, time, room, floor)
-   ON DELETE CASCADE
+   FOREIGN KEY (date, time, room, floor) REFERENCES Sessions (date, time, room, floor) ON DELETE CASCADE
 );
 
 --FIXES 12
@@ -217,9 +198,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION block_deletes_after_approval() RETURNS TRIGGER AS $$
+DECLARE
+    count NUMERIC;
+BEGIN
+    SELECT COUNT(*) into count;
+    FROM Approves
+    WHERE OLD.date = Approves.date AND OLD.time = Approves.time AND OLD.room = Approves.room
+    AND OLD.floor = Approves.floor
+
+    IF count > 0 THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER no_updates_on_joins_after_approval
 BEFORE INSERT OR UPDATE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_changes_after_approval();
+
+CREATE TRIGGER no_deletes_on_joins_after_approval
+BEFORE DELETE ON Joins
+FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
 --FIXES 34
 CREATE OR REPLACE FUNCTION block_resigned_employees() RETURNS TRIGGER AS $$
