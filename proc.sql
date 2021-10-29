@@ -308,11 +308,31 @@ CREATE OR REPLACE PROCEDURE declare_health
     (IN eid INTEGER, IN current_date date, IN temp INTEGER)
 AS $$
 BEGIN
+    IF (temp > 37.5) THEN has_fever = 1;
+    END IF;
     INSERT INTO Health_Declaration
-    VALUES (eid, current_date, temp);
+    VALUES (eid, current_date, temp, has_fever);
 END;
 $$LANGUAGE plpgsql;
 
+--non compliance
+CREATE OR REPLACE FUNCTION non_compliance
+    (IN start_date date, IN end_date date)
+RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
+BEGIN
+
+WITH employees_declared AS(
+SELECT eid from Health_Declaration
+WHERE date BETWEEN start_date and end_date
+)
+
+SELECT eid, ename FROM Employees
+WHERE eid NOT IN employees_declared
+
+END;
+$$LANGUAGE plpgsql;
+
+--contact tracing
 /*
 step 1: check if employee is having fever -> IF NO FEVER --> RETURN;
 ELSE:
@@ -321,4 +341,10 @@ ELSE:
 */
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN eid INTEGER)
-RETURN TABLE(eid INTEGER)
+RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
+BEGIN
+
+
+END;
+$$LANGUAGE plpgsql
+
