@@ -335,13 +335,23 @@ $$LANGUAGE plpgsql;
 /*
 step 1: check if employee is having fever -> IF NO FEVER --> RETURN;
 ELSE:
-    step 2: remove employees from all future meeting room bookings --> check eid in JOINS and date > current_date
+    step 1: remove all bookings by employee
+    step 2: check approved meeting room containing employee
+    step 3: create table of all employess in those meeting rooms
+    step 4: remove close contact employees from meetings for next 7 days --> check eid in JOINS and date > current_date 
 
 */
 CREATE OR REPLACE FUNCTION contact_tracing
-    (IN eid INTEGER)
+    (IN e_id INTEGER)
 RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
 BEGIN
+WITH has_fever AS(
+SELECT fever FROM Health_Declaration
+WHERE eid = e_id
+)
+IF has_fever = 0 THEN RETURN;
+END IF;
+
 
 
 END;
