@@ -286,32 +286,39 @@ $$ LANGUAGE plpgsql;
     # Zhen Hong's Code #
     ###################  */
 
-CREATE OR REPLACE FUNCTION add_department
+CREATE OR REPLACE PROCEDURE add_department
     (IN did INTEGER, IN dname VARCHAR(50))
-RETURN VOID AS $$
+AS $$
 BEGIN
     INSERT INTO departments
     VALUES (did, dname);
 END;
 $$LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION remove_department
+CREATE OR REPLACE PROCEDURE remove_department
     (IN d_id INTEGER)
-RETURN VOID AS $$
+AS $$
 BEGIN
     DELETE FROM departments
     WHERE (did = d_id)
 END;
 $$LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION declare_health
+CREATE OR REPLACE PROCEDURE declare_health
     (IN eid INTEGER, IN current_date date, IN temp INTEGER)
-RETURN VOID AS $$
+AS $$
 BEGIN
     INSERT INTO Health_Declaration
     VALUES (eid, current_date, temp);
 END;
 $$LANGUAGE plpgsql;
 
+/*
+step 1: check if employee is having fever -> IF NO FEVER --> RETURN;
+ELSE:
+    step 2: remove employees from all future meeting room bookings --> check eid in JOINS and date > current_date
+
+*/
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN eid INTEGER)
+RETURN TABLE(eid INTEGER)
