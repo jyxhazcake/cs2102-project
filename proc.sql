@@ -101,7 +101,7 @@ BEGIN
     WHERE all_na.eid = e.eid
     AND e.did = manager_did
     ORDER BY all_na.date, all_na.time ASC;
-END:
+END;
 $$LANGUAGE plpgsql
 
 
@@ -149,7 +149,7 @@ BEGIN
         SELECT floor, room, MAX(date)
         FROM Updates
         WHERE date <= query_date
-        GROUP BY floor, room, new_cap
+        GROUP BY floor, room
     )
 
     --get the rooms with capactity >= required capacity: step 3
@@ -173,8 +173,7 @@ BEGIN
                             AND b.time < end_hour
                             AND b.floor = c.floor
                             AND b.room = c.room);
-
-    RETURN NEXT;
+    RETURN NEXT; --need to confirm if required
 END;
 $$ LANGUAGE plpgsql;
 
@@ -197,28 +196,21 @@ BEGIN
             AND b.bid = bid
     )
 
+
     SELECT floor, room, date, time, CASE
-        WHEN aid IS NULL THEN TRUE
-        ELSE FALSE
+        WHEN aid IS NULL THEN FALSE
+        ELSE TRUE
       END AS is_approved
     FROM booked_rooms
-END
+END;
 $$ LANGUAGE plpgsql;
-/*
-    SELECT c.floor, c.room, c.did, c.new_cap
-    FROM cap_available as c, Books as b
-    WHERE (c.floor, c.room) NOT IN (b.floor, b.room)
-        OR (c.floor = b.floor
-        AND c.room = b.room
-        AND (b < start_hour
-        OR b > end_hour));
 
-*/
 
 /*
     ###################
     #    Jon Code     #
     ###################  */
+
 --book_room
 CREATE OR REPLACE PROCEDURE book_room
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
@@ -238,8 +230,11 @@ BEGIN
     AND start_hour = Books.start_hour AND end_hour = Books.end_hour;
 
     DELETE FROM Approves
-    WHERE floor = Approves.floor AND room = Approves.room AND date = Approves.date
-    AND start_hour = Approves.start_hour AND end_hour = Approves.end_hour;
+    WHERE floor = Approves.floor
+    AND room = Approves.room
+    AND date = Approves.date
+    AND start_hour = Approves.start_hour
+    AND end_hour = Approves.end_hour;
 END;
 $$LANGUAGE plpgsql;
 
@@ -261,10 +256,14 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO count
     FROM Joins J JOIN Approves A
-    ON  J.floor = A.floor AND J.room = A.room AND J.date = A.date AND J.start_hour = A.start_hour
-    AND J.end_hour = A.end_hour AND J.eid = eid;
+    ON  J.floor = A.floor 
+        AND J.room = A.room
+        AND J.date = A.date
+        AND J.start_hour = A.start_hour
+        AND J.end_hour = A.end_hour 
+        AND J.eid = eid;
 
-    IF count <= 0 THEN
+    IF count = 1 THEN
         DELETE FROM Joins
         WHERE floor = Approves.floor AND room = Approves.room AND date = Approves.date
         AND start_hour = Approves.start_hour AND end_hour = Approves.end_hour;
@@ -321,13 +320,13 @@ CREATE OR REPLACE FUNCTION non_compliance
 RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
 BEGIN
 
-WITH employees_declared AS(
-SELECT eid from Health_Declaration
-WHERE date BETWEEN start_date and end_date
-)
+    WITH employees_declared AS(
+    SELECT eid from Health_Declaration
+    WHERE date BETWEEN start_date and end_date
+    )
 
-SELECT eid, ename FROM Employees
-WHERE eid NOT IN employees_declared
+    SELECT eid, ename FROM Employees
+    WHERE eid NOT IN employees_declared
 
 END;
 $$LANGUAGE plpgsql;
