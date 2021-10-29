@@ -1,8 +1,13 @@
-DROP TABLE IF EXISTS Employees, Juniors, Booker, Senior, Manager, Health_Declaration,
-Departments, Meeting_Rooms, Updates, Sessions, Joins, Books, Approves CASCADE;
- 
+DROP TABLE IF EXISTS Employees, Junior, Booker, Senior, Manager, Health_Declaration,
+Departments, Meeting_Rooms, Updates, Joins, Books, Approves CASCADE;
+
+CREATE TABLE Departments (
+   did INTEGER PRIMARY KEY,
+   dname varchar(50)
+);
+  
 CREATE TABLE Employees (
-   eid INTEGER AUTO_INCREMENT,
+   eid INTEGER,
    ename VARCHAR(50),
    email TEXT UNIQUE,
    home_num VARCHAR(50),
@@ -16,22 +21,22 @@ CREATE TABLE Employees (
 );
  
 CREATE TABLE Junior (
-   jid INTEGER PRIMARY KEY,
+   eid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Employees (eid) ON UPDATE CASCADE
 );
  
 CREATE TABLE Booker (
-   bid INTEGER PRIMARY KEY,
+   eid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Employees (eid) ON UPDATE CASCADE
 );
  
 CREATE TABLE Senior (
-   sid INTEGER PRIMARY KEY,
+   eid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Booker (eid) ON UPDATE CASCADE
 ); 
  
 CREATE TABLE Manager (
-   mid INTEGER PRIMARY KEY,
+   eid INTEGER PRIMARY KEY,
    FOREIGN KEY (eid) REFERENCES Booker (eid) ON UPDATE CASCADE
 );
  
@@ -41,11 +46,6 @@ CREATE TABLE Health_Declaration (
     temp NUMERIC CHECK (temp < 43 AND temp > 34),
     fever BOOLEAN,
     PRIMARY KEY (date, eid)
-);
- 
-CREATE TABLE Departments (
-   did INTEGER PRIMARY KEY,
-   dname varchar(50)
 );
  
 CREATE TABLE Meeting_Rooms (
@@ -66,17 +66,6 @@ CREATE TABLE Updates (
    PRIMARY KEY (date, room, floor),
    FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor)
 );
-
-CREATE TABLE Joins (
-   eid INTEGER REFERENCES Employees ON DELETE CASCADE,
-   date DATE,
-   time TIME, 
-   room INTEGER,
-   floor INTEGER,
-   PRIMARY KEY(eid, date, time, room, floor),
-   FOREIGN KEY (date, time, room, floor) REFERENCES Sessions (date, time, room, floor)                 
-   ON DELETE CASCADE
-);
  
 CREATE TABLE Books (
    eid INTEGER NOT NULL REFERENCES Booker ON DELETE CASCADE,
@@ -86,6 +75,17 @@ CREATE TABLE Books (
    floor INTEGER,
    PRIMARY KEY(date, time, room, floor),
    FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor) ON DELETE CASCADE
+);
+
+CREATE TABLE Joins (
+   eid INTEGER REFERENCES Employees ON DELETE CASCADE,
+   date DATE,
+   time TIME, 
+   room INTEGER,
+   floor INTEGER,
+   PRIMARY KEY(eid, date, time, room, floor),
+   FOREIGN KEY (date, time, room, floor) REFERENCES Books (date, time, room, floor)                 
+   ON DELETE CASCADE
 );
  
 CREATE TABLE Approves (
@@ -98,6 +98,15 @@ CREATE TABLE Approves (
    FOREIGN KEY (date, time, room, floor) REFERENCES Books (date, time, room, floor) ON DELETE CASCADE
 );
 
+/*
+
+    ####################
+    # TRIGGERS SECTION #
+    ####################
+
+*/
+
+/*
 --FIXES 12
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
 DECLARE
@@ -247,5 +256,5 @@ FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
 CREATE TRIGGER a_resigned_employee_cannot_approve
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
-
+*/
 
