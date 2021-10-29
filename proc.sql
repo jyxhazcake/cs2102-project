@@ -137,14 +137,12 @@ $$LANGUAGE plpgsql;
 1st step: get all entries in Updates where date is before query_date
 2nd step: filter out Updates so that only the max(date) for each (floor,room) remains --> latest update
 3rd step: filter out Updates where new_cap >= required_cap 
-4th step: check if exists each date, time, floor, room in Books
-        - For each floor, room in filtered out updates list
-        - time from start_hour increments by 1 until (end_hour-1) --> while loop*/
+4th step: return rooms where --> floor, room not in Books where time >=start_hour and time < end_hour
+*/
 
 CREATE OR REPLACE FUNCTION search_room
-    (IN required_cap INTEGER, IN query_date DATE, IN start_hour INTEGER, IN end_hour INTEGER)
+    (IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
 RETURNS TABLE(floor INTEGER, room INTEGER, did INTEGER, available_capacity INTEGER) AS $$
-
 BEGIN
     --get the latest updates: step 1 and 2
     WITH latest_updates AS (
@@ -160,19 +158,53 @@ BEGIN
         SELECT floor, room, did, new_cap,
         FROM Updates as u JOIN Meeting_Rooms as m
         ON u.floor = m.floor
-            AND u.room = m.room 
+            AND u.room = m.room
         WHERE (floor, room, date) IN latest_updates
             AND new_cap >= required_cap
         ORDER BY new_cap ASC;
     )
 
+    --step 4:
     SELECT floor, room, did, new_cap
-    FROM cap_available
-    WHERE floor, room NOT IN (SELECT floor, room
-                                FROM Books
-                                WHERE time >= start_hour
-                                    AND time < end_hour)
+    FROM cap_available AS c
+    WHERE NOT EXISTS (SELECT 1
+                        FROM Books AS b
+                        WHERE b.time >= start_hour
+                            AND b.time < end_hour
+                            AND b.floor = c.floor
+                            AND b.room = c.room);
 
+    RETURN NEXT;
+END;
+$$ LANGUAGE plpgsql;
+
+/*
+step 1: get all the rooms which were booked
+step 2: check if they are approved
+*/
+CREATE OR REPLACE FUNCTION view_booking_report
+    (IN start_date DATE, IN bid INTEGER)
+RETURNS TABLE(floor INTEGER, room INTEGER, date DATE, start_hour TIME, is_approved BOOLEAN) AS $$
+BEGIN
+    WITH booked_rooms AS (
+        SELECT *
+        FROM Books as b JOIN Approves as a
+        ON b.date = a.date
+            AND b.time = a.time
+            AND b.floor = a.floor
+            AND b.room = a.room
+        WHERE date >= start_date
+            AND b.bid = bid
+    )
+
+    SELECT floor, room, date, time, CASE
+        WHEN aid IS NULL THEN TRUE
+        ELSE FALSE
+      END AS is_approved
+    FROM booked_rooms
+END
+$$ LANGUAGE plpgsql;
+/*
     SELECT c.floor, c.room, c.did, c.new_cap
     FROM cap_available as c, Books as b
     WHERE (c.floor, c.room) NOT IN (b.floor, b.room)
@@ -181,26 +213,6 @@ BEGIN
         AND (b < start_hour
         OR b > end_hour));
 
-
-END;
-$$ LANGUAGE plpgsql;
-
-/*
-    SELECT floor, room, did, new_cap
-    --checks if meeting room has the required capacity set before and nearest to the query_date
-    FROM Meeting_Rooms AS mr, Updates AS u, Books AS b
-    WHERE date < query_date
-        AND new_cap >= required_capacity
-
-
-    WHERE (floor, room) IN (SELECT (floor, room), MAX(date)
-                            FROM Updates 
-                            WHERE date <)
-    
-        FOR r IN cap_available
-    LOOP
-        
-    END LOOP;
 */
 
 /*
@@ -303,5 +315,3 @@ $$LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN eid INTEGER)
-
-
