@@ -169,17 +169,83 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/*
+    ###################
+    #    Jon Code     #
+    ###################  */
+--book_room
+CREATE OR REPLACE PROCEDURE book_room
+    (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
+AS $$
+BEGIN
+    INSERT INTO Books VALUES (eid, date, time, room, floor);
+END;
+$$ LANGUAGE plpgsql;
+
+--unbook_room
+CREATE OR REPLACE PROCEDURE unbook_room
+    (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
+AS $$
+BEGIN
+    DELETE FROM Books
+    WHERE eid = Books.eid AND floor = Books.floor AND room = Books.room AND date = Books.date
+    AND start_hour = Books.start_hour AND end_hour = Books.end_hour;
+
+    DELETE FROM Approves
+    WHERE floor = Approves.floor AND room = Approves.room AND date = Approves.date
+    AND start_hour = Approves.start_hour AND end_hour = Approves.end_hour;
+END;
+$$LANGUAGE plpgsql;
+
+--join_meeting
+CREATE OR REPLACE PROCEDURE join_meeting
+    (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
+AS $$
+BEGIN
+    INSERT INTO Joins VALUES (eid, date, time, room, floor);
+END;
+$$ LANGUAGE plpgsql;
+
+--leave_meeting
+CREATE OR REPLACE PROCEDURE leave_meeting
+    (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
+AS $$
+DECLARE
+    count NUMERIC
+BEGIN
+    SELECT COUNT(*) INTO count
+    FROM Joins J JOIN Approves A
+    ON  J.floor = A.floor AND J.room = A.room AND J.date = A.date AND J.start_hour = A.start_hour
+    AND J.end_hour = A.end_hour AND J.eid = eid;
+
+    IF count <= 0 THEN
+        DELETE FROM Joins
+        WHERE floor = Approves.floor AND room = Approves.room AND date = Approves.date
+        AND start_hour = Approves.start_hour AND end_hour = Approves.end_hour;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+--approve_meeting
+CREATE OR REPLACE PROCEDURE approve_meeting
+    (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
+AS $$
+BEGIN
+    INSERT INTO Approves VALUES (eid, date, time, room, floor);
+END;
+$$ LANGUAGE plpgsql;
+
 /* 
-###################
-# Zhen Hong's Code #
-###################  */
+    ###################
+    # Zhen Hong's Code #
+    ###################  */
 
 CREATE OR REPLACE FUNCTION add_department
     (IN did INTEGER, IN dname VARCHAR(50))
 RETURN VOID AS $$
 BEGIN
-INSERT INTO departments
-VALUES (did, dname);
+    INSERT INTO departments
+    VALUES (did, dname);
 END;
 $$LANGUAGE plpgsql;
 
@@ -187,8 +253,8 @@ CREATE OR REPLACE FUNCTION remove_department
     (IN d_id INTEGER)
 RETURN VOID AS $$
 BEGIN
-DELETE FROM departments
-WHERE (did = d_id)
+    DELETE FROM departments
+    WHERE (did = d_id)
 END;
 $$LANGUAGE plpgsql;
 
@@ -196,10 +262,11 @@ CREATE OR REPLACE FUNCTION declare_health
     (IN eid INTEGER, IN current_date date, IN temp INTEGER)
 RETURN VOID AS $$
 BEGIN
-INSERT INTO Health_Declaration
-VALUES (eid, current_date, temp);
+    INSERT INTO Health_Declaration
+    VALUES (eid, current_date, temp);
 END;
 $$LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN eid INTEGER)
+
