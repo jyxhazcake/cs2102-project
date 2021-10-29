@@ -286,6 +286,7 @@ $$ LANGUAGE plpgsql;
     # Zhen Hong's Code #
     ###################  */
 
+--add department
 CREATE OR REPLACE FUNCTION add_department
     (IN did INTEGER, IN dname VARCHAR(50))
 RETURN VOID AS $$
@@ -295,6 +296,7 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
+--remove department
 CREATE OR REPLACE FUNCTION remove_department
     (IN d_id INTEGER)
 RETURN VOID AS $$
@@ -304,14 +306,43 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
+--declare health
 CREATE OR REPLACE FUNCTION declare_health
-    (IN eid INTEGER, IN current_date date, IN temp INTEGER)
+    (IN eid INTEGER, IN current_date date, IN temp NUMERIC)
 RETURN VOID AS $$
+has_fever BOOLEAN = 0;
 BEGIN
+    IF (temp > 37.5) THEN has_fever = 1;
+    END IF;
     INSERT INTO Health_Declaration
-    VALUES (eid, current_date, temp);
+    VALUES (eid, current_date, temp, has_fever);
 END;
 $$LANGUAGE plpgsql;
 
+--non compliance
+CREATE OR REPLACE FUNCTION non_compliance
+    (IN start_date date, IN end_date date)
+RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
+BEGIN
+
+WITH employees_declared AS(
+SELECT eid from Health_Declaration
+WHERE date BETWEEN start_date and end_date
+)
+
+SELECT eid, ename FROM Employees
+WHERE eid NOT IN employees_declared
+
+END;
+$$LANGUAGE plpgsql;
+
+--contact tracing
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN eid INTEGER)
+RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
+BEGIN
+
+
+END;
+$$LANGUAGE plpgsql
+

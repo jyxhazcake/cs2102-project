@@ -38,7 +38,7 @@ CREATE TABLE Manager (
 CREATE TABLE Health_Declaration (
     eid INTEGER REFERENCES Employees ON DELETE CASCADE,
     date DATE,
-    temp DOUBLE CHECK (temp < 43 AND temp > 34),
+    temp NUMERIC CHECK (temp < 43 AND temp > 34),
     fever BOOLEAN,
     PRIMARY KEY (date, eid)
 );
