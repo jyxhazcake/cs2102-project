@@ -3,10 +3,9 @@
     # Wei Howe's Code #
     ###################  */
 
-CREATE OR REPLACE FUNCTION add_employee
+CREATE OR REPLACE PROCEDURE add_employee
     -- This assumes that the employee will always have minimally a mobilenum
     (IN e_name VARCHAR(50), IN mobilenum VARCHAR(50), IN kind VARCHAR(50), IN d_id INTEGER)
-RETURN VOID AS $$
 DECLARE 
 new_eid INTEGER:= 0;
 new_email VARCHAR(50):= "@demo_company.com"
@@ -43,20 +42,18 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION remove_employee
+CREATE OR REPLACE PROCEDURE remove_employee
     (IN e_id INTEGER, IN resign_d DATE)
-RETURN VOID AS $$
 BEGIN
     UPDATE Employee
     SET resigned_date = resign_d
     WHERE eid = e_id;
 END;
--- should the langage just be psql?
-$$LANGUAGE plpgsql
+$$LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION view_future_meeting
     (IN start_date DATE, IN e_id INTEGER)
-RETURN TABLE (date DATE, time TIME, room INTEGER, floor INTEGER) AS $$
+RETURNS TABLE (date DATE, time TIME, room INTEGER, floor INTEGER) AS $$
 BEGIN
     SELECT j.date, j.time, j.room, j.floor 
     FROM Join j, Approves a
@@ -68,13 +65,13 @@ BEGIN
     AND j.date >= start_date
     ORDER BY j.date, j.time ASC;
 END;
-$$LANGUAGE plpgsql
+$$LANGUAGE plpgsql;
 
 --Comment by Wei Xuan: Did not use start_date in function yet
 
 CREATE OR REPLACE FUNCTION view_manager_report
     (IN start_date, IN e_id INTEGER)
-RETURN TABLE (date DATE, time TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
+RETURNS TABLE (date DATE, time TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
 DECLARE manager_did:= 0;
 BEGIN
     -- If not manager, do nothing
@@ -101,7 +98,7 @@ BEGIN
     AND e.did = manager_did
     ORDER BY all_na.date, all_na.time ASC;
 END;
-$$LANGUAGE plpgsql
+$$LANGUAGE plpgsql;
 
 
 /* 
@@ -117,8 +114,10 @@ CREATE OR REPLACE PROCEDURE add_room
 	(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
 AS $$
 BEGIN
-    INSERT INTO Meeting_Rooms(floor, room, rname, did);
-    INSERT INTO Updates(date, floor, room, room_capacity, mid);
+    INSERT INTO Meeting_Rooms 
+    VALUES(floor, room, rname, did);
+    INSERT INTO Updates 
+    VALUES(date, floor, room, room_capacity, mid);
 END;
 $$LANGUAGE plpgsql;
 
@@ -128,7 +127,8 @@ CREATE OR REPLACE PROCEDURE change_capacity
     (floor INTEGER, room INTEGER, new_capacity INTEGER, date DATE)
 AS $$
 BEGIN
-    INSERT INTO Updates(date, room, floor, room_capacity, mid);
+    INSERT INTO Updates
+    VALUES (date, floor, room, room_capacity, mid);
 END;
 $$LANGUAGE plpgsql;
 
@@ -150,18 +150,21 @@ BEGIN
         FROM Updates
         WHERE date <= query_date
         GROUP BY floor, room
-    )
+    ),
 
     --get the rooms with capactity >= required capacity: step 3
     -- e.g. 3 floor, room which meets the required capacity
     cap_available AS (
-        SELECT floor, room, did, new_cap,
+        SELECT floor, room, did, new_cap
         FROM Updates as u JOIN Meeting_Rooms as m
         ON u.floor = m.floor
             AND u.room = m.room
-        WHERE (floor, room, date) IN latest_updates
-            AND new_cap >= required_cap
-        ORDER BY new_cap ASC;
+        WHERE EXISTS (SELECT 1
+                        FROM latest_updates as lu
+                        WHERE lu.floor = floor
+                            AND lu.room = room
+                            AND lu.date = date)
+        ORDER BY new_cap ASC
     )
 
     --step 4:
@@ -201,7 +204,7 @@ BEGIN
         WHEN aid IS NULL THEN FALSE
         ELSE TRUE
       END AS is_approved
-    FROM booked_rooms
+    FROM booked_rooms;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -252,7 +255,7 @@ CREATE OR REPLACE PROCEDURE leave_meeting
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
 DECLARE
-    count NUMERIC
+    count INTEGER
 BEGIN
     SELECT COUNT(*) INTO count
     FROM Joins J JOIN Approves A
@@ -299,25 +302,25 @@ CREATE OR REPLACE PROCEDURE remove_department
 AS $$
 BEGIN
     DELETE FROM departments
-    WHERE (did = d_id)
+    WHERE (did = d_id);
 END;
 $$LANGUAGE plpgsql;
 
 CREATE OR REPLACE PROCEDURE declare_health
-    (IN eid INTEGER, IN current_date date, IN temp INTEGER)
+    (IN eid INTEGER, IN date DATE, IN temp INTEGER)
 AS $$
 BEGIN
     IF (temp > 37.5) THEN has_fever = 1;
     END IF;
     INSERT INTO Health_Declaration
-    VALUES (eid, current_date, temp, has_fever);
+    VALUES (eid, date, temp, has_fever);
 END;
 $$LANGUAGE plpgsql;
 
 --non compliance
 CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
-RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
+RETURNS TABLE(eid INTEGER, ename varchar(50)) AS $$
 BEGIN
 
     WITH employees_declared AS (
@@ -344,7 +347,7 @@ ELSE:
 */
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN e_id INTEGER)
-RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
+RETURNS TABLE(eid INTEGER, ename varchar(50)) AS $$
 BEGIN
 WITH has_fever AS(
 SELECT fever FROM Health_Declaration
