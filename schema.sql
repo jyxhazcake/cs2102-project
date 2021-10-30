@@ -7,7 +7,7 @@ CREATE TABLE Departments (
 );
   
 CREATE TABLE Employees (
-   eid INTEGER,
+   eid SERIAL,
    ename VARCHAR(50),
    email TEXT UNIQUE,
    home_num VARCHAR(50),

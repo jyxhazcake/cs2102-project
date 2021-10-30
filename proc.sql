@@ -65,8 +65,7 @@ BEGIN
     AND j.room = a.room
     AND j.floor = a.floor
     AND j.eid = e_id
-    --should this be >=?
-    AND j.date > start_date
+    AND j.date >= start_date
     ORDER BY j.date, j.time ASC;
 END;
 $$LANGUAGE plpgsql
@@ -111,11 +110,12 @@ $$LANGUAGE plpgsql
     ###################  */
 
 --add_room routine
+/*
+a manager is needed to add a room as the capacity has to be decided by someone
+*/
 CREATE OR REPLACE PROCEDURE add_room
 	(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
 AS $$
--- should i create a variable 'mid' assigned to 0? 
--- DECLARE mid INT := 0;
 BEGIN
     INSERT INTO Meeting_Rooms(floor, room, rname, did);
     INSERT INTO Updates(date, floor, room, room_capacity, mid);
