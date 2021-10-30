@@ -255,7 +255,7 @@ CREATE OR REPLACE PROCEDURE leave_meeting
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
 DECLARE
-    count INTEGER
+    count INTEGER;
 BEGIN
     SELECT COUNT(*) INTO count
     FROM Joins J JOIN Approves A

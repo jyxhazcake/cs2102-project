@@ -106,13 +106,13 @@ CREATE TABLE Approves (
 
 */
 
-/*
+
 --FIXES 12
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
-    SELECT COUNT(*) into count;
+    SELECT COUNT(*) into count
     FROM Junior
     WHERE NEW.eid = Junior.eid;
 
@@ -129,12 +129,14 @@ BEFORE INSERT OR UPDATE ON Books
 FOR EACH ROW
 EXECUTE FUNCTION block_junior_booking();
 
+
+
 --FIXES 16 AND 19
 CREATE OR REPLACE FUNCTION block_fever_meeting() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
-    SELECT COUNT(*) into count;
+    SELECT COUNT(*) into count
     FROM Health_Declaration
     WHERE NEW.eid = Health_Declaration.eid AND Health_Declaration.fever = true;
 
@@ -171,7 +173,7 @@ CREATE OR REPLACE FUNCTION block_outsiders_approval() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
-    SELECT COUNT(*) into count;
+    SELECT COUNT(*) into count
     FROM Employees, Meeting_Rooms
     WHERE NEW.eid = Employees.eid AND NEW.date = Meeting_Rooms.date AND NEW.time = Meeting_Rooms.time
     AND NEW.room = Meeting_Rooms.room AND NEW.floor = Meeting_Rooms.floor
@@ -188,13 +190,13 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER approval_only_from_same_department
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_outsiders_approval();
-
+/*
 --FIXES 23
 CREATE OR REPLACE FUNCTION block_changes_after_approval() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
-    SELECT COUNT(*) into count;
+    SELECT COUNT(*) into count
     FROM Approves
     WHERE NEW.date = Approves.date AND NEW.time = Approves.time AND NEW.room = Approves.room
     AND NEW.floor = Approves.floor
@@ -211,7 +213,7 @@ CREATE OR REPLACE FUNCTION block_deletes_after_approval() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
-    SELECT COUNT(*) into count;
+    SELECT COUNT(*) into count
     FROM Approves
     WHERE OLD.date = Approves.date AND OLD.time = Approves.time AND OLD.room = Approves.room
     AND OLD.floor = Approves.floor
@@ -232,12 +234,14 @@ CREATE TRIGGER no_deletes_on_joins_after_approval
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
+*/
+
 --FIXES 34
 CREATE OR REPLACE FUNCTION block_resigned_employees() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
-    SELECT COUNT(*) into count;
+    SELECT COUNT(*) into count
     FROM Employees
     WHERE NEW.eid = Employees.eid AND Employees.resigned_date IS NOT NULL;
 
@@ -256,5 +260,4 @@ FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
 CREATE TRIGGER a_resigned_employee_cannot_approve
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
-*/
 
