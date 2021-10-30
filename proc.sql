@@ -320,14 +320,15 @@ CREATE OR REPLACE FUNCTION non_compliance
 RETURN TABLE(eid INTEGER, ename varchar(50)) AS $$
 BEGIN
 
-    WITH employees_declared AS(
-    SELECT eid from Health_Declaration
+    WITH employees_declared AS (
+    SELECT eid
+    FROM Health_Declaration
     WHERE date BETWEEN start_date and end_date
     )
 
-    SELECT eid, ename FROM Employees
-    WHERE eid NOT IN employees_declared
-
+    SELECT eid, ename 
+    FROM Employees
+    WHERE eid NOT IN employees_declared;
 END;
 $$LANGUAGE plpgsql;
 
