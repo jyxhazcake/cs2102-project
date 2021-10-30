@@ -5,25 +5,26 @@
 
 CREATE OR REPLACE PROCEDURE add_employee
     -- This assumes that the employee will always have minimally a mobilenum
-    (IN e_name VARCHAR(50), IN mobilenum VARCHAR(50), IN kind VARCHAR(50), IN d_id INTEGER)
+    (IN e_name VARCHAR(50), IN mobilenum VARCHAR(50), IN homenum VARCHAR(50) DEFAULT NULL, IN officenum VARCHAR(50) DEFAULT NULL, IN kind VARCHAR(50), IN d_id INTEGER)
+AS $$
 DECLARE 
 new_eid INTEGER:= 0;
-new_email VARCHAR(50):= "@demo_company.com"
+new_email VARCHAR(50):= "@demo_company.com";
 BEGIN
-    
+
     -- Should we assume that the departments will always exist first before adding an employee?
     -- We probably need a trigger, else we can't insert both the d_id as well as the name for department
-    IF NOT EXISTS (SELECT 1 FROM Departments WHERE did = d_id)
-    THEN INSERT INTO Department ...
+    --IF NOT EXISTS (SELECT 1 FROM Departments WHERE did = d_id)
+    --THEN INSERT INTO Department ...
 
-    new_eid:= SELECT max(id) FROM Employees;
+    new_eid:= SELECT max(eid) FROM Employees;
     new_eid:= new_eid + 1;
     new_email:= CONCAT(CAST(new_eid AS VARCHAR(50)), new_email);
     
     -- How to insert multiple values for mobile num/ home num?
     -- Is there a better way of generating the eid than using AUTOINCREMENT?
-    INSERT INTO Employees(ename, mobile_num, email, did)
-    VALUES (e_name, mobilenum, new_email, d_id);
+    INSERT INTO Employees(ename, mobile_num, home_num, office_num, email, did)
+    VALUES (e_name, mobilenum, homenum, officenum, new_email, d_id);
     
     
     -- For updating kind of employee
@@ -44,6 +45,7 @@ $$LANGUAGE plpgsql;
 
 CREATE OR REPLACE PROCEDURE remove_employee
     (IN e_id INTEGER, IN resign_d DATE)
+AS $$
 BEGIN
     UPDATE Employee
     SET resigned_date = resign_d
@@ -53,10 +55,10 @@ $$LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION view_future_meeting
     (IN start_date DATE, IN e_id INTEGER)
-RETURNS TABLE (date DATE, time TIME, room INTEGER, floor INTEGER) AS $$
+RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER) AS $$
 BEGIN
     SELECT j.date, j.time, j.room, j.floor 
-    FROM Join j, Approves a
+    FROM Joins j, Approves a
     WHERE j.date = a.date
     AND j.time = a.time
     AND j.room = a.room
@@ -67,12 +69,12 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
---Comment by Wei Xuan: Did not use start_date in function yet
 
 CREATE OR REPLACE FUNCTION view_manager_report
     (IN start_date, IN e_id INTEGER)
-RETURNS TABLE (date DATE, time TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
-DECLARE manager_did:= 0;
+RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
+DECLARE 
+manager_did INTEGER:= 0;
 BEGIN
     -- If not manager, do nothing
     IF e_id IN (SELECT eid FROM Manager)
@@ -96,6 +98,7 @@ BEGIN
     FROM all_na, employee e
     WHERE all_na.eid = e.eid
     AND e.did = manager_did
+    AND all_na.date >= start_date
     ORDER BY all_na.date, all_na.time ASC;
 END;
 $$LANGUAGE plpgsql;
