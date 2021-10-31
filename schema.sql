@@ -318,7 +318,6 @@ CREATE TRIGGER no_deletes_on_joins_after_approval
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
-
 --FIXES 25
 CREATE OR REPLACE FUNCTION block_book_past_meetings() RETURNS TRIGGER AS $$
 DECLARE 
