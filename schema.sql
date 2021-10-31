@@ -125,13 +125,13 @@ EXECUTE FUNCTION check_only_junior();
 
 CREATE OR REPLACE FUNCTION check_only_senior() RETURNS TRIGGER AS $$
 BEGIN
-    IF (NEW.eid IN (SELECT eid FROM Junior) OR IN (SELECT eid FROM Manager))
-        RETURN NULL;
+    IF (NEW.eid IN (SELECT eid FROM Junior) OR NEW.eid IN (SELECT eid FROM Manager))
+        THEN RETURN NULL;
     END IF;
     
     --If not in Booker table, void transaction or help insert?
     IF (NEW.eid NOT IN (SELECT eid FROM Booker))
-        INSERT INTO Booker VALUES (NEW.eid);
+        THEN INSERT INTO Booker VALUES (NEW.eid);
     END IF;
     
     RETURN NEW;
@@ -145,13 +145,13 @@ EXECUTE FUNCTION check_only_senior();
 
 CREATE OR REPLACE FUNCTION check_only_manager() RETURNS TRIGGER AS $$
 BEGIN
-    IF (NEW.eid IN (SELECT eid FROM Junior) OR IN (SELECT eid FROM Senior))
-        RETURN NULL;
+    IF (NEW.eid IN (SELECT eid FROM Junior) OR NEW.eid IN (SELECT eid FROM Senior))
+        THEN RETURN NULL;
     END IF;
     
     --If not in Booker table, void transaction or help insert?
     IF (NEW.eid NOT IN (SELECT eid FROM Booker))
-        INSERT INTO Booker VALUES (NEW.eid);
+        THEN INSERT INTO Booker VALUES (NEW.eid);
     END IF;
 
     RETURN NEW;
