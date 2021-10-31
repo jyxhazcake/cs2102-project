@@ -336,7 +336,6 @@ CREATE TRIGGER no_updates_on_joins_after_approval
 BEFORE INSERT OR UPDATE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_changes_after_approval();
 
-/*
 CREATE TRIGGER no_deletes_on_joins_after_approval
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
@@ -344,22 +343,19 @@ FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 --FIXES 25
 CREATE OR REPLACE FUNCTION block_book_past_meetings() RETURNS TRIGGER AS $$
 DECLARE 
-current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
-current_date DATE := Convert(date, getdate());
+--current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+--current_date DATE := Convert(date, getdate());
 BEGIN
-    IF current_date > NEW.date THEN
+    IF CURRENT_DATE > NEW.date THEN
         RETURN NULL;
-    ELSE IF current_date = NEW.date 
-        AND current_time > NEW.time THEN
+    ELSE IF CURRENT_DATE = NEW.date 
+        AND LOCALTIME > NEW.time THEN
         RETURN NULL;
     ELSE
         RETURN NEW;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
-*/
-
-/*
 
 CREATE TRIGGER cannot_book_past_meeting
 BEFORE INSERT OR UPDATE ON Books
@@ -368,12 +364,13 @@ FOR EACH ROW EXECUTE FUNCTION block_book_past_meetings();
 --FIXES 26
 CREATE OR REPLACE FUNCTION block_join_past_meetings() RETURNS TRIGGER AS $$
 DECLARE 
-current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
-current_date DATE := Convert(date, getdate());
+--current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+--current_date DATE := Convert(date, getdate());
 BEGIN
-    IF current_date > NEW.date THEN
+    IF CURRENT_DATE > NEW.date THEN
         RETURN NULL;
-    ELSE IF current_date = NEW.date AND current_time > NEW.time THEN
+    ELSE IF CURRENT_DATE = NEW.date 
+        AND LOCALTIME > NEW.time THEN
         RETURN NULL;
     ELSE
         RETURN NEW;
@@ -388,20 +385,19 @@ FOR EACH ROW EXECUTE FUNCTION block_join_past_meetings();
 --FIXES 27
 CREATE OR REPLACE FUNCTION block_approve_past_meetings() RETURNS TRIGGER AS $$
 DECLARE 
-current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
-current_date DATE := Convert(date, getdate());
+--current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+--current_date DATE := Convert(date, getdate());
 BEGIN
-    IF current_date > NEW.date THEN
+    IF CURRENT_DATE > NEW.date THEN
         RETURN NULL;
-    ELSE IF current_date = NEW.date AND current_time > NEW.time THEN
+    ELSE IF CURRENT_DATE = NEW.date 
+        AND LOCALTIME > NEW.time THEN
         RETURN NULL;
     ELSE
         RETURN NEW;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
-
-*/
 
 CREATE TRIGGER cannot_approve_past_meeting
 BEFORE INSERT OR UPDATE ON Approves
