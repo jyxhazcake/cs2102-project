@@ -5,7 +5,7 @@
 
 CREATE OR REPLACE PROCEDURE add_employee
     -- This assumes that the employee will always have minimally a mobilenum
-    (IN e_name VARCHAR(50), IN mobilenum VARCHAR(50), IN homenum VARCHAR(50) DEFAULT NULL, IN officenum VARCHAR(50) DEFAULT NULL, IN kind VARCHAR(50), IN d_id INTEGER)
+    (IN e_name VARCHAR(50), IN mobilenum VARCHAR(50), IN kind VARCHAR(50), IN d_id INTEGER, IN homenum VARCHAR(50) DEFAULT NULL, IN officenum VARCHAR(50) DEFAULT NULL)
 AS $$
 DECLARE 
 new_eid INTEGER:= 0;
@@ -17,7 +17,7 @@ BEGIN
     --IF NOT EXISTS (SELECT 1 FROM Departments WHERE did = d_id)
     --THEN INSERT INTO Department ...
 
-    new_eid:= SELECT max(eid) FROM Employees;
+    SELECT max(eid) INTO new_eid FROM Employees;
     new_eid:= new_eid + 1;
     new_email:= CONCAT(CAST(new_eid AS VARCHAR(50)), new_email);
     
@@ -29,17 +29,22 @@ BEGIN
     
     -- For updating kind of employee
     IF kind = 'junior'
-    THEN INSERT INTO Junior VALUES new_eid;
+    THEN INSERT INTO Junior VALUES (new_eid);
+    END IF;
     IF kind = 'senior'
+    THEN
         BEGIN
-        INSERT INTO Senior VALUES new_eid;
-        INSERT INTO Booker VALUES new_eid;
-        END
+        INSERT INTO Senior VALUES (new_eid);
+        INSERT INTO Booker VALUES (new_eid);
+        END;
+    END IF;
     IF kind = 'manager'
+    THEN
         BEGIN
-        THEN INSERT INTO Manager VALUES new_eid;
-        INSERT INTO Booker VALUES new_eid;
-        END
+        INSERT INTO Manager VALUES (new_eid);
+        INSERT INTO Booker VALUES (new_eid);
+        END;
+    END IF;
 END;
 $$LANGUAGE plpgsql;
 
@@ -71,7 +76,7 @@ $$LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION view_manager_report
-    (IN start_date, IN e_id INTEGER)
+    (IN start_date DATE, IN e_id INTEGER)
 RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
 DECLARE 
 manager_did INTEGER:= 0;
@@ -79,7 +84,8 @@ BEGIN
     -- If not manager, do nothing
     IF e_id IN (SELECT eid FROM Manager)
     THEN 
-    manager_did = SELECT did FROM Employee WHERE eid = m_eid;
+    SELECT did INTO manager_did FROM Employee WHERE eid = m_eid;
+    END IF;
 
     -- Get all meetings not approved yet using left join
     WITH all_na AS (
@@ -91,7 +97,7 @@ BEGIN
         AND b.room = a.room
         AND b.floor = a.floor
         WHERE a.date = NULL
-    );
+    )
 
     --Only select meetings which the booker and the manager is from the same department
     SELECT all_na.date, all_na.time, all_na.room, all_na.floor, all_na.eid
