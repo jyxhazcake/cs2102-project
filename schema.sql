@@ -106,6 +106,90 @@ CREATE TABLE Approves (
 
 */
 
+--FIXES 12 (WH - Tested for juniors only)
+CREATE OR REPLACE FUNCTION check_only_junior() RETURNS TRIGGER AS $$
+BEGIN
+    -- Need to check whether is already in employee table(?)
+    IF (NEW.eid IN (SELECT eid FROM Booker) OR NEW.eid IN (SELECT eid FROM Senior) OR NEW.eid IN (SELECT eid FROM Manager) OR NEW.eid NOT IN (SELECT eid FROM Employees))
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_only_is_junior
+BEFORE INSERT OR UPDATE ON Junior
+FOR EACH ROW
+EXECUTE FUNCTION check_only_junior();
+
+
+CREATE OR REPLACE FUNCTION check_only_senior() RETURNS TRIGGER AS $$
+BEGIN
+    IF (NEW.eid IN (SELECT eid FROM Junior) OR IN (SELECT eid FROM Manager))
+        RETURN NULL;
+    END IF;
+    
+    --If not in Booker table, void transaction or help insert?
+    IF (NEW.eid NOT IN (SELECT eid FROM Booker))
+        INSERT INTO Booker VALUES (NEW.eid);
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_only_is_senior
+BEFORE INSERT OR UPDATE ON Senior
+FOR EACH ROW
+EXECUTE FUNCTION check_only_senior();
+
+CREATE OR REPLACE FUNCTION check_only_manager() RETURNS TRIGGER AS $$
+BEGIN
+    IF (NEW.eid IN (SELECT eid FROM Junior) OR IN (SELECT eid FROM Senior))
+        RETURN NULL;
+    END IF;
+    
+    --If not in Booker table, void transaction or help insert?
+    IF (NEW.eid NOT IN (SELECT eid FROM Booker))
+        INSERT INTO Booker VALUES (NEW.eid);
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_only_is_manager
+BEFORE INSERT OR UPDATE ON Manager
+FOR EACH ROW
+EXECUTE FUNCTION check_only_manager();
+
+
+/*
+Is it necessary to safeguard against insertion into booker? Does it matter whether if booker
+and junior contain the same eid value, since by the above 3 triggers, each employee will be only
+one type. If implemenet safeguard against insertion into booker, then also have to check that that correct
+values will be inserted into senior and manager after insertion into booker. 
+
+CREATE OR REPLACE FUNCTION check_only_booker() RETURNS TRIGGER AS $$
+BEGIN
+    IF (NEW.eid IN (SELECT eid FROM Junior))
+        RETURN NULL;
+    END IF;
+    
+    --Booker value will be redudant, ie exists a Booker value but no senior/manager.
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_only_is_manager
+BEFORE INSERT OR UPDATE ON Manager
+FOR EACH ROW
+EXECUTE FUNCTION check_only_manager();
+
+*/
+
+--Comment by Wei Howe: This fixes 13 & 14 but not 12
 
 --FIXES 12
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
