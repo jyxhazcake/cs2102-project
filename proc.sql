@@ -325,20 +325,31 @@ CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
 RETURNS TABLE(eid INTEGER, count INTEGER) AS $$
 DECLARE
-count INTEGER := 0;
 current_date date := start_date;
 BEGIN
 
+    WITH employees_not_declared AS (
+        WHILE current_date <= end_date LOOP
 
-    WITH employees_declared AS (
-    SELECT eid
-    FROM Health_Declaration
-    WHERE date BETWEEN start_date and end_date
+            WITH employees_declared AS (
+            SELECT eid
+            FROM Health_Declaration
+            WHERE current_date = Health_Declaration.date
+            )
+
+            SELECT eid
+            FROM Employees
+            WHERE eid NOT IN employees_declared;
+
+            DATEADD(day, 1, current_date);
+
+        END LOOP
     )
 
-    SELECT eid, ename 
-    FROM Employees
-    WHERE eid NOT IN employees_declared;
+    SELECT eid, COUNT(*) FROM employees_not_declared
+    GROUP BY eid
+    ORDER BY COUNT(*) desc;
+
 END;
 $$LANGUAGE plpgsql;
 
@@ -356,6 +367,7 @@ CREATE OR REPLACE FUNCTION contact_tracing
     (IN e_id INTEGER)
 RETURNS TABLE(eid INTEGER) AS $$
 DECLARE has_fever BOOLEAN
+current_date DATE := Convert(date, getdate());
 BEGIN
     has_fever = SELECT fever FROM Health_Declaration WHERE eid = e_id;
     IF has_fever = 0 THEN RETURN;
