@@ -189,9 +189,7 @@ EXECUTE FUNCTION check_only_manager();
 
 */
 
---Comment by Wei Howe: This fixes 13 & 14 but not 12
-
---FIXES 12
+--FIXES 13
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
@@ -222,7 +220,8 @@ DECLARE
 BEGIN
     SELECT COUNT(*) into count
     FROM Health_Declaration
-    WHERE NEW.eid = Health_Declaration.eid AND Health_Declaration.fever = true;
+    WHERE NEW.eid = Health_Declaration.eid 
+        AND Health_Declaration.fever = true;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -259,9 +258,12 @@ DECLARE
 BEGIN
     SELECT COUNT(*) into count
     FROM Employees, Meeting_Rooms
-    WHERE NEW.eid = Employees.eid AND NEW.date = Meeting_Rooms.date AND NEW.time = Meeting_Rooms.time
-    AND NEW.room = Meeting_Rooms.room AND NEW.floor = Meeting_Rooms.floor
-    AND Employees.did = Meeting_Rooms.did;
+    WHERE NEW.eid = Employees.eid 
+        AND NEW.date = Meeting_Rooms.date 
+        AND NEW.time = Meeting_Rooms.time
+        AND NEW.room = Meeting_Rooms.room 
+        AND NEW.floor = Meeting_Rooms.floor
+        AND Employees.did = Meeting_Rooms.did;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -282,8 +284,10 @@ DECLARE
 BEGIN
     SELECT COUNT(*) into count
     FROM Approves
-    WHERE NEW.date = Approves.date AND NEW.time = Approves.time AND NEW.room = Approves.room
-    AND NEW.floor = Approves.floor;
+    WHERE NEW.date = Approves.date 
+        AND NEW.time = Approves.time 
+        AND NEW.room = Approves.room
+        AND NEW.floor = Approves.floor;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -315,8 +319,10 @@ DECLARE
 BEGIN
     SELECT COUNT(*) into count
     FROM Approves
-    WHERE OLD.date = Approves.date AND OLD.time = Approves.time AND OLD.room = Approves.room
-    AND OLD.floor = Approves.floor;
+    WHERE OLD.date = Approves.date 
+        AND OLD.time = Approves.time 
+        AND OLD.room = Approves.room
+        AND OLD.floor = Approves.floor;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -330,6 +336,7 @@ CREATE TRIGGER no_updates_on_joins_after_approval
 BEFORE INSERT OR UPDATE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_changes_after_approval();
 
+/*
 CREATE TRIGGER no_deletes_on_joins_after_approval
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
@@ -342,13 +349,17 @@ current_date DATE := Convert(date, getdate());
 BEGIN
     IF current_date > NEW.date THEN
         RETURN NULL;
-    ELSE IF current_date = NEW.date AND current_time > NEW.time THEN
+    ELSE IF current_date = NEW.date 
+        AND current_time > NEW.time THEN
         RETURN NULL;
     ELSE
         RETURN NEW;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+*/
+
+/*
 
 CREATE TRIGGER cannot_book_past_meeting
 BEFORE INSERT OR UPDATE ON Books
@@ -390,6 +401,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+*/
+
 CREATE TRIGGER cannot_approve_past_meeting
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_approve_past_meetings();
@@ -401,7 +414,8 @@ DECLARE
 BEGIN
     SELECT COUNT(*) into count
     FROM Employees
-    WHERE NEW.eid = Employees.eid AND Employees.resigned_date IS NOT NULL;
+    WHERE NEW.eid = Employees.eid 
+        AND Employees.resigned_date IS NOT NULL;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -418,4 +432,3 @@ FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
 CREATE TRIGGER a_resigned_employee_cannot_approve
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
-

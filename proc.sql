@@ -17,7 +17,9 @@ BEGIN
     --IF NOT EXISTS (SELECT 1 FROM Departments WHERE did = d_id)
     --THEN INSERT INTO Department ...
 
-    SELECT max(eid) INTO new_eid FROM Employees;
+    -- Wei Xuan's comment: I believe this is already enforced by Foreign key constraint.
+
+    new_eid:= SELECT max(eid) FROM Employees;
     new_eid:= new_eid + 1;
     new_email:= CONCAT(CAST(new_eid AS VARCHAR(50)), new_email);
     
@@ -65,11 +67,11 @@ BEGIN
     SELECT j.date, j.time, j.room, j.floor 
     FROM Joins j, Approves a
     WHERE j.date = a.date
-    AND j.time = a.time
-    AND j.room = a.room
-    AND j.floor = a.floor
-    AND j.eid = e_id
-    AND j.date >= start_date
+        AND j.time = a.time
+        AND j.room = a.room
+        AND j.floor = a.floor
+        AND j.eid = e_id
+        AND j.date >= start_date
     ORDER BY j.date, j.time ASC;
 END;
 $$LANGUAGE plpgsql;
@@ -329,28 +331,27 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
+
+
 --non compliance
 CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
-RETURNS TABLE(eid INTEGER, count INTEGER) AS $$
+RETURNS TABLE(eid INTEGER, days INTEGER) AS $$
 DECLARE
-current_date date := start_date;
+    total_days INTEGER;
 BEGIN
-
+    /*
     WITH employees_not_declared AS (
-        WHILE current_date <= end_date LOOP
+        WHILE curr_date <= end_date LOOP
 
-            WITH employees_declared AS (
-            SELECT eid
-            FROM Health_Declaration
-            WHERE current_date = Health_Declaration.date
-            )
+            SELECT e.eid
+            FROM Employees AS e
+            WHERE e.eid NOT IN (SELECT hd.eid
+                            FROM Health_Declaration as hd
+                            WHERE hd.date < start_date
+                            AND hd.date > end_date);
 
-            SELECT eid
-            FROM Employees
-            WHERE eid NOT IN employees_declared;
-
-            DATEADD(day, 1, current_date);
+            DATEADD(day, 1, curr_date);
 
         END LOOP
     )
@@ -358,6 +359,24 @@ BEGIN
     SELECT eid, COUNT(*) FROM employees_not_declared
     GROUP BY eid
     ORDER BY COUNT(*) desc;
+    */
+
+    total_days := DATEDIFF(day, start_date, end_date); --**CHECK WHETHER NEED TO PLUS ONE**
+        
+    WITH declared_days AS (
+        SELECT eid, COUNT(*) AS days
+        FROM Health_Declaration
+        WHERE date >= start_date
+            AND date <= end_date
+        GROUP BY eid
+        HAVING days < total_days
+        ORDER BY days ASC
+    )
+
+    UPDATE declared_days
+    SET days = total_days - days;
+
+    SELECT * FROM declared_days;
 
 END;
 $$LANGUAGE plpgsql;
