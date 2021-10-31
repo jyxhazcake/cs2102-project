@@ -312,8 +312,11 @@ $$LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE declare_health
     (IN eid INTEGER, IN date DATE, IN temp INTEGER)
 AS $$
+DECLARE
+    has_fever BOOLEAN := FALSE;
 BEGIN
-    IF (temp > 37.5) THEN has_fever = 1;
+    IF (temp > 37.5) 
+        THEN has_fever = TRUE;
     END IF;
     INSERT INTO Health_Declaration
     VALUES (eid, date, temp, has_fever);
