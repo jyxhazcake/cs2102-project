@@ -1,6 +1,10 @@
 DROP TABLE IF EXISTS Employees, Junior, Booker, Senior, Manager, Health_Declaration,
 Departments, Meeting_Rooms, Updates, Joins, Books, Approves CASCADE;
 
+/*
+Should we add INITIALLY DEFERRABLE IMMEDIATE to our constraints?
+*/
+
 CREATE TABLE Departments (
    did INTEGER PRIMARY KEY,
    dname varchar(50)
@@ -14,7 +18,7 @@ CREATE TABLE Employees (
    mobile_num VARCHAR(50),
    office_num VARCHAR(50),
    resigned_date DATE,
-   role VARCHAR(50) NOT NULL,
+   role VARCHAR(50) NOT NULL CHECK(role IN ('Junior', 'Senior', 'Manager')),
    did INTEGER NOT NULL,
    PRIMARY KEY (eid),
    FOREIGN KEY (did) REFERENCES Departments (did) ON UPDATE CASCADE
@@ -98,6 +102,7 @@ CREATE TABLE Approves (
    FOREIGN KEY (date, time, room, floor) REFERENCES Books (date, time, room, floor) ON DELETE CASCADE
 );
 
+-- 12 Tables --> 120 
 /*
 
     ####################
@@ -110,7 +115,10 @@ CREATE TABLE Approves (
 CREATE OR REPLACE FUNCTION check_only_junior() RETURNS TRIGGER AS $$
 BEGIN
     -- Need to check whether is already in employee table(?)
-    IF (NEW.eid IN (SELECT eid FROM Booker) OR NEW.eid IN (SELECT eid FROM Senior) OR NEW.eid IN (SELECT eid FROM Manager) OR NEW.eid NOT IN (SELECT eid FROM Employees))
+    IF (NEW.eid IN (SELECT eid FROM Booker) 
+        OR NEW.eid IN (SELECT eid FROM Senior) 
+        OR NEW.eid IN (SELECT eid FROM Manager) 
+        OR NEW.eid NOT IN (SELECT eid FROM Employees))
         THEN RETURN NULL;
     END IF;
     RETURN NEW;
@@ -165,15 +173,16 @@ EXECUTE FUNCTION check_only_manager();
 
 
 /*
-Is it necessary to safeguard against insertion into booker? Does it matter whether if booker
-and junior contain the same eid value, since by the above 3 triggers, each employee will be only
-one type. If implemenet safeguard against insertion into booker, then also have to check that that correct
-values will be inserted into senior and manager after insertion into booker. 
+When user inserts into booker directly --> 
+1. check not junior
+2. query for role in Employees
+3. add into manager/senior
+*/
 
 CREATE OR REPLACE FUNCTION check_only_booker() RETURNS TRIGGER AS $$
 BEGIN
     IF (NEW.eid IN (SELECT eid FROM Junior))
-        RETURN NULL;
+        THEN RETURN NULL;
     END IF;
     
     --Booker value will be redudant, ie exists a Booker value but no senior/manager.
@@ -182,14 +191,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_only_is_manager
-BEFORE INSERT OR UPDATE ON Manager
+CREATE TRIGGER check_booker_employee_type
+BEFORE INSERT OR UPDATE ON Booker
 FOR EACH ROW
-EXECUTE FUNCTION check_only_manager();
+EXECUTE FUNCTION check_only_booker();
 
-*/
 
---FIXES 13
+
+--FIXES 13 & 14
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
@@ -313,7 +322,7 @@ BEFORE INSERT OR UPDATE ON Updates
 FOR EACH ROW
 EXECUTE FUNCTION check_dept_before_update_capacity();
 
-CREATE OR REPLACE FUNCTION block_deletes_after_approval() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION block_leaving_after_approval() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
@@ -336,19 +345,19 @@ CREATE TRIGGER no_updates_on_joins_after_approval
 BEFORE INSERT OR UPDATE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_changes_after_approval();
 
+
 CREATE TRIGGER no_deletes_on_joins_after_approval
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
+
 --FIXES 25
-CREATE OR REPLACE FUNCTION block_book_past_meetings() RETURNS TRIGGER AS $$
-DECLARE 
---current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
---current_date DATE := Convert(date, getdate());
+CREATE OR REPLACE FUNCTION block_book_past_meetings() 
+RETURNS TRIGGER AS $$
 BEGIN
     IF CURRENT_DATE > NEW.date THEN
         RETURN NULL;
-    ELSE IF CURRENT_DATE = NEW.date 
+    ELSIF CURRENT_DATE = NEW.date 
         AND LOCALTIME > NEW.time THEN
         RETURN NULL;
     ELSE
@@ -362,14 +371,12 @@ BEFORE INSERT OR UPDATE ON Books
 FOR EACH ROW EXECUTE FUNCTION block_book_past_meetings();
 
 --FIXES 26
-CREATE OR REPLACE FUNCTION block_join_past_meetings() RETURNS TRIGGER AS $$
-DECLARE 
---current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
---current_date DATE := Convert(date, getdate());
+CREATE OR REPLACE FUNCTION block_join_past_meetings() 
+RETURNS TRIGGER AS $$
 BEGIN
     IF CURRENT_DATE > NEW.date THEN
         RETURN NULL;
-    ELSE IF CURRENT_DATE = NEW.date 
+    ELSIF CURRENT_DATE = NEW.date 
         AND LOCALTIME > NEW.time THEN
         RETURN NULL;
     ELSE
@@ -383,14 +390,12 @@ BEFORE INSERT OR UPDATE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_join_past_meetings();
 
 --FIXES 27
-CREATE OR REPLACE FUNCTION block_approve_past_meetings() RETURNS TRIGGER AS $$
-DECLARE 
---current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
---current_date DATE := Convert(date, getdate());
+CREATE OR REPLACE FUNCTION block_approve_past_meetings() 
+RETURNS TRIGGER AS $$
 BEGIN
     IF CURRENT_DATE > NEW.date THEN
         RETURN NULL;
-    ELSE IF CURRENT_DATE = NEW.date 
+    ELSIF CURRENT_DATE = NEW.date 
         AND LOCALTIME > NEW.time THEN
         RETURN NULL;
     ELSE
@@ -399,9 +404,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 CREATE TRIGGER cannot_approve_past_meeting
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_approve_past_meetings();
+
+
 
 --FIXES 34
 CREATE OR REPLACE FUNCTION block_resigned_employees() RETURNS TRIGGER AS $$

@@ -1,7 +1,8 @@
 /* 
     ###################
     # Wei Howe's Code #
-    ###################  */
+    ###################  
+*/
 
 CREATE OR REPLACE PROCEDURE add_employee
     -- This assumes that the employee will always have minimally a mobilenum
@@ -9,7 +10,7 @@ CREATE OR REPLACE PROCEDURE add_employee
 AS $$
 DECLARE 
 new_eid INTEGER:= 0;
-new_email VARCHAR(50):= "@demo_company.com";
+new_email VARCHAR(50);
 BEGIN
 
     -- Should we assume that the departments will always exist first before adding an employee?
@@ -19,14 +20,28 @@ BEGIN
 
     -- Wei Xuan's comment: I believe this is already enforced by Foreign key constraint.
 
-    new_eid:= SELECT max(eid) FROM Employees;
-    new_eid:= new_eid + 1;
-    new_email:= CONCAT(CAST(new_eid AS VARCHAR(50)), new_email);
+    SELECT max(eid) INTO new_eid FROM Employees;
+    IF (new_eid IS NULL) 
+        THEN new_eid = 1;
+    ELSE
+        new_eid:= new_eid + 1;
+    END IF;
+
+    SELECT CONCAT(CAST(new_eid AS VARCHAR(50)), '@demo_company.com') into new_email;
+
+    /*
+    SELECT max(eid) INTO new_eid FROM Employees;
+    IF (last_eid IS NULL)
+        new_email := CONCAT(1, '@demo_company.com');
+    ELSE
+        new_eid:= (new_eid + 1)::varchar(50);
+        new_email:= CONCAT(new_eid, '@demo_company.com');
+    END IF;*/
     
     -- How to insert multiple values for mobile num/ home num?
     -- Is there a better way of generating the eid than using AUTOINCREMENT?
-    INSERT INTO Employees(ename, mobile_num, home_num, office_num, email, did)
-    VALUES (e_name, mobilenum, homenum, officenum, new_email, d_id);
+    INSERT INTO Employees(ename, mobile_num, home_num, office_num, email, role, did)
+    VALUES (e_name, mobilenum, homenum, officenum, new_email, kind, d_id);
     
     
     -- For updating kind of employee
@@ -195,6 +210,7 @@ $$ LANGUAGE plpgsql;
 step 1: get all the rooms which were booked
 step 2: check if they are approved
 */
+
 CREATE OR REPLACE FUNCTION view_booking_report
     (IN start_date DATE, IN bid INTEGER)
 RETURNS TABLE(floor INTEGER, room INTEGER, date DATE, start_hour TIME, is_approved BOOLEAN) AS $$
@@ -389,14 +405,18 @@ ELSE:
     step 2: check approved meeting room containing employee
     step 3: create table of all employess in those meeting rooms
     step 4: remove close contact employees from meetings for next 7 days --> check eid in JOINS and date > current_date 
-
 */
+
+/*
+    Wei Xuan's Comment: Missing Books & Approved
+*/
+
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN e_id INTEGER)
 RETURNS TABLE(eid INTEGER) AS $$
 DECLARE 
     has_fever BOOLEAN;
-    current_date DATE := Convert(date, getdate());
+    curr_date DATE := Convert(date, getdate());
 BEGIN
     has_fever = GET fever FROM Health_Declaration WHERE eid = e_id;
     IF has_fever = 0 THEN RETURN;
@@ -406,7 +426,8 @@ BEGIN
         SELECT date, time, room, floor
         FROM Joins
         WHERE eid = e_id
-            AND date BETWEEN (DATEADD(day, -3, current_date), current_date)
+            AND date >= DATEADD(day, -3, curr_date)
+            AND date <= curr_date
     ),
 
     compromised_employees AS (
@@ -419,8 +440,9 @@ BEGIN
     
     DELETE FROM Joins
     WHERE compromised_employees.eid = Joins.eid
-    AND Joins.date BETWEEN current_date, DATEADD(day, 7, current_date);
+    AND Joins.date >= curr_date
+    AND Joins.date <= DATEADD(day, 7, curr_date);
 
-    RETURN compromised_employees;
+    SELECT * FROM compromised_employees;
 END;
-$$LANGUAGE plpgsql
+$$LANGUAGE plpgsql;
