@@ -293,6 +293,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--FIXES 24
+CREATE OR REPLACE FUNCTION check_dept_before_update_capacity() RETURNS TRIGGER AS $$
+BEGIN
+    IF ((SELECT did FROM Employees e WHERE e.eid = NEW.eid) NOT IN 
+    (SELECT did FROM Meeting_Rooms m WHERE m.room = NEW.room AND m.floor = NEW.floor))
+    THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER only_same_dept_update_capacity
+BEFORE INSERT OR UPDATE ON Updates
+FOR EACH ROW
+EXECUTE FUNCTION check_dept_before_update_capacity();
+
 CREATE OR REPLACE FUNCTION block_deletes_after_approval() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
