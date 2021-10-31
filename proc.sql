@@ -326,8 +326,12 @@ $$LANGUAGE plpgsql;
 --non compliance
 CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
-RETURNS TABLE(eid INTEGER, ename varchar(50)) AS $$
+RETURNS TABLE(eid INTEGER, count INTEGER) AS $$
+DECLARE
+count INTEGER := 0;
+current_date date := start_date;
 BEGIN
+
 
     WITH employees_declared AS (
     SELECT eid
