@@ -350,17 +350,33 @@ ELSE:
 */
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN e_id INTEGER)
-RETURNS TABLE(eid INTEGER, ename varchar(50)) AS $$
+RETURNS TABLE(eid INTEGER) AS $$
+DECLARE has_fever BOOLEAN
 BEGIN
-WITH has_fever AS(
-SELECT fever FROM Health_Declaration
-WHERE eid = e_id
-)
-IF has_fever = 0 THEN RETURN;
-END IF;
+    has_fever = SELECT fever FROM Health_Declaration WHERE eid = e_id;
+    IF has_fever = 0 THEN RETURN;
+    END IF;
 
+    WITH compromised_meetings AS (
+        SELECT date, time, room, floor
+        FROM Joins
+        WHERE Joins.eid = e_id
+        AND date BETWEEN DATEADD(day, -3, current_date), current_date)
+    )
 
+    WITH compromised_employees AS (
+        SELECT eid from Joins
+        WHERE compromised_meetings.date = Joins.date
+        AND compromised_meetings.time = Joins.time
+        AND compromised_meetings.room = Joins.room
+        AND compromised_meetings.floor = Joins.floor
+    )
+    
+    DELETE FROM Joins
+    WHERE compromised_employees.eid = Joins.eid
+    AND Joins.date BETWEEN current_date, DATEADD(day, 7, current_date)
 
+    RETURN compromised_employees;
 END;
 $$LANGUAGE plpgsql
 
