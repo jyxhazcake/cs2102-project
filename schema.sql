@@ -274,7 +274,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER approval_only_from_same_department
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_outsiders_approval();
-/*
+
 --FIXES 23
 CREATE OR REPLACE FUNCTION block_changes_after_approval() RETURNS TRIGGER AS $$
 DECLARE
@@ -283,7 +283,7 @@ BEGIN
     SELECT COUNT(*) into count
     FROM Approves
     WHERE NEW.date = Approves.date AND NEW.time = Approves.time AND NEW.room = Approves.room
-    AND NEW.floor = Approves.floor
+    AND NEW.floor = Approves.floor;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -300,7 +300,7 @@ BEGIN
     SELECT COUNT(*) into count
     FROM Approves
     WHERE OLD.date = Approves.date AND OLD.time = Approves.time AND OLD.room = Approves.room
-    AND OLD.floor = Approves.floor
+    AND OLD.floor = Approves.floor;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -318,7 +318,6 @@ CREATE TRIGGER no_deletes_on_joins_after_approval
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
-*/
 
 --FIXES 25
 CREATE OR REPLACE FUNCTION block_book_past_meetings() RETURNS TRIGGER AS $$
