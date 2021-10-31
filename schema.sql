@@ -239,8 +239,8 @@ FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 --FIXES 25
 CREATE OR REPLACE FUNCTION block_book_past_meetings() RETURNS TRIGGER AS $$
 DECLARE 
-current_time := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
-current_date := Convert(date, getdate());
+current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+current_date DATE := Convert(date, getdate());
 BEGIN
     IF current_date > NEW.date THEN
         RETURN NULL;
@@ -259,8 +259,8 @@ FOR EACH ROW EXECUTE FUNCTION block_book_past_meetings();
 --FIXES 26
 CREATE OR REPLACE FUNCTION block_join_past_meetings() RETURNS TRIGGER AS $$
 DECLARE 
-current_time := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
-current_date := Convert(date, getdate());
+current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+current_date DATE := Convert(date, getdate());
 BEGIN
     IF current_date > NEW.date THEN
         RETURN NULL;
@@ -279,8 +279,8 @@ FOR EACH ROW EXECUTE FUNCTION block_join_past_meetings();
 --FIXES 27
 CREATE OR REPLACE FUNCTION block_approve_past_meetings() RETURNS TRIGGER AS $$
 DECLARE 
-current_time := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
-current_date := Convert(date, getdate());
+current_time TIME := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+current_date DATE := Convert(date, getdate());
 BEGIN
     IF current_date > NEW.date THEN
         RETURN NULL;
