@@ -236,6 +236,66 @@ FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
 */
 
+--FIXES 25
+CREATE OR REPLACE FUNCTION block_book_past_meetings() RETURNS TRIGGER AS $$
+DECLARE 
+current_time := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+current_date := Convert(date, getdate());
+BEGIN
+    IF current_date > NEW.date THEN
+        RETURN NULL;
+    ELSE IF current_date = NEW.date AND current_time > NEW.time THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER cannot_book_past_meeting
+BEFORE INSERT OR UPDATE ON Books
+FOR EACH ROW EXECUTE FUNCTION block_book_past_meetings();
+
+--FIXES 26
+CREATE OR REPLACE FUNCTION block_join_past_meetings() RETURNS TRIGGER AS $$
+DECLARE 
+current_time := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+current_date := Convert(date, getdate());
+BEGIN
+    IF current_date > NEW.date THEN
+        RETURN NULL;
+    ELSE IF current_date = NEW.date AND current_time > NEW.time THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER cannot_book_past_meeting
+BEFORE INSERT OR UPDATE ON Joins
+FOR EACH ROW EXECUTE FUNCTION block_join_past_meetings();
+
+--FIXES 27
+CREATE OR REPLACE FUNCTION block_approve_past_meetings() RETURNS TRIGGER AS $$
+DECLARE 
+current_time := SELECT CONVERT (TIME, CURRENT_TIMESTAMP);
+current_date := Convert(date, getdate());
+BEGIN
+    IF current_date > NEW.date THEN
+        RETURN NULL;
+    ELSE IF current_date = NEW.date AND current_time > NEW.time THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER cannot_approve_past_meeting
+BEFORE INSERT OR UPDATE ON Approves
+FOR EACH ROW EXECUTE FUNCTION block_approve_past_meetings();
+
 --FIXES 34
 CREATE OR REPLACE FUNCTION block_resigned_employees() RETURNS TRIGGER AS $$
 DECLARE
