@@ -71,7 +71,7 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', '
 
 --Booker
 
--- Why is adding eid = 1 allowed? Where is the trigger check for inserting/updating of booker?
+-- To test if Junior employee can be inserted into Booker --> Should show "INSERT 0 0"
 insert into Booker (eid) values (1);
 /*
 insert into Booker (eid) values (1);

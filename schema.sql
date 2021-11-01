@@ -572,7 +572,7 @@ $$LANGUAGE plpgsql;
 --Trigger is activated when employee resigned_date is changed
 CREATE TRIGGER resigned_employee_removed
 AFTER UPDATE ON Employees
-FOR EACH ROW
+FOR EACH ROW -- add a when condition to check resigned date
 EXECUTE FUNCTION remove_future_records();
 
 /* FIXES Requirement:
