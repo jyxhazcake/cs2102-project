@@ -69,6 +69,32 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkem
 insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
 
+--Booker
+insert into Booker (eid) values (2);
+insert into Booker (eid) values (3);
+insert into Booker (eid) values (6);
+insert into Booker (eid) values (7);
+insert into Booker (eid) values (9);
+insert into Booker (eid) values (11);
+insert into Booker (eid) values (14);
+insert into Booker (eid) values (18);
+insert into Booker (eid) values (24);
+insert into Booker (eid) values (32);
+
+--Senior
+insert into Senior (eid) values (2);
+insert into Senior (eid) values (3);
+insert into Senior (eid) values (6);
+insert into Senior (eid) values (7);
+insert into Senior (eid) values (9);
+
+--Manager
+insert into Manager (eid) values (11);
+insert into Manager (eid) values (14);
+insert into Manager (eid) values (18);
+insert into Manager (eid) values (24);
+insert into Manager (eid) values (32);
+
 
 --Meeting_Rooms
 INSERT INTO Meeting_Rooms (floor,room, rname ,did)
@@ -88,3 +114,5 @@ Call add_employee('jon', '11112233', 'Manager', 4);
 Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
 --
+
+--MY FUNCTIONS

@@ -219,8 +219,26 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE book_room
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
+DECLARE
+    number_of_hours INTEGER := 0;
+    booking_hour TIME := start_hour;
 BEGIN
-    INSERT INTO Books VALUES (eid, date, time, room, floor);
+--find number of hours is the booking
+--for loop through the number of hours and add the start hour to books, with start hour incrementing by 1 hour after every insertion
+    number_of_hours := DATE_PART('hour', end_hour - start_hour);
+    WHILE number_of_hours > 0 LOOP
+        number_of_hours := number_of_hours - 1;
+        CALL add_booking(eid, date, booking_hour, room, floor);
+        booking_hour := booking_hour + interval '1 hour';
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE add_booking
+    (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
+AS $$
+BEGIN
+    INSERT INTO Books VALUES (eid, date, start_hour, room, floor);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -228,50 +246,92 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE unbook_room
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
+DECLARE
+    number_of_hours INTEGER := 0;
+    booking_hour TIME := start_hour;
+BEGIN
+    number_of_hours := DATE_PART('hour', end_hour - start_hour);
+    WHILE number_of_hours > 0 LOOP
+        number_of_hours := number_of_hours - 1;
+        CALL remove_booking(eid, date, booking_hour, room, floor);
+        booking_hour := booking_hour + interval '1 hour';
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE remove_booking
+     (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
+AS $$
 BEGIN
     DELETE FROM Books
-    WHERE eid = Books.eid AND floor = Books.floor AND room = Books.room AND date = Books.date
-    AND start_hour = Books.start_hour AND end_hour = Books.end_hour;
+    WHERE eid = Books.eid
+    AND floor = Books.floor
+    AND room = Books.room
+    AND date = Books.date
+    AND start_hour = Books.time;
 
     DELETE FROM Approves
     WHERE floor = Approves.floor
     AND room = Approves.room
     AND date = Approves.date
-    AND start_hour = Approves.start_hour
-    AND end_hour = Approves.end_hour;
+    AND start_hour = Approves.time;
 END;
-$$LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 --join_meeting
 CREATE OR REPLACE PROCEDURE join_meeting
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
+DECLARE
+    number_of_hours INTEGER := 0;
+    booking_hour TIME := start_hour;
 BEGIN
-    INSERT INTO Joins VALUES (eid, date, time, room, floor);
+    number_of_hours := DATE_PART('hour', end_hour - start_hour);
+    WHILE number_of_hours > 0 LOOP
+        number_of_hours := number_of_hours - 1;
+        CALL add_to_meeting(eid, date, booking_hour, room, floor);
+        booking_hour := booking_hour + interval '1 hour';
+    END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE add_to_meeting
+    (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
+AS $$
+BEGIN
+    INSERT INTO Joins VALUES (eid, date, start_hour, room, floor);
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 --leave_meeting
 CREATE OR REPLACE PROCEDURE leave_meeting
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
 DECLARE
-    count INTEGER;
+    number_of_hours INTEGER := 0;
+    booking_hour TIME := start_hour;
 BEGIN
-    SELECT COUNT(*) INTO count
-    FROM Joins J JOIN Approves A
-    ON  J.floor = A.floor 
-        AND J.room = A.room
-        AND J.date = A.date
-        AND J.start_hour = A.start_hour
-        AND J.end_hour = A.end_hour 
-        AND J.eid = eid;
+    number_of_hours := DATE_PART('hour', end_hour - start_hour);
+    WHILE number_of_hours > 0 LOOP
+        number_of_hours := number_of_hours - 1;
+        CALL remove_from_meeting(eid, date, booking_hour, room, floor);
+        booking_hour := booking_hour + interval '1 hour';
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
-    IF count = 1 THEN
-        DELETE FROM Joins
-        WHERE floor = Approves.floor AND room = Approves.room AND date = Approves.date
-        AND start_hour = Approves.start_hour AND end_hour = Approves.end_hour;
-    END IF;
+CREATE OR REPLACE PROCEDURE remove_from_meeting
+    (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
+AS $$
+BEGIN
+    DELETE FROM Joins
+    WHERE floor = Joins.floor
+    AND room = Joins.room
+    AND date = Joins.date
+    AND start_hour = Joins.time
+    AND eid = Joins.eid;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -279,8 +339,25 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE approve_meeting
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
+DECLARE
+    number_of_hours INTEGER := 0;
+    booking_hour TIME := start_hour;
 BEGIN
-    INSERT INTO Approves VALUES (eid, date, time, room, floor);
+    number_of_hours := DATE_PART('hour', end_hour - start_hour);
+    WHILE number_of_hours > 0 LOOP
+        number_of_hours := number_of_hours - 1;
+        CALL approve_the_meeting(eid, date, booking_hour, room, floor);
+        booking_hour := booking_hour + interval '1 hour';
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE PROCEDURE approve_the_meeting
+    (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
+AS $$
+BEGIN
+    INSERT INTO Approves VALUES (eid, date, start_hour, room, floor);
 END;
 $$ LANGUAGE plpgsql;
 
