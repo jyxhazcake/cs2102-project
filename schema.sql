@@ -524,15 +524,60 @@ FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
 
 
 /* FIXES Requirement:
-All future records(Joins+Books) should be removed when employee resigns
+All future records(Books) should be removed when employee resigns
+assume they will not join future meeting
 */
+CREATE OR REPLACE FUNCTION remove_future_records()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM Books 
+    WHERE Books.eid = NEW.eid
+        AND Books.date >= NEW.resigned_date;
+    --Do not need to account for joins and approval as they
+    -- are automatically deleted under FK Constraint
+END;
+$$LANGUAGE plpgsql;
+
+--Trigger is activated when employee resigned_date is changed
+CREATE TRIGGER resigned_employee_removed
+AFTER UPDATE ON Employees
+FOR EACH ROW
+EXECUTE FUNCTION remove_future_records();
 
 /* FIXES Requirement:
 Checks that all employees under the department have been removed (resign_date IS NOT NULL) when department is deleted.
 BEFORE DELETE
 */
+CREATE OR REPLACE FUNCTION check_remove_department()
+RETURNS TRIGGER AS $$
+DECLARE
+    count numeric;
+BEGIN
+    SELECT COUNT(*) AS count
+    FROM Employees
+    WHERE Employees.did = OLD.did
+        AND resigned_date IS NOT NULL;
+
+    IF (count > 0) -- there is an employee which is still under the department and not resigned
+        RETURN NULL; -- PREVENT DELETE
+    ELSE
+        RETURN OLD;
+    END IF;
+END;
+$$LANGUAGE plpgsql
+
+CREATE TRIGGER remove_department_check
+BEFORE DELETE ON Departments
+FOR EACH ROW
+EXECUTE FUNCTION check_remove_department();
+
+
+/* FIXES Requirement:
+When a meeting room has its capacity changed, any room booking after the change date with more participants 
+(including the employee who made the booking) will automatically be removed. This is regardless of whether they are approved or not.
+*/
+
 
 /* FIXES Requirement:
 Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
 */
-

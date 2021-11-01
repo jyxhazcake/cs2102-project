@@ -70,6 +70,10 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mn
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
 
 --Booker
+
+-- Why is adding eid = 1 allowed? Where is the trigger check for inserting/updating of booker?
+
+insert into Booker (eid) values (1);
 insert into Booker (eid) values (2);
 insert into Booker (eid) values (3);
 insert into Booker (eid) values (6);

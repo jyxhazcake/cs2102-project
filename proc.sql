@@ -109,6 +109,8 @@ $$LANGUAGE plpgsql;
 --add_room routine
 /*
 a manager is needed to add a room as the capacity has to be decided by someone
+whenever a room is newly added, we assume that the room is not available for booking
+on that day, as this was not specified by the document.
 */
 CREATE OR REPLACE PROCEDURE add_room
 	(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
@@ -243,6 +245,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 --unbook_room
+/*
+All participants removed via the Foreign Key constraint
+--> On delete cascade for joins and approves
+*/
 CREATE OR REPLACE PROCEDURE unbook_room
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
@@ -270,11 +276,13 @@ BEGIN
     AND date = Books.date
     AND start_hour = Books.time;
 
-    DELETE FROM Approves
+    -- Should be unecessary because once it is deleted from books it will automatically
+    -- be deleted from approves via the FK Constraint
+    /*DELETE FROM Approves
     WHERE floor = Approves.floor
     AND room = Approves.room
     AND date = Approves.date
-    AND start_hour = Approves.time;
+    AND start_hour = Approves.time;*/
 END;
 $$ LANGUAGE plpgsql;
 
