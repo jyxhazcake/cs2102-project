@@ -114,5 +114,6 @@ Call add_employee('jon', '11112233', 'Manager', 4);
 Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
 --
+Call add_room(1, 1, 'France', 5, 1, 4, '1/11/2021');
 
 --MY FUNCTIONS
