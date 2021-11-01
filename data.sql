@@ -101,6 +101,26 @@ insert into Manager (eid) values (24);
 insert into Manager (eid) values (32);
 */
 
+/*
+Wei Xuan's Functions
+*/
+
+-- add_room(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
+CALL add_room (1, 1, 'Germany', 10, 1, 4, '2020-01-01');
+CALL add_room (1, 2, 'Germany', 10, 1, 4, '2020-01-01');
+Call add_room(1, 3, 'France', 5, 1, 4, '1/11/2021');
+
+-- change_capacity(floor INTEGER, room INTEGER, new_capacity INTEGER, date DATE, mid INTEGER)
+CALL change_capacity(1, 1, 20, '2021-11-01', 4);
+CALL change_capacity(1, 2, 16, '2021-11-01', 4);
+
+-- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
+
+
+--Checks Trigger #24
+INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 4); -- Manager same department
+INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 2); -- Non-manager
+INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 11); --Manager from different department
 
 --Meeting_Rooms
 INSERT INTO Meeting_Rooms (floor,room, rname ,did)
@@ -140,8 +160,7 @@ Call book_room(2, 7, '2022-01-01', '01:00:00', '03:00:00', 2);
 --Call add_booking(2, '2022-01-01', '01:00:00', 2, 7);
 --Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
---
-Call add_room(1, 1, 'France', 5, 1, 4, '1/11/2021');
+
 --zh functions
 --add and remove department works
 Call add_department(369, 'salakau');
@@ -153,7 +172,8 @@ Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
 Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
 Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
 
-SELECT * FROM non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+--SELECT * FROM non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+
 
 SELECT contact_tracing(1);
 

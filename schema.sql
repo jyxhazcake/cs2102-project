@@ -90,8 +90,7 @@ CREATE TABLE Joins (
    floor INTEGER,
    room INTEGER,
    PRIMARY KEY(eid, date, time, floor, room),
-   FOREIGN KEY (date, time, floor, room) REFERENCES Books (date, time, floor, room)
-   ON DELETE CASCADE
+   FOREIGN KEY (date, time, floor, room) REFERENCES Books (date, time, floor, room) ON DELETE CASCADE
 );
  
 CREATE TABLE Approves (
@@ -408,7 +407,6 @@ BEFORE INSERT OR UPDATE ON Updates
 FOR EACH ROW
 EXECUTE FUNCTION check_dept_before_update_capacity();
 
-
 /*
        ############################################
        # Missing IF condition for contact_tracing #
@@ -425,7 +423,7 @@ BEGIN
     WHERE OLD.eid = Health_Declaration.eid;
 
     IF is_fever = true THEN
-        RETURN NEW;
+        RETURN OLD;
     ELSE
         SELECT COUNT(*) into count
         FROM Approves
@@ -437,7 +435,7 @@ BEGIN
         IF count > 0 THEN
             RETURN NULL;
         ELSE
-            RETURN NEW;
+            RETURN OLD;
         END IF;
     END IF;
 END;

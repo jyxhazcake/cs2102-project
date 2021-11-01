@@ -114,6 +114,8 @@ a manager is needed to add a room as the capacity has to be decided by someone
 whenever a room is newly added, we assume that the room is not available for booking
 on that day, as this was not specified by the document.
 */
+
+-- ******************* Works *******************
 CREATE OR REPLACE PROCEDURE add_room
 	(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
 AS $$
@@ -127,12 +129,14 @@ $$LANGUAGE plpgsql;
 
 
 --change_capacity routine
+
+-- ******************* Works *******************
 CREATE OR REPLACE PROCEDURE change_capacity
-    (floor INTEGER, room INTEGER, new_capacity INTEGER, date DATE)
+    (floor INTEGER, room INTEGER, new_capacity INTEGER, date DATE, mid INTEGER)
 AS $$
 BEGIN
     INSERT INTO Updates
-    VALUES (date, floor, room, room_capacity, mid);
+    VALUES (date, floor, room, new_capacity, mid);
 END;
 $$LANGUAGE plpgsql;
 
@@ -420,7 +424,7 @@ CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
 RETURNS TABLE(eid INTEGER, days BIGINT) AS $$
 DECLARE
-    total_days INTEGER;
+    total_days INTEGER:= end_date - start_date + 1;
 BEGIN
     /*
     WITH employees_not_declared AS (
@@ -442,30 +446,33 @@ BEGIN
     GROUP BY eid
     ORDER BY COUNT(*) desc;
     */
-
-    total_days := end_date - start_date + 1; --**CHECK WHETHER NEED TO PLUS ONE**
-
-    
-    
-    
+ 
     WITH declared_days AS (
         SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
             FROM Health_Declaration
             WHERE date >= start_date
                 AND date <= end_date
             GROUP BY Health_Declaration.eid
-            ORDER BY days DESC;
-    )
+            ORDER BY days DESC
+    ),
 
     no_declaration AS (
-        SELECT eid, total_days as days
+        SELECT Employees.eid, total_days as days
         FROM Employees
-        WHERE eid NOT IN SELECT * FROM declared_days;
+        WHERE Employees.eid NOT IN (SELECT dd.eid
+                        FROM declared_days as dd)
+    ),
+
+    result AS (
+    SELECT * 
+    FROM  no_declaration UNION 
+    SELECT *  FROM declared_days
+    WHERE declared_days.days <> 0
     )
 
-    RETURN QUERY SELECT * 
-        FROM  no_declaration UNION declared_days
-        WHERE days <> 0;
+    SELECT * FROM result;
+
+    RETURN QUERY (SELECT * FROM result);
 
     /*    
     WITH declared_days AS (
@@ -508,8 +515,8 @@ DECLARE
     has_fever BOOLEAN;
     curr_date DATE;
 BEGIN
-    has_fever := GET fever FROM Health_Declaration WHERE eid = e_id;
-    IF has_fever = 0 THEN RETURN;
+    SELECT fever INTO has_fever FROM Health_Declaration WHERE Health_Declaration.eid = e_id;
+    IF has_fever = FALSE THEN RETURN;
     END IF;
 
     WITH compromised_meetings AS (
@@ -546,7 +553,7 @@ BEGIN
     AND Books.room = bookings_to_cancel.room
     AND Books.floor = bookings_to_cancel.floor;
 
-    SELECT * FROM compromised_employees;
+    RETURN QUERY SELECT * FROM compromised_employees;
 END;
 $$LANGUAGE plpgsql;
 
