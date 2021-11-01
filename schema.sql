@@ -196,6 +196,7 @@ EITHER
 
 Because it is not possible to insert into Booker a value that is not in Employee already. 
 Insertion in Employee will cause help_role_insert() to be run.
+*/
 
 CREATE OR REPLACE FUNCTION check_only_booker() RETURNS TRIGGER AS $$
 DECLARE
@@ -205,8 +206,9 @@ BEGIN
         THEN RETURN NULL;
     END IF;
     
+    /*
     SELECT role INTO n_role 
-    FROM Employee 
+    FROM Employees 
     WHERE NEW.eid = eid;
 
     IF (role = 'Senior')
@@ -216,6 +218,7 @@ BEGIN
     IF (role = 'Manager')
         THEN INSERT INTO Manager VALUES (NEW.eid);
     END IF;
+    */
 
     RETURN NEW;
 END;
@@ -225,7 +228,7 @@ CREATE TRIGGER check_booker_employee_type
 BEFORE INSERT OR UPDATE ON Booker
 FOR EACH ROW
 EXECUTE FUNCTION check_only_booker();
-*/
+
 
 --New function: Helps guard against manual insertion into employees (removed from proc.sql)
 CREATE OR REPLACE FUNCTION help_insert_role() RETURNS TRIGGER AS $$

@@ -513,13 +513,13 @@ BEGIN
 
     total_days := end_date - start_date + 1; --**CHECK WHETHER NEED TO PLUS ONE**
 
-    RETURN QUERY (SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
+    RETURN QUERY SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
         FROM Health_Declaration
         WHERE date >= start_date
             AND date <= end_date
         GROUP BY Health_Declaration.eid
         HAVING days <> 0
-        ORDER BY days ASC;)
+        ORDER BY days ASC;
 
     /*    
     WITH declared_days AS (
@@ -599,12 +599,6 @@ BEGIN
     AND Books.time = bookings_to_cancel.time
     AND Books.room = bookings_to_cancel.room
     AND Books.floor = bookings_to_cancel.floor;
-
-    DELETE FROM Approves
-    WHERE Approves.date = bookings_to_cancel.date
-    AND Approves.time = bookings_to_cancel.time
-    AND Approves.room = bookings_to_cancel.room
-    AND Approves.floor = bookings_to_cancel.floor;
 
     SELECT * FROM compromised_employees;
 END;
