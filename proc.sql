@@ -43,7 +43,7 @@ CREATE OR REPLACE PROCEDURE remove_employee
     (IN e_id INTEGER, IN resign_d DATE)
 AS $$
 BEGIN
-    UPDATE Employee
+    UPDATE Employees
     SET resigned_date = resign_d
     WHERE eid = e_id;
 END;
