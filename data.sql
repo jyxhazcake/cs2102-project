@@ -112,11 +112,12 @@ VALUES
   (7,1,'Spain',1);
 
 --Books
---insert into Books (eid, date, time, floor, room) values (2, '2022-01-01', '01:00:00', 2, 7);
-insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7);
-insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 5, 6);
-insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 2, 6);
-insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 7, 1);
+insert into Books (eid, date, time, floor, room) values (1, '2022-01-01', '12:00:00', 2, 7); --junior fails to book room
+insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7); --senior books
+insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 5, 6); --manager books
+insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 2, 6); --senior books
+insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 7, 1); --senior books
+--auto join trigger works for bookers
 
 --Joins
 --insert into Joins (eid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 2, 7);
@@ -126,20 +127,29 @@ insert into Joins (eid, date, time, floor, room) values (10, '2022-01-01', '01:0
 insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 7, 1);
 
 --Approves
-insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7);
-insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6);
-insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1);
+insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7); --manager approves
+insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
+insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
+insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
+insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
+insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
 
 --Functions
 Call add_employee('weihowe', '87222555', 'Junior', 1);
 Call add_employee('yap', '1919192-3', 'Senior', 2);
 Call add_employee('jim', '1111112333', 'Manager', 3);
 Call add_employee('jon', '11112233', 'Manager', 4);
+Call add_employee('FrenchGuy', '00000', 'Manager', 5);
 
-Call book_room(2, 7, '2022-01-01', '01:00:00', '03:00:00', 2);
---Call add_booking(2, '2022-01-01', '01:00:00', 2, 7);
 --Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
+--jon functions
+Call book_room(2, 7, '2022-01-01', '01:00:00', '10:00:00', 2); --should work and it does
+Call unbook_room(2, 7, '2022-01-01', '02:00:00', '04:00:00', 2); --should work and it does
+Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work and it does
+Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
+Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
+Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
 --
 Call add_room(1, 1, 'France', 5, 1, 4, '1/11/2021');
 --zh functions
@@ -153,8 +163,8 @@ Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
 Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
 Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
 
-SELECT * FROM non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+--SELECT * FROM non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
 
-SELECT contact_tracing(1);
+--SELECT contact_tracing(1);
 
 --MY FUNCTIONS

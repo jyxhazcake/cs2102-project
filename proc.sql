@@ -308,10 +308,6 @@ END;
 $$ LANGUAGE plpgsql; --this works
 
 --unbook_room
-/*
-All participants removed via the Foreign Key constraint
---> On delete cascade for joins and approves
-*/
 CREATE OR REPLACE PROCEDURE unbook_room
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
@@ -329,28 +325,20 @@ BEGIN
         CALL remove_booking(eid, date, booking_hour, room, floor);
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; --this works
 
 CREATE OR REPLACE PROCEDURE remove_booking
-     (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
+     (IN input_eid INTEGER, IN input_date DATE, IN start_hour TIME, IN input_room INTEGER, IN input_floor INTEGER)
 AS $$
 BEGIN
     DELETE FROM Books
-    WHERE eid = Books.eid
-    AND floor = Books.floor
-    AND room = Books.room
-    AND date = Books.date
+    WHERE input_eid = Books.eid
+    AND input_floor = Books.floor
+    AND input_room = Books.room
+    AND input_date = Books.date
     AND start_hour = Books.time;
-
-    -- Should be unecessary because once it is deleted from books it will automatically
-    -- be deleted from approves via the FK Constraint
-    /*DELETE FROM Approves
-    WHERE floor = Approves.floor
-    AND room = Approves.room
-    AND date = Approves.date
-    AND start_hour = Approves.time;*/
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; --this works
 
 --join_meeting
 CREATE OR REPLACE PROCEDURE join_meeting
@@ -359,7 +347,7 @@ AS $$
 DECLARE
     number_of_hours INTEGER;
     time_diff TIME;
-    booking_hour TIME := start_hour;
+    booking_hour TIME := end_hour;
     one_hour TIME := '01:00:00';
 BEGIN
     SELECT end_hour - start_hour INTO time_diff;
@@ -370,7 +358,7 @@ BEGIN
         INSERT INTO Joins VALUES (eid, date, booking_hour, floor, room);
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; --this works
 
 --leave_meeting
 CREATE OR REPLACE PROCEDURE leave_meeting
@@ -379,7 +367,7 @@ AS $$
 DECLARE
     number_of_hours INTEGER;
     time_diff TIME;
-    booking_hour TIME := start_hour;
+    booking_hour TIME := end_hour;
     one_hour TIME := '01:00:00';
 BEGIN
     SELECT end_hour - start_hour INTO time_diff;
@@ -390,20 +378,20 @@ BEGIN
         CALL remove_from_meeting(eid, date, booking_hour, room, floor);
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; --this works
 
 CREATE OR REPLACE PROCEDURE remove_from_meeting
-    (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
+    (IN input_eid INTEGER, IN input_date DATE, IN start_hour TIME, IN input_room INTEGER, IN input_floor INTEGER)
 AS $$
 BEGIN
     DELETE FROM Joins
-    WHERE floor = Joins.floor
-    AND room = Joins.room
-    AND date = Joins.date
+    WHERE input_floor = Joins.floor
+    AND input_room = Joins.room
+    AND input_date = Joins.date
     AND start_hour = Joins.time
-    AND eid = Joins.eid;
+    AND input_eid = Joins.eid;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; --this works
 
 --approve_meeting
 CREATE OR REPLACE PROCEDURE approve_meeting
@@ -412,7 +400,7 @@ AS $$
 DECLARE
     number_of_hours INTEGER := 0;
     time_diff TIME;
-    booking_hour TIME := start_hour;
+    booking_hour TIME := end_hour;
     one_hour TIME := '01:00:00';
 BEGIN
     SELECT end_hour - start_hour INTO time_diff;
