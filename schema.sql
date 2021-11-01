@@ -79,7 +79,7 @@ CREATE TABLE Books (
    time TIME,
    floor INTEGER,
    room INTEGER,
-   PRIMARY KEY(date, time, room, floor),
+   PRIMARY KEY(date, time, floor, room),
    FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor) ON DELETE CASCADE
 );
 
@@ -90,8 +90,7 @@ CREATE TABLE Joins (
    floor INTEGER,
    room INTEGER,
    PRIMARY KEY(eid, date, time, floor, room),
-   FOREIGN KEY (date, time, floor, room) REFERENCES Books (date, time, floor, room)
-   ON DELETE CASCADE
+   FOREIGN KEY (date, time, floor, room) REFERENCES Books (date, time, floor, room) ON DELETE CASCADE
 );
  
 CREATE TABLE Approves (
@@ -437,7 +436,7 @@ BEGIN
         IF count > 0 THEN
             RETURN NULL;
         ELSE
-            RETURN NEW;
+            RETURN OLD;
         END IF;
     END IF;
 END;
