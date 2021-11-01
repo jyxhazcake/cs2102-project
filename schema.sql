@@ -51,6 +51,8 @@ CREATE TABLE Health_Declaration (
     fever BOOLEAN,
     PRIMARY KEY (date, eid)
 );
+
+
  
 CREATE TABLE Meeting_Rooms (
    floor INTEGER,
@@ -580,18 +582,18 @@ RETURNS TRIGGER AS $$
 DECLARE
     count numeric;
 BEGIN
-    SELECT COUNT(*) AS count
+    SELECT COUNT(*) INTO count
     FROM Employees
     WHERE Employees.did = OLD.did
         AND resigned_date IS NOT NULL;
 
     IF (count > 0) -- there is an employee which is still under the department and not resigned
-        RETURN NULL; -- PREVENT DELETE
+        THEN RETURN NULL; -- PREVENT DELETE
     ELSE
         RETURN OLD;
     END IF;
 END;
-$$LANGUAGE plpgsql
+$$LANGUAGE plpgsql;
 
 CREATE TRIGGER remove_department_check
 BEFORE DELETE ON Departments

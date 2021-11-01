@@ -73,6 +73,7 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', '
 
 -- Why is adding eid = 1 allowed? Where is the trigger check for inserting/updating of booker?
 
+/*
 insert into Booker (eid) values (1);
 insert into Booker (eid) values (2);
 insert into Booker (eid) values (3);
@@ -98,6 +99,7 @@ insert into Manager (eid) values (14);
 insert into Manager (eid) values (18);
 insert into Manager (eid) values (24);
 insert into Manager (eid) values (32);
+*/
 
 
 --Meeting_Rooms
@@ -151,7 +153,7 @@ Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
 Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
 Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
 
-SELECT non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+SELECT * FROM non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
 
 SELECT contact_tracing(1);
 
