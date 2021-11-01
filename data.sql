@@ -69,33 +69,6 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkem
 insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
 
---Booker
-insert into Booker (eid) values (2);
-insert into Booker (eid) values (3);
-insert into Booker (eid) values (6);
-insert into Booker (eid) values (7);
-insert into Booker (eid) values (9);
-insert into Booker (eid) values (11);
-insert into Booker (eid) values (14);
-insert into Booker (eid) values (18);
-insert into Booker (eid) values (24);
-insert into Booker (eid) values (32);
-
---Senior
-insert into Senior (eid) values (2);
-insert into Senior (eid) values (3);
-insert into Senior (eid) values (6);
-insert into Senior (eid) values (7);
-insert into Senior (eid) values (9);
-
---Manager
-insert into Manager (eid) values (11);
-insert into Manager (eid) values (14);
-insert into Manager (eid) values (18);
-insert into Manager (eid) values (24);
-insert into Manager (eid) values (32);
-
-
 --Meeting_Rooms
 INSERT INTO Meeting_Rooms (floor,room, rname ,did)
 VALUES
@@ -105,13 +78,34 @@ VALUES
   (2,6,'Ireland',4),
   (7,1,'Spain',1);
 
+--Books
+--insert into Books (eid, date, time, floor, room) values (2, '2022-01-01', '01:00:00', 2, 7);
+insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7);
+insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 5, 6);
+insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 2, 6);
+insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 7, 1);
+
+--Joins
+--insert into Joins (eid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 2, 7);
+insert into Joins (eid, date, time, floor, room) values (8, '2022-01-01', '01:00:00', 4, 7);
+insert into Joins (eid, date, time, floor, room) values (9, '2022-01-01', '01:00:00', 5, 6);
+insert into Joins (eid, date, time, floor, room) values (10, '2022-01-01', '01:00:00', 2, 6);
+insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 7, 1);
+
+--Approves
+insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7);
+insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6);
+insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1);
+
 --Functions
 Call add_employee('weihowe', '87222555', 'Junior', 1);
 Call add_employee('yap', '1919192-3', 'Senior', 2);
 Call add_employee('jim', '1111112333', 'Manager', 3);
 Call add_employee('jon', '11112233', 'Manager', 4);
 
-Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
+Call book_room(2, 7, '2022-01-01', '01:00:00', '03:00:00', 2);
+--Call add_booking(2, '2022-01-01', '01:00:00', 2, 7);
+--Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
 --zh functions
 --add and remove department works
