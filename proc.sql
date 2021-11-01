@@ -490,11 +490,30 @@ BEGIN
         AND compromised_meetings.room = Joins.room
         AND compromised_meetings.floor = Joins.floor
     )
-    
+
+    bookings_to_cancel AS (
+        SELECT date, time, room, floor
+        FROM Books
+        WHERE Books.eid = e_id
+            AND (Books.date > CURRENT_DATE OR (Books.date = CURRENT_DATE AND LOCALTIME > Books.time))
+    )
+
     DELETE FROM Joins
     WHERE compromised_employees.eid = Joins.eid
     AND Joins.date >= curr_date
     AND Joins.date <= DATEADD(day, 7, curr_date);
+
+    DELETE FROM Books
+    WHERE Books.date = bookings_to_cancel.date
+    AND Books.time = bookings_to_cancel.time
+    AND Books.room = bookings_to_cancel.room
+    AND Books.floor = bookings_to_cancel.floor
+
+    DELETE FROM Approves
+    WHERE Approves.date = bookings_to_cancel.date
+    AND Approves.time = bookings_to_cancel.time
+    AND Approves.room = bookings_to_cancel.room
+    AND Approves.floor = bookings_to_cancel.floor
 
     SELECT * FROM compromised_employees;
 END;
