@@ -445,13 +445,27 @@ BEGIN
 
     total_days := end_date - start_date + 1; --**CHECK WHETHER NEED TO PLUS ONE**
 
-    RETURN QUERY SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
-        FROM Health_Declaration
-        WHERE date >= start_date
-            AND date <= end_date
-        GROUP BY Health_Declaration.eid
-        HAVING days <> 0
-        ORDER BY days ASC;
+    
+    
+    
+    WITH declared_days AS (
+        SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
+            FROM Health_Declaration
+            WHERE date >= start_date
+                AND date <= end_date
+            GROUP BY Health_Declaration.eid
+            ORDER BY days DESC;
+    )
+
+    no_declaration AS (
+        SELECT eid, total_days as days
+        FROM Employees
+        WHERE eid NOT IN SELECT * FROM declared_days;
+    )
+
+    RETURN QUERY SELECT * 
+        FROM  no_declaration UNION declared_days
+        WHERE days <> 0;
 
     /*    
     WITH declared_days AS (
