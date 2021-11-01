@@ -230,19 +230,19 @@ BEGIN
     number_of_hours := DATE_PART('hour', end_hour - start_hour);
     WHILE number_of_hours > 0 LOOP
         number_of_hours := number_of_hours - 1;
-        CALL add_booking(eid, date, booking_hour, room, floor);
-        booking_hour := booking_hour + interval '1 hour';
+        INSERT INTO Books VALUES (eid, date, booking_hour, floor, room);
+        select booking_hour + interval '1 hour' into booking_hour;
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; --no works
 
-CREATE OR REPLACE PROCEDURE add_booking
-    (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
-AS $$
-BEGIN
-    INSERT INTO Books VALUES (eid, date, start_hour, room, floor);
-END;
-$$ LANGUAGE plpgsql;
+--CREATE OR REPLACE PROCEDURE add_booking
+--    (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN floor INTEGER, IN room INTEGER)
+--AS $$
+--BEGIN
+--    INSERT INTO Books VALUES (eid, date, start_hour, floor, room);
+--END;
+--$$ LANGUAGE plpgsql; --this works
 
 --unbook_room
 /*
@@ -307,7 +307,7 @@ CREATE OR REPLACE PROCEDURE add_to_meeting
     (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
 AS $$
 BEGIN
-    INSERT INTO Joins VALUES (eid, date, start_hour, room, floor);
+    INSERT INTO Joins VALUES (eid, date, start_hour, floor, room);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -365,7 +365,7 @@ CREATE OR REPLACE PROCEDURE approve_the_meeting
     (IN eid INTEGER, IN date DATE, IN start_hour TIME, IN room INTEGER, IN floor INTEGER)
 AS $$
 BEGIN
-    INSERT INTO Approves VALUES (eid, date, start_hour, room, floor);
+    INSERT INTO Approves VALUES (eid, date, start_hour, floor, room);
 END;
 $$ LANGUAGE plpgsql;
 
