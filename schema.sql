@@ -74,9 +74,9 @@ CREATE TABLE Updates (
 CREATE TABLE Books (
    eid INTEGER NOT NULL REFERENCES Booker ON DELETE CASCADE,
    date DATE,
-   time TIME, 
-   room INTEGER,
+   time TIME,
    floor INTEGER,
+   room INTEGER,
    PRIMARY KEY(date, time, room, floor),
    FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor) ON DELETE CASCADE
 );
@@ -85,10 +85,10 @@ CREATE TABLE Joins (
    eid INTEGER REFERENCES Employees ON DELETE CASCADE,
    date DATE,
    time TIME, 
-   room INTEGER,
    floor INTEGER,
-   PRIMARY KEY(eid, date, time, room, floor),
-   FOREIGN KEY (date, time, room, floor) REFERENCES Books (date, time, room, floor)                 
+   room INTEGER,
+   PRIMARY KEY(eid, date, time, floor, room),
+   FOREIGN KEY (date, time, floor, room) REFERENCES Books (date, time, floor, room)
    ON DELETE CASCADE
 );
  
@@ -96,10 +96,10 @@ CREATE TABLE Approves (
    aid INTEGER REFERENCES Manager ON DELETE CASCADE,
    date DATE,
    time TIME,
-   room INTEGER,
    floor INTEGER,
-   PRIMARY KEY(date, time, room, floor),
-   FOREIGN KEY (date, time, room, floor) REFERENCES Books (date, time, room, floor) ON DELETE CASCADE
+   room INTEGER,
+   PRIMARY KEY(date, time, floor, room),
+   FOREIGN KEY (date, time, floor, room) REFERENCES Books (date, time, floor, room) ON DELETE CASCADE
 );
 
 -- 12 Tables --> 120 
@@ -267,6 +267,11 @@ AFTER INSERT OR UPDATE ON Employees
 FOR EACH ROW
 EXECUTE FUNCTION help_insert_role();
 
+
+/*
+Jon
+*/
+
 --FIXES 13 & 14
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
 DECLARE
@@ -321,7 +326,7 @@ FOR EACH ROW EXECUTE FUNCTION block_fever_meeting();
 --FIXES 18
 CREATE OR REPLACE FUNCTION booker_joins_meeting() RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO Joins VALUES (NEW.eid, NEW.date, NEW.time, NEW.room, NEW.floor);
+    INSERT INTO Joins VALUES (NEW.eid, NEW.date, NEW.time, NEW.floor, NEW.room);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -336,18 +341,20 @@ DECLARE
     count NUMERIC;
 BEGIN
     SELECT COUNT(*) into count
-    FROM Employees, Meeting_Rooms
-    WHERE NEW.eid = Employees.eid 
-        AND NEW.date = Meeting_Rooms.date 
-        AND NEW.time = Meeting_Rooms.time
-        AND NEW.room = Meeting_Rooms.room 
-        AND NEW.floor = Meeting_Rooms.floor
-        AND Employees.did = Meeting_Rooms.did;
+    FROM Employees, Books, Meeting_Rooms
+    WHERE NEW.aid = Employees.eid --approver is part of employees
+        AND NEW.date = Books.date --approved date is booked date
+        AND NEW.time = Books.time --approved time is booked time
+        AND NEW.room = Books.room --approved room is booked room
+        AND NEW.floor = Books.floor --approved floor is booked floor
+        AND NEW.room = Meeting_Rooms.room
+        AND NEW.floor = Meeting_Rooms.floor --approved room exists
+        AND Employees.did = Meeting_Rooms.did; --approver did matches approved room did
 
     IF count > 0 THEN
-        RETURN NULL;
-    ELSE
         RETURN NEW;
+    ELSE
+        RETURN NULL;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -435,6 +442,9 @@ CREATE TRIGGER no_deletes_on_joins_after_approval_unless_fever
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
+/*
+Jim
+*/
 
 --FIXES 25
 CREATE OR REPLACE FUNCTION block_book_past_meetings() 
@@ -475,12 +485,12 @@ BEFORE INSERT OR UPDATE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_join_past_meetings();
 
 --FIXES 27
-CREATE OR REPLACE FUNCTION block_approve_past_meetings() 
+CREATE OR REPLACE FUNCTION block_approve_past_meetings()
 RETURNS TRIGGER AS $$
 BEGIN
     IF CURRENT_DATE > NEW.date THEN
         RETURN NULL;
-    ELSIF CURRENT_DATE = NEW.date 
+    ELSIF CURRENT_DATE = NEW.date
         AND LOCALTIME > NEW.time THEN
         RETURN NULL;
     ELSE
@@ -503,7 +513,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) into count
     FROM Employees
-    WHERE NEW.eid = Employees.eid 
+    WHERE NEW.eid = Employees.eid
         AND Employees.resigned_date IS NOT NULL;
 
     IF count > 0 THEN
@@ -518,9 +528,26 @@ CREATE TRIGGER a_resigned_employee_cannot_join
 BEFORE INSERT OR UPDATE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
 
+CREATE OR REPLACE FUNCTION block_resigned_managers() RETURNS TRIGGER AS $$
+DECLARE
+    count NUMERIC;
+BEGIN
+    SELECT COUNT(*) into count
+    FROM Employees
+    WHERE NEW.aid = Employees.eid
+        AND Employees.resigned_date IS NOT NULL;
+
+    IF count > 0 THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER a_resigned_employee_cannot_approve
 BEFORE INSERT OR UPDATE ON Approves
-FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
+FOR EACH ROW EXECUTE FUNCTION block_resigned_managers();
 
 
 /* FIXES Requirement:
