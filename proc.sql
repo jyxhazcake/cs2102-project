@@ -298,6 +298,7 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
+
 CREATE OR REPLACE PROCEDURE remove_department
     (IN d_id INTEGER)
 AS $$
@@ -306,6 +307,7 @@ BEGIN
     WHERE (did = d_id);
 END;
 $$LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE PROCEDURE declare_health
     (IN eid INTEGER, IN date DATE, IN temp INTEGER)

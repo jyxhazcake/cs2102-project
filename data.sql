@@ -69,6 +69,16 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkem
 insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
 
+
+--Meeting_Rooms
+INSERT INTO Meeting_Rooms (floor,room, rname ,did)
+VALUES
+  (2,7,'France',5),
+  (4,7,'Sweden',12),
+  (5,6,'Ireland',6),
+  (2,6,'Ireland',4),
+  (7,1,'Spain',1);
+
 --Functions
 Call add_employee('weihowe', '87222555', 'Junior', 1);
 Call add_employee('yap', '1919192-3', 'Senior', 2);

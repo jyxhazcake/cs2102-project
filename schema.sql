@@ -292,7 +292,8 @@ EXECUTE FUNCTION block_junior_booking();
 
 
 --FIXES 16 AND 19
-CREATE OR REPLACE FUNCTION block_fever_meeting() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION block_fever_meeting()
+RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
 BEGIN
@@ -375,6 +376,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TRIGGER no_updates_on_joins_after_approval
+BEFORE INSERT OR UPDATE ON Joins
+FOR EACH ROW EXECUTE FUNCTION block_changes_after_approval();
+
 --FIXES 24
 CREATE OR REPLACE FUNCTION check_dept_before_update_capacity() RETURNS TRIGGER AS $$
 BEGIN
@@ -390,6 +395,13 @@ CREATE TRIGGER only_same_dept_update_capacity
 BEFORE INSERT OR UPDATE ON Updates
 FOR EACH ROW
 EXECUTE FUNCTION check_dept_before_update_capacity();
+
+
+/*
+       ############################################
+       # Missing IF condition for contact_tracing #
+       ############################################
+*/
 
 CREATE OR REPLACE FUNCTION block_leaving_after_approval() RETURNS TRIGGER AS $$
 DECLARE
@@ -409,10 +421,6 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
-
-CREATE TRIGGER no_updates_on_joins_after_approval
-BEFORE INSERT OR UPDATE ON Joins
-FOR EACH ROW EXECUTE FUNCTION block_changes_after_approval();
 
 
 CREATE TRIGGER no_deletes_on_joins_after_approval
@@ -505,3 +513,18 @@ FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
 CREATE TRIGGER a_resigned_employee_cannot_approve
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
+
+
+/* FIXES Requirement:
+All future records(Joins+Books) should be removed when employee resigns
+*/
+
+/* FIXES Requirement:
+Checks that all employees under the department have been removed (resign_date IS NOT NULL) when department is deleted.
+BEFORE DELETE
+*/
+
+/* FIXES Requirement:
+Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
+*/
+
