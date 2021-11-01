@@ -69,6 +69,39 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkem
 insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
 
+--Booker
+
+-- Why is adding eid = 1 allowed? Where is the trigger check for inserting/updating of booker?
+insert into Booker (eid) values (1);
+/*
+insert into Booker (eid) values (1);
+insert into Booker (eid) values (2);
+insert into Booker (eid) values (3);
+insert into Booker (eid) values (6);
+insert into Booker (eid) values (7);
+insert into Booker (eid) values (9);
+insert into Booker (eid) values (11);
+insert into Booker (eid) values (14);
+insert into Booker (eid) values (18);
+insert into Booker (eid) values (24);
+insert into Booker (eid) values (32);
+
+--Senior
+insert into Senior (eid) values (2);
+insert into Senior (eid) values (3);
+insert into Senior (eid) values (6);
+insert into Senior (eid) values (7);
+insert into Senior (eid) values (9);
+
+--Manager
+insert into Manager (eid) values (11);
+insert into Manager (eid) values (14);
+insert into Manager (eid) values (18);
+insert into Manager (eid) values (24);
+insert into Manager (eid) values (32);
+*/
+
+
 --Meeting_Rooms
 INSERT INTO Meeting_Rooms (floor,room, rname ,did)
 VALUES
@@ -108,5 +141,20 @@ Call book_room(2, 7, '2022-01-01', '01:00:00', '03:00:00', 2);
 --Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
 --
+Call add_room(1, 1, 'France', 5, 1, 4, '1/11/2021');
+--zh functions
+--add and remove department works
+Call add_department(369, 'salakau');
+Call add_department(108, 'an soon tong');
+Call add_department(555, 'hahaha');
+Call remove_department(555);
+
+Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
+Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
+Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
+
+SELECT * FROM non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+
+SELECT contact_tracing(1);
 
 --MY FUNCTIONS

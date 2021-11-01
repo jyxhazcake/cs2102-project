@@ -1,3 +1,73 @@
+-- DateDiff function that returns the difference between two timestamps in the given date_part (weeks, months, etc) as an integer
+-- This behaves like the DateDiff function in warehouses like Redshift and Snowflake, which count the boundaries between date_parts
+CREATE OR REPLACE FUNCTION datediff (date_part VARCHAR(30), start_t TIMESTAMP, end_t TIMESTAMP)
+  RETURNS INT AS $diff$
+
+  DECLARE
+    years INT = 0;
+    days INT = 0;
+    hours INT = 0;
+    minutes INT = 0;  
+  BEGIN
+
+    -- year is straightforward. Convert to an integer representing the year and subtract
+    years = DATE_PART('year', end_t) - DATE_PART('year', start_t);
+
+    IF date_part IN ('y', 'yr', 'yrs', 'year', 'years')  THEN
+      RETURN years;
+    END IF;
+
+    -- quarter and month use integer math: count years, multiply to convert to quarters or months
+    -- as an integer and then subtract
+
+    IF date_part IN ('quarter', 'quarters', 'qtr', 'qtrs')  THEN
+      RETURN years * 4 + (DATE_PART('quarter', end_t) - DATE_PART('quarter', start_t)); 
+    END IF;
+
+    IF date_part IN ('month', 'months', 'mon', 'mons')  THEN
+      RETURN years * 12 + (DATE_PART('month', end_t) - DATE_PART('month', start_t)); 
+    END IF;
+
+
+    -- Weeks only fit evenly in days.  
+    -- Truncate by week (which returns the start of the first day of the week)
+    -- then subtract by days.
+    IF date_part IN ('week', 'weeks', 'w') THEN
+      RETURN DATE_PART('day', (DATE_TRUNC('week', end_t) - DATE_TRUNC('week', start_t)) / 7);
+    END IF;
+
+
+    -- Day is similar to week. Truncate to beginning of day so that we can diff whole days
+    days = DATE_PART('day', DATE_TRUNC('day', end_t) - DATE_TRUNC('day', start_t));
+
+    IF date_part IN ('day', 'days', 'd') THEN
+      RETURN days;
+    END IF;
+    
+    -- hours, minutes, and seconds all just build up from each other
+    hours = days * 24 + (DATE_PART('hour', end_t) - DATE_PART('hour', start_t));
+
+    IF date_part IN ('hour', 'hours', 'h', 'hr', 'hrs') THEN
+      RETURN hours;
+    END IF;
+
+
+    minutes = hours * 60 + (DATE_PART('minute', end_t) - DATE_PART('minute', start_t));
+
+    IF date_part IN ('minute', 'minutes', 'm', 'min', 'mins') THEN
+      RETURN minutes;
+    END IF;
+
+
+    IF date_part IN ('second', 'seconds', 's', 'sec', 'secs') THEN
+      RETURN minutes * 60 + (DATE_PART('second', end_t) - DATE_PART('second', start_t));
+    END IF;
+
+
+    RETURN 0;
+END;
+$diff$ LANGUAGE plpgsql;
+
 /* 
     ###################
     # Wei Howe's Code #
@@ -109,6 +179,8 @@ $$LANGUAGE plpgsql;
 --add_room routine
 /*
 a manager is needed to add a room as the capacity has to be decided by someone
+whenever a room is newly added, we assume that the room is not available for booking
+on that day, as this was not specified by the document.
 */
 CREATE OR REPLACE PROCEDURE add_room
 	(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
@@ -236,6 +308,10 @@ END;
 $$ LANGUAGE plpgsql; --this works
 
 --unbook_room
+/*
+All participants removed via the Foreign Key constraint
+--> On delete cascade for joins and approves
+*/
 CREATE OR REPLACE PROCEDURE unbook_room
     (IN floor INTEGER, IN room INTEGER, IN date DATE, IN start_hour TIME, IN end_hour TIME, IN eid INTEGER)
 AS $$
@@ -266,11 +342,13 @@ BEGIN
     AND date = Books.date
     AND start_hour = Books.time;
 
-    DELETE FROM Approves
+    -- Should be unecessary because once it is deleted from books it will automatically
+    -- be deleted from approves via the FK Constraint
+    /*DELETE FROM Approves
     WHERE floor = Approves.floor
     AND room = Approves.room
     AND date = Approves.date
-    AND start_hour = Approves.time;
+    AND start_hour = Approves.time;*/
 END;
 $$ LANGUAGE plpgsql;
 
@@ -373,7 +451,7 @@ $$LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE PROCEDURE declare_health
-    (IN eid INTEGER, IN date DATE, IN temp INTEGER)
+    (IN eid INTEGER, IN date DATE, IN temp NUMERIC)
 AS $$
 DECLARE
     has_fever BOOLEAN := FALSE;
@@ -389,9 +467,12 @@ $$LANGUAGE plpgsql;
 
 
 --non compliance
+/*
+
+*/
 CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
-RETURNS TABLE(eid INTEGER, days INTEGER) AS $$
+RETURNS TABLE(eid INTEGER, days BIGINT) AS $$
 DECLARE
     total_days INTEGER;
 BEGIN
@@ -416,14 +497,23 @@ BEGIN
     ORDER BY COUNT(*) desc;
     */
 
-    total_days := DATEDIFF(day, start_date, end_date); --**CHECK WHETHER NEED TO PLUS ONE**
-        
-    WITH declared_days AS (
-        SELECT eid, COUNT(*) AS days
+    total_days := end_date - start_date + 1; --**CHECK WHETHER NEED TO PLUS ONE**
+
+    RETURN QUERY SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
         FROM Health_Declaration
         WHERE date >= start_date
             AND date <= end_date
-        GROUP BY eid
+        GROUP BY Health_Declaration.eid
+        HAVING days <> 0
+        ORDER BY days ASC;
+
+    /*    
+    WITH declared_days AS (
+        SELECT Health_Declaration.eid, total_days - COUNT(*) AS days
+        FROM Health_Declaration
+        WHERE date >= start_date
+            AND date <= end_date
+        GROUP BY Health_Declaration.eid
         HAVING days < total_days
         ORDER BY days ASC
     )
@@ -432,6 +522,7 @@ BEGIN
     SET days = total_days - days;
 
     SELECT * FROM declared_days;
+    */
 
 END;
 $$LANGUAGE plpgsql;
@@ -455,9 +546,9 @@ CREATE OR REPLACE FUNCTION contact_tracing
 RETURNS TABLE(eid INTEGER) AS $$
 DECLARE 
     has_fever BOOLEAN;
-    curr_date DATE := Convert(date, getdate());
+    curr_date DATE;
 BEGIN
-    has_fever = GET fever FROM Health_Declaration WHERE eid = e_id;
+    has_fever := GET fever FROM Health_Declaration WHERE eid = e_id;
     IF has_fever = 0 THEN RETURN;
     END IF;
 
@@ -475,13 +566,27 @@ BEGIN
         AND compromised_meetings.time = Joins.time
         AND compromised_meetings.room = Joins.room
         AND compromised_meetings.floor = Joins.floor
+    ),
+
+    bookings_to_cancel AS (
+        SELECT date, time, room, floor
+        FROM Books
+        WHERE Books.eid = e_id
+            AND (Books.date > CURRENT_DATE OR (Books.date = CURRENT_DATE AND LOCALTIME > Books.time))
     )
-    
+
     DELETE FROM Joins
     WHERE compromised_employees.eid = Joins.eid
     AND Joins.date >= curr_date
     AND Joins.date <= DATEADD(day, 7, curr_date);
 
+    DELETE FROM Books
+    WHERE Books.date = bookings_to_cancel.date
+    AND Books.time = bookings_to_cancel.time
+    AND Books.room = bookings_to_cancel.room
+    AND Books.floor = bookings_to_cancel.floor;
+
     SELECT * FROM compromised_employees;
 END;
 $$LANGUAGE plpgsql;
+
