@@ -96,6 +96,14 @@ insert into Manager (eid) values (24);
 insert into Manager (eid) values (32);
 
 
+--Meeting_Rooms
+INSERT INTO Meeting_Rooms (floor,room, rname ,did)
+VALUES
+  (2,7,'France',5),
+  (4,7,'Sweden',12),
+  (5,6,'Ireland',6),
+  (2,6,'Ireland',4),
+  (7,1,'Spain',1);
 
 --Functions
 Call add_employee('weihowe', '87222555', 'Junior', 1);
