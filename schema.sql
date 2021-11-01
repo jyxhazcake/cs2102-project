@@ -137,10 +137,13 @@ BEGIN
         THEN RETURN NULL;
     END IF;
     
+    /*
     --If not in Booker table, void transaction or help insert?
+    --Update: May be unnecessary. New function help_insert_role() will prevent empty booker
     IF (NEW.eid NOT IN (SELECT eid FROM Booker))
         THEN INSERT INTO Booker VALUES (NEW.eid);
     END IF;
+    */
     
     RETURN NEW;
 END;
@@ -158,10 +161,13 @@ BEGIN
         THEN RETURN NULL;
     END IF;
     
+    /*
     --If not in Booker table, void transaction or help insert?
+    --Update: May be unnecessary. New function help_insert_role() will prevent empty booker
     IF (NEW.eid NOT IN (SELECT eid FROM Booker))
         THEN INSERT INTO Booker VALUES (NEW.eid);
     END IF;
+    */
 
     RETURN NEW;
 END;
@@ -180,9 +186,15 @@ When user inserts into booker directly -->
 3. add into manager/senior
 */
 
---Update weihowe: realise is not possible because you need to insert into booker first, else violate FK constraint.
-
 /*
+Update weihowe: Not necessary. New trigger of help_update_role() will prevent ensures that 
+EITHER 
+1) Employee is a junior (prevent insertion)
+2) Employee is already inserted into senior/manager (duplicated insertion into Booker)
+
+Because it is not possible to insert into Booker a value that is not in Employee already. 
+Insertion in Employee will cause help_role_insert() to be run.
+
 CREATE OR REPLACE FUNCTION check_only_booker() RETURNS TRIGGER AS $$
 DECLARE
     n_role VARCHAR(50);
@@ -213,21 +225,33 @@ FOR EACH ROW
 EXECUTE FUNCTION check_only_booker();
 */
 
---New function: Helps guard against manual insertion into employees
+--New function: Helps guard against manual insertion into employees (removed from proc.sql)
 CREATE OR REPLACE FUNCTION help_insert_role() RETURNS TRIGGER AS $$
 BEGIN
     -- For updating kind of employee
-    IF NEW.role = 'Junior'
+
+    /*
+    It is necessary to check if the values exist in the corresponding tables already.
+    This is in the case of remove_employee(), where UPDATE employee will be called.
+
+    UPDATE: Should we delete entries Junior/Senior/Manager or leave it?
+    */
+    
+    IF (NEW.role = 'Junior' AND NEW.EID NOT IN (SELECT eid FROM Junior))
     THEN INSERT INTO Junior VALUES (NEW.eid);
     END IF;
-    IF NEW.role = 'Senior'
+    IF (NEW.role = 'Senior' 
+        AND NEW.EID NOT IN (SELECT eid FROM Senior)
+        AND NEW.EID NOT IN (SELECT eid FROM Booker))
     THEN
         BEGIN
         INSERT INTO Booker VALUES (NEW.eid);
         INSERT INTO Senior VALUES (NEW.eid);
         END;
     END IF;
-    IF NEW.role = 'Manager'
+    IF (NEW.role = 'Manager' 
+        AND NEW.EID NOT IN (SELECT eid FROM Booker)
+        AND NEW.EID NOT IN (SELECT eid FROM Manager))
     THEN
         BEGIN
         INSERT INTO Booker VALUES (NEW.eid);
