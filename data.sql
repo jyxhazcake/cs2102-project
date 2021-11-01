@@ -113,6 +113,19 @@ Call add_employee('jon', '11112233', 'Manager', 4);
 
 Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
---
+--zh functions
+--add and remove department works
+Call add_department(369, 'salakau');
+Call add_department(108, 'an soon tong');
+Call add_department(555, 'hahaha');
+Call remove_department(555);
+
+Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
+Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
+Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
+
+SELECT non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+
+SELECT contact_tracing(1);
 
 --MY FUNCTIONS

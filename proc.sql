@@ -387,7 +387,7 @@ $$LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE PROCEDURE declare_health
-    (IN eid INTEGER, IN date DATE, IN temp INTEGER)
+    (IN eid INTEGER, IN date DATE, IN temp NUMERIC)
 AS $$
 DECLARE
     has_fever BOOLEAN := FALSE;
@@ -469,7 +469,7 @@ CREATE OR REPLACE FUNCTION contact_tracing
 RETURNS TABLE(eid INTEGER) AS $$
 DECLARE 
     has_fever BOOLEAN;
-    curr_date DATE := Convert(date, getdate());
+    curr_date DATE CURRENT_DATE;
 BEGIN
     has_fever = GET fever FROM Health_Declaration WHERE eid = e_id;
     IF has_fever = 0 THEN RETURN;
@@ -489,7 +489,7 @@ BEGIN
         AND compromised_meetings.time = Joins.time
         AND compromised_meetings.room = Joins.room
         AND compromised_meetings.floor = Joins.floor
-    )
+    ),
 
     bookings_to_cancel AS (
         SELECT date, time, room, floor
@@ -507,13 +507,13 @@ BEGIN
     WHERE Books.date = bookings_to_cancel.date
     AND Books.time = bookings_to_cancel.time
     AND Books.room = bookings_to_cancel.room
-    AND Books.floor = bookings_to_cancel.floor
+    AND Books.floor = bookings_to_cancel.floor;
 
     DELETE FROM Approves
     WHERE Approves.date = bookings_to_cancel.date
     AND Approves.time = bookings_to_cancel.time
     AND Approves.room = bookings_to_cancel.room
-    AND Approves.floor = bookings_to_cancel.floor
+    AND Approves.floor = bookings_to_cancel.floor;
 
     SELECT * FROM compromised_employees;
 END;
