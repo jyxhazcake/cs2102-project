@@ -79,7 +79,7 @@ CREATE TABLE Books (
    time TIME,
    floor INTEGER,
    room INTEGER,
-   PRIMARY KEY(date, time, room, floor),
+   PRIMARY KEY(date, time, floor, room),
    FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor) ON DELETE CASCADE
 );
 
