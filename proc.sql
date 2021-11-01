@@ -13,13 +13,6 @@ new_eid INTEGER:= 0;
 new_email VARCHAR(50);
 BEGIN
 
-    -- Should we assume that the departments will always exist first before adding an employee?
-    -- We probably need a trigger, else we can't insert both the d_id as well as the name for department
-    --IF NOT EXISTS (SELECT 1 FROM Departments WHERE did = d_id)
-    --THEN INSERT INTO Department ...
-
-    -- Wei Xuan's comment: I believe this is already enforced by Foreign key constraint.
-
     SELECT max(eid) INTO new_eid FROM Employees;
     IF (new_eid IS NULL) 
         THEN new_eid = 1;
@@ -38,30 +31,11 @@ BEGIN
         new_email:= CONCAT(new_eid, '@demo_company.com');
     END IF;*/
     
-    -- How to insert multiple values for mobile num/ home num?
     -- Is there a better way of generating the eid than using AUTOINCREMENT?
     INSERT INTO Employees(ename, mobile_num, home_num, office_num, email, role, did)
     VALUES (e_name, mobilenum, homenum, officenum, new_email, kind, d_id);
-    
-    
-    -- For updating kind of employee
-    IF kind = 'junior'
-    THEN INSERT INTO Junior VALUES (new_eid);
-    END IF;
-    IF kind = 'senior'
-    THEN
-        BEGIN
-        INSERT INTO Senior VALUES (new_eid);
-        INSERT INTO Booker VALUES (new_eid);
-        END;
-    END IF;
-    IF kind = 'manager'
-    THEN
-        BEGIN
-        INSERT INTO Manager VALUES (new_eid);
-        INSERT INTO Booker VALUES (new_eid);
-        END;
-    END IF;
+
+    -- Removed insertion of junior/manager/senior here and instead put in trigger help_insert_role()
 END;
 $$LANGUAGE plpgsql;
 

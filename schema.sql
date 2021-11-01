@@ -31,7 +31,7 @@ CREATE TABLE Junior (
  
 CREATE TABLE Booker (
    eid INTEGER PRIMARY KEY,
-   FOREIGN KEY (eid) REFERENCES Employees (eid) ON UPDATE CASCADE
+   FOREIGN KEY (eid) REFERENCES Employees (eid) ON UPDATE CASCADE 
 );
  
 CREATE TABLE Senior (
@@ -117,8 +117,7 @@ BEGIN
     -- Need to check whether is already in employee table(?)
     IF (NEW.eid IN (SELECT eid FROM Booker) 
         OR NEW.eid IN (SELECT eid FROM Senior) 
-        OR NEW.eid IN (SELECT eid FROM Manager) 
-        OR NEW.eid NOT IN (SELECT eid FROM Employees))
+        OR NEW.eid IN (SELECT eid FROM Manager))
         THEN RETURN NULL;
     END IF;
     RETURN NEW;
@@ -133,7 +132,8 @@ EXECUTE FUNCTION check_only_junior();
 
 CREATE OR REPLACE FUNCTION check_only_senior() RETURNS TRIGGER AS $$
 BEGIN
-    IF (NEW.eid IN (SELECT eid FROM Junior) OR NEW.eid IN (SELECT eid FROM Manager))
+    IF (NEW.eid IN (SELECT eid FROM Junior) 
+        OR NEW.eid IN (SELECT eid FROM Manager))
         THEN RETURN NULL;
     END IF;
     
@@ -153,7 +153,8 @@ EXECUTE FUNCTION check_only_senior();
 
 CREATE OR REPLACE FUNCTION check_only_manager() RETURNS TRIGGER AS $$
 BEGIN
-    IF (NEW.eid IN (SELECT eid FROM Junior) OR NEW.eid IN (SELECT eid FROM Senior))
+    IF (NEW.eid IN (SELECT eid FROM Junior) 
+        OR NEW.eid IN (SELECT eid FROM Senior))
         THEN RETURN NULL;
     END IF;
     
@@ -179,13 +180,28 @@ When user inserts into booker directly -->
 3. add into manager/senior
 */
 
+--Update weihowe: realise is not possible because you need to insert into booker first, else violate FK constraint.
+
+/*
 CREATE OR REPLACE FUNCTION check_only_booker() RETURNS TRIGGER AS $$
+DECLARE
+    n_role VARCHAR(50);
 BEGIN
-    IF (NEW.eid IN (SELECT eid FROM Junior))
+    IF (NEW.eid IN (SELECT eid FROM Junior) OR NEW.eid NOT IN (SELECT eid FROM Employees))
         THEN RETURN NULL;
     END IF;
     
-    --Booker value will be redudant, ie exists a Booker value but no senior/manager.
+    SELECT role INTO n_role 
+    FROM Employee 
+    WHERE NEW.eid = eid;
+
+    IF (role = 'Senior')
+        THEN INSERT INTO Senior VALUES (NEW.eid);
+    END IF;
+
+    IF (role = 'Manager')
+        THEN INSERT INTO Manager VALUES (NEW.eid);
+    END IF;
 
     RETURN NEW;
 END;
@@ -195,8 +211,37 @@ CREATE TRIGGER check_booker_employee_type
 BEFORE INSERT OR UPDATE ON Booker
 FOR EACH ROW
 EXECUTE FUNCTION check_only_booker();
+*/
 
+--New function: Helps guard against manual insertion into employees
+CREATE OR REPLACE FUNCTION help_insert_role() RETURNS TRIGGER AS $$
+BEGIN
+    -- For updating kind of employee
+    IF NEW.role = 'Junior'
+    THEN INSERT INTO Junior VALUES (NEW.eid);
+    END IF;
+    IF NEW.role = 'Senior'
+    THEN
+        BEGIN
+        INSERT INTO Booker VALUES (NEW.eid);
+        INSERT INTO Senior VALUES (NEW.eid);
+        END;
+    END IF;
+    IF NEW.role = 'Manager'
+    THEN
+        BEGIN
+        INSERT INTO Booker VALUES (NEW.eid);
+        INSERT INTO Manager VALUES (NEW.eid);
+        END;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE TRIGGER help_insert_employee_role
+AFTER INSERT OR UPDATE ON Employees
+FOR EACH ROW
+EXECUTE FUNCTION help_insert_role();
 
 --FIXES 13 & 14
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
