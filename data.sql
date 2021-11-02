@@ -73,36 +73,9 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', '
 
 -- To test if Junior employee can be inserted into Booker --> Should show "INSERT 0 0"
 insert into Booker (eid) values (1);
-/*
-insert into Booker (eid) values (1);
-insert into Booker (eid) values (2);
-insert into Booker (eid) values (3);
-insert into Booker (eid) values (6);
-insert into Booker (eid) values (7);
-insert into Booker (eid) values (9);
-insert into Booker (eid) values (11);
-insert into Booker (eid) values (14);
-insert into Booker (eid) values (18);
-insert into Booker (eid) values (24);
-insert into Booker (eid) values (32);
-
---Senior
-insert into Senior (eid) values (2);
-insert into Senior (eid) values (3);
-insert into Senior (eid) values (6);
-insert into Senior (eid) values (7);
-insert into Senior (eid) values (9);
-
---Manager
-insert into Manager (eid) values (11);
-insert into Manager (eid) values (14);
-insert into Manager (eid) values (18);
-insert into Manager (eid) values (24);
-insert into Manager (eid) values (32);
-*/
 
 /*
-Wei Xuan's Functions
+       Wei Xuan's Functions
 */
 
 -- add_room(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
@@ -170,8 +143,8 @@ Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work
 Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
---
-Call add_room(1, 1, 'France', 5, 1, 4, '1/11/2021');
+
+
 --zh functions
 --add and remove department works
 Call add_department(369, 'salakau');
@@ -183,8 +156,8 @@ Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
 Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
 Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
 
---SELECT * FROM non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+--SELECT non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
 
---SELECT contact_tracing(1);
+SELECT contact_tracing(11);
 
 --MY FUNCTIONS

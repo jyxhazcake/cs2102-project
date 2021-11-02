@@ -564,14 +564,14 @@ BEGIN
     WHERE Books.eid = NEW.eid
         AND Books.date >= NEW.resigned_date;
     --Do not need to account for joins and approval as they
-    -- are automatically deleted under FK Constraint
+    --are automatically deleted under FK Constraint
 END;
 $$LANGUAGE plpgsql;
 
 --Trigger is activated when employee resigned_date is changed
 CREATE TRIGGER resigned_employee_removed
 AFTER UPDATE ON Employees
-FOR EACH ROW -- add a when condition to check resigned date
+FOR EACH ROW WHEN (New.resigned_date IS NOT NULL)
 EXECUTE FUNCTION remove_future_records();
 
 /* FIXES Requirement:

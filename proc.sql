@@ -55,7 +55,7 @@ CREATE OR REPLACE FUNCTION view_future_meeting
     (IN start_date DATE, IN e_id INTEGER)
 RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER) AS $$
 BEGIN
-    SELECT j.date, j.time, j.room, j.floor 
+    RETURN QUERY SELECT j.date, j.time, j.room, j.floor 
     FROM Joins j, Approves a
     WHERE j.date = a.date
         AND j.time = a.time
@@ -148,72 +148,76 @@ $$LANGUAGE plpgsql;
 4th step: return rooms where --> floor, room not in Books where time >=start_hour and time < end_hour
 */
 
+-- ******************* Works *******************
 CREATE OR REPLACE FUNCTION search_room
     (IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
 RETURNS TABLE(floor INTEGER, room INTEGER, did INTEGER, available_capacity INTEGER) AS $$
 BEGIN
+    --step 4:
+    RETURN QUERY 
     --get the latest updates: step 1 and 2
     WITH latest_updates AS (
-        SELECT floor, room, MAX(date)
-        FROM Updates
-        WHERE date <= query_date
-        GROUP BY floor, room
+        SELECT U.floor, U.room, MAX(U.date) as date
+        FROM Updates AS U
+        WHERE U.date <= query_date
+        GROUP BY U.floor, U.room
     ),
 
     --get the rooms with capactity >= required capacity: step 3
     -- e.g. 3 floor, room which meets the required capacity
     cap_available AS (
-        SELECT floor, room, did, new_cap
+        SELECT u.floor, u.room, m.did, u.new_cap
         FROM Updates as u JOIN Meeting_Rooms as m
         ON u.floor = m.floor
             AND u.room = m.room
         WHERE EXISTS (SELECT 1
                         FROM latest_updates as lu
-                        WHERE lu.floor = floor
-                            AND lu.room = room
-                            AND lu.date = date)
+                        WHERE lu.floor = u.floor
+                            AND lu.room = u.room
+                            AND lu.date = u.date)
         ORDER BY new_cap ASC
     )
 
-    --step 4:
-    SELECT floor, room, did, new_cap
-    FROM cap_available AS c
-    WHERE NOT EXISTS (SELECT 1
+    SELECT c.floor, c.room, c.did, c.new_cap
+        FROM cap_available AS c
+        WHERE NOT EXISTS (SELECT 1
                         FROM Books AS b
                         WHERE b.time >= start_hour
                             AND b.time < end_hour
                             AND b.floor = c.floor
                             AND b.room = c.room);
-    RETURN NEXT; --need to confirm if required
 END;
 $$ LANGUAGE plpgsql;
 
-/*
+/* view_booking_report routing
 step 1: get all the rooms which were booked
 step 2: check if they are approved
 */
-
+--  ******************* Works *******************
 CREATE OR REPLACE FUNCTION view_booking_report
     (IN start_date DATE, IN bid INTEGER)
 RETURNS TABLE(floor INTEGER, room INTEGER, date DATE, start_hour TIME, is_approved BOOLEAN) AS $$
 BEGIN
+
+    RETURN QUERY 
+
     WITH booked_rooms AS (
-        SELECT *
-        FROM Books as b JOIN Approves as a
+        SELECT a.aid, b.eid, b.floor, b.room, b.date, b.time
+        FROM Books as b LEFT OUTER JOIN Approves as a
         ON b.date = a.date
             AND b.time = a.time
             AND b.floor = a.floor
             AND b.room = a.room
-        WHERE date >= start_date
-            AND b.bid = bid
+        WHERE b.date >= start_date
+            AND b.eid = bid
     )
 
 
-    SELECT floor, room, date, time, CASE
-        WHEN aid IS NULL THEN FALSE
+    SELECT br.floor, br.room, br.date, br.time, CASE
+        WHEN br.aid IS NULL THEN FALSE
         ELSE TRUE
       END AS is_approved
-    FROM booked_rooms;
+    FROM booked_rooms AS br;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -400,27 +404,8 @@ RETURNS TABLE(eid INTEGER, days BIGINT) AS $$
 DECLARE
     total_days INTEGER:= end_date - start_date + 1;
 BEGIN
-    /*
-    WITH employees_not_declared AS (
-        WHILE curr_date <= end_date LOOP
 
-            SELECT e.eid
-            FROM Employees AS e
-            WHERE e.eid NOT IN (SELECT hd.eid
-                            FROM Health_Declaration as hd
-                            WHERE hd.date < start_date
-                            AND hd.date > end_date);
-
-            DATEADD(day, 1, curr_date);
-
-        END LOOP
-    )
-
-    SELECT eid, COUNT(*) FROM employees_not_declared
-    GROUP BY eid
-    ORDER BY COUNT(*) desc;
-    */
- 
+    RETURN QUERY 
     WITH declared_days AS (
         SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
             FROM Health_Declaration
@@ -435,18 +420,15 @@ BEGIN
         FROM Employees
         WHERE Employees.eid NOT IN (SELECT dd.eid
                         FROM declared_days as dd)
-    ),
-
-    result AS (
-    SELECT * 
-    FROM  no_declaration UNION 
-    SELECT *  FROM declared_days
-    WHERE declared_days.days <> 0
     )
 
-    SELECT * FROM result;
+    (SELECT no_declaration.eid, no_declaration.days
+    FROM  no_declaration)
+    UNION 
+    (SELECT declared_days.eid, declared_days.days  FROM 
+    declared_days
+    WHERE declared_days.days <> 0);
 
-    RETURN QUERY (SELECT * FROM result);
 
     /*    
     WITH declared_days AS (
@@ -493,20 +475,22 @@ BEGIN
     IF has_fever = FALSE THEN RETURN;
     END IF;
 
+
     WITH compromised_meetings AS (
         SELECT date, time, room, floor
         FROM Joins
-        WHERE eid = e_id
-            AND date >= DATEADD(day, -3, curr_date)
+        WHERE Joins.eid = e_id
+            AND date >= (curr_date - INTERVAL'3 days')::date
             AND date <= curr_date
     ),
 
     compromised_employees AS (
-        SELECT eid from Joins
-        WHERE compromised_meetings.date = Joins.date
-        AND compromised_meetings.time = Joins.time
-        AND compromised_meetings.room = Joins.room
-        AND compromised_meetings.floor = Joins.floor
+        SELECT J.eid 
+        FROM Joins as J, compromised_meetings as CM
+        WHERE CM.date = J.date
+        AND CM.time = J.time
+        AND CM.room = J.room
+        AND CM.floor = J.floor
     ),
 
     bookings_to_cancel AS (
@@ -516,18 +500,21 @@ BEGIN
             AND (Books.date > CURRENT_DATE OR (Books.date = CURRENT_DATE AND LOCALTIME > Books.time))
     )
 
-    DELETE FROM Joins
+    DELETE FROM Joins USING compromised_employees
     WHERE compromised_employees.eid = Joins.eid
     AND Joins.date >= curr_date
-    AND Joins.date <= DATEADD(day, 7, curr_date);
+    AND Joins.date <= (curr_date + INTERVAL'7 days');
 
-    DELETE FROM Books
+    DELETE FROM Books USING bookings_to_cancel
     WHERE Books.date = bookings_to_cancel.date
     AND Books.time = bookings_to_cancel.time
     AND Books.room = bookings_to_cancel.room
     AND Books.floor = bookings_to_cancel.floor;
 
+    
     RETURN QUERY SELECT * FROM compromised_employees;
+
+    
 END;
 $$LANGUAGE plpgsql;
 
