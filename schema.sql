@@ -645,7 +645,49 @@ When a meeting room has its capacity changed, any room booking after the change 
 (including the employee who made the booking) will automatically be removed. This is regardless of whether they are approved or not.
 */
 
+/*
+1. Find all bookings that > curr date && is the room that is being modified
+2. For each booking in (1),
+3. If Curr Participants in booking > updated capcity
+4. Delete Booking (Should propogate to approves + joins)
+5. Else keep booking
+*/
+
+CREATE OR REPLACE FUNCTION remove_excess_capacity() RETURNS TRIGGER AS $$
+BEGIN
+
+    DELETE FROM Books
+    WHERE Books.date >= NEW.DATE
+    AND Books.room = NEW.room
+    AND Books.floor = NEW.floor
+    AND ((SELECT COUNT(*) 
+    FROM Joins
+    WHERE Joins.room = New.room
+    AND Joins.floor = New.floor) >= 
+    SELECT * FROM (return_latest_capacity(NEW.room, NEW.floor)));
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER remove_less_than_capactiy
+AFTER INSERT OR UPDATE ON JOINS -- SHOULD THIS BE BEFORE INSERT AS WE SHOULD PREVENT UPDATE ON UPDATE
+FOR EACH ROW
+EXECUTE FUNCTION remove_excess_capacity();
 
 /* FIXES Requirement:
 Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
 */
+CREATE OR REPLACE FUNCTION prevent_joining_meeting() RETURNS TRIGGER AS $$
+BEGIN
+    -- Already in another meeting
+    IF ((NEW.eid, NEW.date, NEW.time) IN (SELECT eid, date, time FROM Joins)) 
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_multiple_meetings
+BEFORE INSERT OR UPDATE ON JOINS
+FOR EACH ROW
+EXECUTE FUNCTION prevent_joining_meeting();

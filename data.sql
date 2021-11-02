@@ -146,6 +146,10 @@ Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
 
+--
+--Call book_room(2,7,'2022-01-01', '08:00:00', '10:00:00', 2);
+insert into Joins (eid, date, time, floor, room) values (2, '2022-01-01', '02:00:00', 2, 7); -- should fail, can't join 2 meetings at once
+
 --wx functions
 -- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
 SELECT search_room(10, '2021-12-01', '00:00', '01:00');
