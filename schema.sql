@@ -309,7 +309,8 @@ BEGIN
     SELECT COUNT(*) into count
     FROM Health_Declaration
     WHERE NEW.eid = Health_Declaration.eid 
-        AND Health_Declaration.fever = true;
+    AND Health_Declaration.fever = true
+    AND CURRENT_DATE = Health_Declaration.date;
 
     IF count > 0 THEN
         RETURN NULL;
@@ -600,6 +601,36 @@ CREATE TRIGGER remove_department_check
 BEFORE DELETE ON Departments
 FOR EACH ROW
 EXECUTE FUNCTION check_remove_department();
+
+--PREVENT NON-HOURLY INPUTS
+CREATE OR REPLACE FUNCTION block_non_hourly_input() RETURNS TRIGGER AS $$
+DECLARE
+    number_of_minutes INTEGER;
+    number_of_seconds INTEGER;
+BEGIN
+    SELECT EXTRACT (MINUTE FROM NEW.time) INTO number_of_minutes;
+    SELECT EXTRACT (SECOND FROM NEW.time) INTO number_of_seconds;
+    IF number_of_minutes > 0 THEN
+        RETURN NULL;
+    ELSIF number_of_seconds > 0 THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER only_hourly_input
+BEFORE INSERT OR UPDATE ON Books
+FOR EACH ROW EXECUTE FUNCTION block_non_hourly_input();
+
+CREATE TRIGGER only_hourly_input
+BEFORE INSERT OR UPDATE ON Joins
+FOR EACH ROW EXECUTE FUNCTION block_non_hourly_input();
+
+CREATE TRIGGER only_hourly_input
+BEFORE INSERT OR UPDATE ON Approves
+FOR EACH ROW EXECUTE FUNCTION block_non_hourly_input();
 
 
 /* FIXES Requirement:
