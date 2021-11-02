@@ -104,6 +104,8 @@ VALUES
   (2,6,'Ireland',4),
   (7,1,'Spain',1);
 
+insert into updates values ('2021-11-02', 7, 1, 3, 4);
+
 --Books
 insert into Books (eid, date, time, floor, room) values (1, '2022-01-01', '12:00:00', 2, 7); --junior fails to book room
 insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7); --senior books
@@ -125,7 +127,7 @@ insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01
 insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
 insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
 insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
-insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
+--insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
 
 --Functions
 Call add_employee('weihowe', '87222555', 'Junior', 1);

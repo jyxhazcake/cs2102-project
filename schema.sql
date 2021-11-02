@@ -275,6 +275,55 @@ EXECUTE FUNCTION help_insert_role();
 /*
 Jon
 */
+--Prevents joins on full room
+CREATE OR REPLACE FUNCTION block_join_on_full_room() RETURNS TRIGGER AS $$
+DECLARE
+    max_capacity INTEGER;
+    current_capacity INTEGER;
+    available_capacity INTEGER;
+BEGIN
+    SELECT return_latest_capacity(NEW.floor, NEW.room) INTO max_capacity;
+    SELECT COUNT(*) INTO current_capacity
+    FROM Joins
+    WHERE NEW.floor = Joins.floor
+    AND NEW.room = Joins.room
+    AND NEW.date = Joins.date
+    AND NEW.time = Joins.time;
+    available_capacity:= max_capacity - current_capacity;
+
+    IF available_capacity > 0 THEN
+        RETURN NEW;
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER fully_joined_room
+BEFORE INSERT ON Joins
+FOR EACH ROW EXECUTE FUNCTION block_join_on_full_room();
+
+--Prevents booking on room without capacity
+CREATE OR REPLACE FUNCTION block_room_booking_without_capacity() RETURNS TRIGGER AS $$
+DECLARE
+    capacity_declared NUMERIC;
+BEGIN
+    SELECT COUNT(*) into capacity_declared
+    FROM Updates
+    WHERE Updates.floor = NEW.floor
+    AND Updates.room = NEW.room;
+
+    IF capacity_declared > 0 THEN
+        RETURN NEW;
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER booking_room_with_no_capacity
+BEFORE INSERT OR UPDATE ON Books
+FOR EACH ROW EXECUTE FUNCTION block_room_booking_without_capacity();
 
 --FIXES 13 & 14
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
