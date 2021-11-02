@@ -121,11 +121,11 @@ insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00
 
 --Approves
 insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7); --manager approves
-insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
-insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
-insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
-insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
-insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
+--insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
+--insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
+--insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
+--insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
+--insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
 
 --Functions
 Call add_employee('weihowe', '87222555', 'Junior', 1);
@@ -140,7 +140,7 @@ Call add_employee('FrenchGuy', '00000', 'Manager', 5);
 Call book_room(2, 7, '2022-01-01', '01:00:00', '10:00:00', 2); --should work and it does
 Call unbook_room(2, 7, '2022-01-01', '02:00:00', '04:00:00', 2); --should work and it does
 Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work and it does
-Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
+--Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
 
@@ -161,3 +161,9 @@ Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
 SELECT contact_tracing(11);
 
 --MY FUNCTIONS
+
+--weihowe remaining functions
+SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 3); -- Testing Manual Insertion into Books + Approve 
+SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 12); -- Testing the Join Meeting/Approve Meeting Function
+
+SELECT view_manager_report(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 32);
