@@ -1,6 +1,10 @@
 -- Manual insertions
+/*
+Department constraint -> Department 0 is reserved for Resigned employees whose department has been deleted.
+*/
 
 --Departments
+insert into Departments (did, dname) values (0, 'Department deleted after Resignation');
 insert into Departments (did, dname) values (1, 'Product Management');
 insert into Departments (did, dname) values (2, 'Legal');
 insert into Departments (did, dname) values (3, 'Training');
@@ -87,8 +91,6 @@ Call add_room(1, 3, 'France', 5, 1, 4, '1/11/2021');
 CALL change_capacity(1, 1, 20, '2021-11-01', 4);
 CALL change_capacity(1, 2, 16, '2021-11-01', 4);
 
--- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
-
 
 --Checks Trigger #24
 INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 4); -- Manager same department
@@ -144,6 +146,11 @@ Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should wor
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
 
+--wx functions
+-- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
+SELECT search_room(10, '2021-12-01', '00:00', '01:00');
+SELECT view_booking_report('2021-01-01', 2);
+
 
 --zh functions
 --add and remove department works
@@ -155,8 +162,22 @@ Call remove_department(555);
 Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
 Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
 Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
+Call declare_health(11, TO_DATE('2/11/2021', 'DD/MM/YYYY'), 37.7);
 
---SELECT non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+SELECT non_compliance('17/12/2015', '17/12/2015'); --should have 55-3 = 52rows
+
+/*
+Check remove_department
+- remove all employees under department 2
+- remove department 2
+*/
+CALL remove_employee(1, '2021-11-01');
+CALL remove_employee(10, '2021-11-01');
+CALL remove_employee(21, '2021-11-01');
+CALL remove_employee(41, '2021-11-01');
+CALL remove_employee(52, '2021-11-01');
+CALL remove_department(2);
+
 
 SELECT contact_tracing(11);
 

@@ -396,7 +396,7 @@ $$LANGUAGE plpgsql;
 
 --non compliance
 /*
-
+ Works for light testing
 */
 CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
@@ -428,25 +428,6 @@ BEGIN
     (SELECT declared_days.eid, declared_days.days  FROM 
     declared_days
     WHERE declared_days.days <> 0);
-
-
-    /*    
-    WITH declared_days AS (
-        SELECT Health_Declaration.eid, total_days - COUNT(*) AS days
-        FROM Health_Declaration
-        WHERE date >= start_date
-            AND date <= end_date
-        GROUP BY Health_Declaration.eid
-        HAVING days < total_days
-        ORDER BY days ASC
-    )
-
-    UPDATE declared_days
-    SET days = total_days - days;
-
-    SELECT * FROM declared_days;
-    */
-
 END;
 $$LANGUAGE plpgsql;
 
@@ -475,13 +456,14 @@ BEGIN
     IF has_fever = FALSE THEN RETURN;
     END IF;
 
+    RETURN QUERY 
 
     WITH compromised_meetings AS (
         SELECT date, time, room, floor
         FROM Joins
         WHERE Joins.eid = e_id
-            AND date >= (curr_date - INTERVAL'3 days')::date
-            AND date <= curr_date
+            AND date >= (CURRENT_DATE - INTERVAL'3 days')::date
+            AND date <= CURRENT_DATE
     ),
 
     compromised_employees AS (
@@ -491,13 +473,26 @@ BEGIN
         AND CM.time = J.time
         AND CM.room = J.room
         AND CM.floor = J.floor
+    )
+    
+    SELECT * FROM compromised_employees;
+
+    /*
+    WITH compromised_meetings AS (
+        SELECT date, time, room, floor
+        FROM Joins
+        WHERE Joins.eid = e_id
+            AND date >= (CURRENT_DATE - INTERVAL'3 days')::date
+            AND date <= CURRENT_DATE
     ),
 
-    bookings_to_cancel AS (
-        SELECT date, time, room, floor
-        FROM Books
-        WHERE Books.eid = e_id
-            AND (Books.date > CURRENT_DATE OR (Books.date = CURRENT_DATE AND LOCALTIME > Books.time))
+    compromised_employees AS (
+        SELECT J.eid 
+        FROM Joins as J, compromised_meetings as CM
+        WHERE CM.date = J.date
+        AND CM.time = J.time
+        AND CM.room = J.room
+        AND CM.floor = J.floor
     )
 
     DELETE FROM Joins USING compromised_employees
@@ -505,16 +500,19 @@ BEGIN
     AND Joins.date >= curr_date
     AND Joins.date <= (curr_date + INTERVAL'7 days');
 
+    WITH bookings_to_cancel AS (
+        SELECT date, time, room, floor
+        FROM Books
+        WHERE Books.eid = e_id
+            AND (Books.date > CURRENT_DATE OR (Books.date = CURRENT_DATE AND LOCALTIME > Books.time))
+    )
+
     DELETE FROM Books USING bookings_to_cancel
     WHERE Books.date = bookings_to_cancel.date
     AND Books.time = bookings_to_cancel.time
     AND Books.room = bookings_to_cancel.room
     AND Books.floor = bookings_to_cancel.floor;
-
-    
-    RETURN QUERY SELECT * FROM compromised_employees;
-
-    
+    */
 END;
 $$LANGUAGE plpgsql;
 
