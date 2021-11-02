@@ -156,7 +156,7 @@ CREATE OR REPLACE FUNCTION search_room
     (IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
 RETURNS TABLE(floor INTEGER, room INTEGER, did INTEGER, available_capacity INTEGER) AS $$
 BEGIN
-    --step 4:
+
     RETURN QUERY 
     --get the latest updates: step 1 and 2
     WITH latest_updates AS (
@@ -181,6 +181,7 @@ BEGIN
         ORDER BY new_cap ASC
     )
 
+    --step 4:
     SELECT c.floor, c.room, c.did, c.new_cap
         FROM cap_available AS c
         WHERE NOT EXISTS (SELECT 1
@@ -427,11 +428,11 @@ BEGIN
 
     RETURN QUERY 
     WITH declared_days AS (
-        SELECT Health_Declaration.eid, (total_days - COUNT(*)) AS days
-            FROM Health_Declaration
+        SELECT HD.eid, (total_days - COUNT(*)) AS days
+            FROM Health_Declaration as HD
             WHERE date >= start_date
                 AND date <= end_date
-            GROUP BY Health_Declaration.eid
+            GROUP BY HD.eid
             ORDER BY days DESC
     ),
 
@@ -470,7 +471,7 @@ CREATE OR REPLACE FUNCTION contact_tracing
 RETURNS TABLE(eid INTEGER) AS $$
 DECLARE 
     has_fever BOOLEAN;
-    curr_date DATE;
+    curr_date DATE := '2022-10-10' ; 
 BEGIN
     SELECT fever INTO has_fever FROM Health_Declaration WHERE Health_Declaration.eid = e_id;
     IF has_fever = FALSE THEN RETURN;
@@ -479,11 +480,15 @@ BEGIN
     RETURN QUERY 
 
     WITH compromised_meetings AS (
-        SELECT date, time, room, floor
-        FROM Joins
-        WHERE Joins.eid = e_id
-            AND date >= (CURRENT_DATE - INTERVAL'3 days')::date
-            AND date <= CURRENT_DATE
+        SELECT J.date, J.time, J.room, J.floor
+        FROM Joins as J JOIN Approves as a
+        ON J.date = A.date
+            AND J.time = A.time
+            AND J.room = A.room
+            AND J.floor = A.floor
+        WHERE J.eid = 20
+            AND J.date >= (curr_date - INTERVAL'3 days')::date
+            AND J.date <= curr_date
     ),
 
     compromised_employees AS (

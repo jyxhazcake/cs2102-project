@@ -72,6 +72,12 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Boony', 'bd
 insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 13);
 insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
+ 
+/*
+Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
+Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
+Managers:  4 11 14 18 24 32 35 48 53 54 55
+*/
 
 --Booker
 
@@ -100,10 +106,10 @@ INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 11); --Manager from different
 --Meeting_Rooms
 INSERT INTO Meeting_Rooms (floor,room, rname ,did)
 VALUES
+  (2,6,'Ireland',4),
   (2,7,'France',5),
   (4,7,'Sweden',12),
   (5,6,'Ireland',6),
-  (2,6,'Ireland',4),
   (7,1,'Spain',1);
 
 --Books
@@ -162,7 +168,8 @@ Call remove_department(555);
 Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
 Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
 Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
-Call declare_health(11, TO_DATE('2/11/2021', 'DD/MM/YYYY'), 37.7);
+-- Call declare_health(4, '3/11/2021', 37.7);
+Call declare_health(4, '9/11/2021', 37.2);
 
 SELECT non_compliance('17/12/2015', '17/12/2015'); --should have 55-3 = 52rows
 
@@ -179,7 +186,66 @@ CALL remove_employee(52, '2021-11-01');
 CALL remove_department(2);
 
 
-SELECT contact_tracing(11);
+/* 
+Check contact_Tracing
+
+Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
+Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
+Managers:  4 11 14 18 24 32 35 48 53 54 55
+
+*/
+-- Booking after fever day (5 Not Traced)
+CALL book_room (1, 1, '2022-10-11', '01:00', '04:00', 4);
+CALL join_meeting(1, 1, '2022-10-11', '01:00', '04:00', 5);
+CALL approve_meeting (1, 1, '2022-10-11', '01:00', '04:00', 11);
+
+-- Booking on fever day with the fever (1002, 4 Traced)
+CALL book_room (1, 1, '2022-10-10', '01:00', '04:00', 4);
+CALL join_meeting (1, 1, '2022-10-10', '01:00', '04:00', 20);
+CALL join_meeting(1, 1, '2022-10-10', '01:00', '04:00', 1);
+CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 4);
+
+-- Booking on fever day without the fever (6 Traced)
+CALL book_room (1, 1, '2022-10-10', '08:00', '09:00', 4);
+CALL join_meeting(1, 1, '2022-10-10', '08:00', '09:00', 6);
+CALL approve_meeting (1, 1, '2022-10-10', '08:00', '09:00', 4);
+
+-- Booking on fever day in another room (7 Not Traced)
+CALL book_room (7, 1, '2022-10-10', '01:00', '04:00', 4);
+CALL join_meeting(7, 1, '2022-10-10', '01:00', '04:00', 7);
+CALL approve_meeting (7, 1, '2022-10-10', '01:00', '04:00', 4);
+
+-- Booking on fever day not approved (8 Not Traced)
+CALL book_room (1, 1, '2022-10-10', '06:00', '07:00', 4);
+CALL join_meeting(1, 1, '2022-10-10', '06:00', '07:00', 8);
+
+-- Booking on fever day - 3 (11 Traced)
+CALL book_room (1, 1, '2022-10-07', '01:00', '04:00', 4);
+CALL join_meeting(1, 1, '2022-10-07', '01:00', '04:00', 11);
+CALL approve_meeting (1, 1, '2022-10-07', '01:00', '04:00', 4);
+
+-- Booking on fever day + 7 (Deleted - 4 close contact)
+CALL book_room (1, 1, '2022-10-17', '01:00', '04:00', 4);
+
+CALL approve_meeting (1, 1, '2022-10-17', '01:00', '04:00', 4);
+
+-- Booking on fever day + 7 (Not Deleted - 5 Not close contact)
+CALL book_room (1, 1, '2022-10-17', '05:00', '06:00', 4);
+CALL join_meeting (1, 1, '2022-10-17', '05:00', '06:00', 5);
+CALL approve_meeting (1, 1, '2022-10-17', '05:00', '06:00', 4);
+
+-- Booking on fever day + 8 (Not Deleted - After D + 7)
+CALL book_room (1, 1, '2022-10-18', '01:00', '04:00', 4);
+
+CALL approve_meeting (1, 1, '2022-10-18', '01:00', '04:00', 4);
+
+-- Booking on fever day + 15 by primary (Deleted - 1002 primary contact)
+CALL book_room (1, 1, '2022-10-25', '01:00', '04:00', 20);
+
+-- The primary fever contact for contact tracing
+CALL declare_health (20, '2022-10-10', 37.6);
+
+SELECT contact_tracing(20);
 
 --MY FUNCTIONS
 

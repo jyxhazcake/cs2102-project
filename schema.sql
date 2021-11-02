@@ -408,11 +408,6 @@ BEFORE INSERT OR UPDATE ON Updates
 FOR EACH ROW
 EXECUTE FUNCTION check_dept_before_update_capacity();
 
-/*
-       ############################################
-       # Missing IF condition for contact_tracing #
-       ############################################
-*/
 
 CREATE OR REPLACE FUNCTION block_leaving_after_approval() RETURNS TRIGGER AS $$
 DECLARE
@@ -448,7 +443,7 @@ FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
 /*
 Jim
-*/
+
 
 --FIXES 25
 CREATE OR REPLACE FUNCTION block_book_past_meetings() 
@@ -508,6 +503,7 @@ CREATE TRIGGER cannot_approve_past_meeting
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_approve_past_meetings();
 
+*/
 
 
 --FIXES 34
@@ -641,8 +637,15 @@ FOR EACH ROW EXECUTE FUNCTION block_non_hourly_input();
 
 
 /* FIXES Requirement:
-When a meeting room has its capacity changed, any room booking after the change date with more participants 
-(including the employee who made the booking) will automatically be removed. This is regardless of whether they are approved or not.
+When a meeting room has its capacity changed --> INSERT INTO Updates,
+any room booking after the change date with more participants (including the employee who made the booking) will automatically be removed. 
+--> SELECT floor, room, date, time, COUNT(*)
+    FROM Booking as B Join Joins as J
+    ON B date, time, room, floor == J
+        AND date >= Updates
+    GROUP BY floor, room, date, time
+remove_booking;
+This is regardless of whether they are approved or not.
 */
 
 
