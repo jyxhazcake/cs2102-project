@@ -125,6 +125,7 @@ AS $$
 BEGIN
     INSERT INTO Meeting_Rooms 
     VALUES(floor, room, rname, did);
+
     INSERT INTO Updates 
     VALUES(date, floor, room, room_capacity, mid);
 END;
@@ -466,29 +467,32 @@ ELSE:
     Wei Xuan's Comment: Missing Books & Approved
 */
 
+/*
+Possible implementation: 
+1. Create a table compromised_employees
+2. Create a trigger --> When eid added into compromised_employees, delete all meetings in next 7days
+*/
+
+/*
+Constraint: If the health_declaration is not assumed to be in the morning --> 
+*/
+
 CREATE OR REPLACE FUNCTION contact_tracing
     (IN e_id INTEGER)
 RETURNS TABLE(eid INTEGER) AS $$
 DECLARE 
-    has_fever BOOLEAN;
-    curr_date DATE := '2022-10-10' ; 
+    has_fever BOOLEAN; 
 BEGIN
     SELECT fever INTO has_fever FROM Health_Declaration WHERE Health_Declaration.eid = e_id;
     IF has_fever = FALSE THEN RETURN;
     END IF;
 
-    RETURN QUERY 
-
     WITH compromised_meetings AS (
-        SELECT J.date, J.time, J.room, J.floor
-        FROM Joins as J JOIN Approves as a
-        ON J.date = A.date
-            AND J.time = A.time
-            AND J.room = A.room
-            AND J.floor = A.floor
-        WHERE J.eid = 20
-            AND J.date >= (curr_date - INTERVAL'3 days')::date
-            AND J.date <= curr_date
+        SELECT date, time, room, floor
+        FROM Joins
+        WHERE Joins.eid = e_id
+            AND date >= (CURRENT_DATE - INTERVAL'3 days')::date
+            AND date <= CURRENT_DATE
     ),
 
     compromised_employees AS (
@@ -498,6 +502,47 @@ BEGIN
         AND CM.time = J.time
         AND CM.room = J.room
         AND CM.floor = J.floor
+    ),
+
+    bookings_to_cancel AS (
+        SELECT date, time, room, floor
+        FROM Books
+        WHERE Books.eid = e_id
+            AND (Books.date > CURRENT_DATE OR (Books.date = CURRENT_DATE AND LOCALTIME > Books.time))
+    )
+
+    DELETE FROM Joins USING compromised_employees
+    WHERE compromised_employees.eid = Joins.eid
+    AND Joins.date >= curr_date
+    AND Joins.date <= (curr_date + INTERVAL'7 days');
+
+    DELETE FROM Books USING (SELECT date, time, room, floor
+                        FROM Books
+                        WHERE Books.eid = e_id
+                            AND (Books.date > CURRENT_DATE OR (Books.date = CURRENT_DATE AND LOCALTIME > Books.time))) AS bookings_to_cancel
+    WHERE Books.date = bookings_to_cancel.date
+    AND Books.time = bookings_to_cancel.time
+    AND Books.room = bookings_to_cancel.room
+    AND Books.floor = bookings_to_cancel.floor;
+
+    RETURN QUERY 
+
+    WITH compromised_meetings AS (
+        SELECT J.date, J.time, J.room, J.floor
+        FROM Joins J NATURAL JOIN Approves as a
+        WHERE J.eid = e_id
+            AND J.date >= (CURRENT_DATE - INTERVAL'3 days')::date
+            AND J.date <= CURRENT_DATE
+    ),
+
+    compromised_employees AS (
+        SELECT distinct(J.eid )
+        FROM Joins as J, compromised_meetings as CM
+        WHERE CM.date = J.date
+        AND CM.time = J.time
+        AND CM.room = J.room
+        AND CM.floor = J.floor
+        AND J.eid <> e_id
     )
     
     SELECT * FROM compromised_employees;

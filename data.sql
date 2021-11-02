@@ -69,7 +69,7 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Bondy', 'br
 insert into Employees (ename, email, mobile_num, role, did) values ('Linzy', 'lmcgettrick18@joomla.org', '890-109-7554', 'Junior', 9);
 insert into Employees (ename, email, mobile_num, role, did) values ('Gabriel', 'ginold19@jalbum.net', '158-407-5909', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Boony', 'bdot1a@odnoklassniki.ru', '303-402-9208', 'Senior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 13);
+insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 1);
 insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
  
@@ -201,11 +201,11 @@ CALL book_room (1, 1, '2022-10-11', '01:00', '04:00', 4);
 CALL join_meeting(1, 1, '2022-10-11', '01:00', '04:00', 5);
 CALL approve_meeting (1, 1, '2022-10-11', '01:00', '04:00', 11);
 
--- Booking on fever day with the fever (1002, 4 Traced)
+-- Booking on fever day with the fever (1, 4 Traced)
 CALL book_room (1, 1, '2022-10-10', '01:00', '04:00', 4);
 CALL join_meeting (1, 1, '2022-10-10', '01:00', '04:00', 20);
 CALL join_meeting(1, 1, '2022-10-10', '01:00', '04:00', 1);
-CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 4);
+CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 55);
 
 -- Booking on fever day without the fever (6 Traced)
 CALL book_room (1, 1, '2022-10-10', '08:00', '09:00', 4);
