@@ -226,6 +226,19 @@ $$ LANGUAGE plpgsql;
     ###################
     #    Jon Code     #
     ###################  */
+--return_latest_capacity
+CREATE OR REPLACE FUNCTION return_latest_capacity (IN input_floor INTEGER, IN input_room INTEGER)
+RETURNS TABLE(latest_capacity INTEGER) AS $$
+BEGIN
+    SELECT new_cap INTO latest_capacity
+    FROM Updates
+    WHERE input_floor = floor AND input_room = room AND date = (SELECT MAX(date)
+                                                                FROM Updates
+                                                                WHERE input_floor = floor AND input_room = room);
+    RETURN QUERY SELECT latest_capacity;
+END;
+$$ LANGUAGE plpgsql;
+
 
 --book_room
 CREATE OR REPLACE PROCEDURE book_room
