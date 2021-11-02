@@ -1,6 +1,10 @@
 -- Manual insertions
+/*
+Department constraint -> Department 0 is reserved for Resigned employees whose department has been deleted.
+*/
 
 --Departments
+insert into Departments (did, dname) values (0, 'Department deleted after Resignation');
 insert into Departments (did, dname) values (1, 'Product Management');
 insert into Departments (did, dname) values (2, 'Legal');
 insert into Departments (did, dname) values (3, 'Training');
@@ -68,6 +72,12 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Boony', 'bd
 insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 13);
 insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Senior', 6);
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
+ 
+/*
+Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
+Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
+Managers:  4 11 14 18 24 32 35 48 53 54 55
+*/
 
 --Booker
 
@@ -87,8 +97,6 @@ Call add_room(1, 3, 'France', 5, 1, 4, '1/11/2021');
 CALL change_capacity(1, 1, 20, '2021-11-01', 4);
 CALL change_capacity(1, 2, 16, '2021-11-01', 4);
 
--- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
-
 
 --Checks Trigger #24
 INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 4); -- Manager same department
@@ -98,10 +106,10 @@ INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 11); --Manager from different
 --Meeting_Rooms
 INSERT INTO Meeting_Rooms (floor,room, rname ,did)
 VALUES
+  (2,6,'Ireland',4),
   (2,7,'France',5),
   (4,7,'Sweden',12),
   (5,6,'Ireland',6),
-  (2,6,'Ireland',4),
   (7,1,'Spain',1);
 
 insert into updates values ('2021-11-02', 7, 1, 3, 4);
@@ -123,10 +131,10 @@ insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00
 
 --Approves
 insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7); --manager approves
-insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
-insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
-insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
-insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
+--insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
+--insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
+--insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
+--insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
 --insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
 
 --Functions
@@ -142,9 +150,14 @@ Call add_employee('FrenchGuy', '00000', 'Manager', 5);
 Call book_room(2, 7, '2022-01-01', '01:00:00', '10:00:00', 2); --should work and it does
 Call unbook_room(2, 7, '2022-01-01', '02:00:00', '04:00:00', 2); --should work and it does
 Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work and it does
-Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
+--Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
 Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
+
+--wx functions
+-- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
+SELECT search_room(10, '2021-12-01', '00:00', '01:00');
+SELECT view_booking_report('2021-01-01', 2);
 
 
 --zh functions
@@ -157,9 +170,89 @@ Call remove_department(555);
 Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
 Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
 Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
+-- Call declare_health(4, '3/11/2021', 37.7);
+Call declare_health(4, '9/11/2021', 37.2);
 
---SELECT non_compliance(TO_DATE('18/12/2015', 'DD/MM/YYYY'),TO_DATE('19/12/2015', 'DD/MM/YYYY'));
+SELECT non_compliance('17/12/2015', '17/12/2015'); --should have 55-3 = 52rows
 
-SELECT contact_tracing(11);
+/*
+Check remove_department
+- remove all employees under department 2
+- remove department 2
+*/
+CALL remove_employee(1, '2021-11-01');
+CALL remove_employee(10, '2021-11-01');
+CALL remove_employee(21, '2021-11-01');
+CALL remove_employee(41, '2021-11-01');
+CALL remove_employee(52, '2021-11-01');
+CALL remove_department(2);
+
+
+/* 
+Check contact_Tracing
+
+Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
+Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
+Managers:  4 11 14 18 24 32 35 48 53 54 55
+
+*/
+-- Booking after fever day (5 Not Traced)
+CALL book_room (1, 1, '2022-10-11', '01:00', '04:00', 4);
+CALL join_meeting(1, 1, '2022-10-11', '01:00', '04:00', 5);
+CALL approve_meeting (1, 1, '2022-10-11', '01:00', '04:00', 11);
+
+-- Booking on fever day with the fever (1002, 4 Traced)
+CALL book_room (1, 1, '2022-10-10', '01:00', '04:00', 4);
+CALL join_meeting (1, 1, '2022-10-10', '01:00', '04:00', 20);
+CALL join_meeting(1, 1, '2022-10-10', '01:00', '04:00', 1);
+CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 4);
+
+-- Booking on fever day without the fever (6 Traced)
+CALL book_room (1, 1, '2022-10-10', '08:00', '09:00', 4);
+CALL join_meeting(1, 1, '2022-10-10', '08:00', '09:00', 6);
+CALL approve_meeting (1, 1, '2022-10-10', '08:00', '09:00', 4);
+
+-- Booking on fever day in another room (7 Not Traced)
+CALL book_room (7, 1, '2022-10-10', '01:00', '04:00', 4);
+CALL join_meeting(7, 1, '2022-10-10', '01:00', '04:00', 7);
+CALL approve_meeting (7, 1, '2022-10-10', '01:00', '04:00', 4);
+
+-- Booking on fever day not approved (8 Not Traced)
+CALL book_room (1, 1, '2022-10-10', '06:00', '07:00', 4);
+CALL join_meeting(1, 1, '2022-10-10', '06:00', '07:00', 8);
+
+-- Booking on fever day - 3 (11 Traced)
+CALL book_room (1, 1, '2022-10-07', '01:00', '04:00', 4);
+CALL join_meeting(1, 1, '2022-10-07', '01:00', '04:00', 11);
+CALL approve_meeting (1, 1, '2022-10-07', '01:00', '04:00', 4);
+
+-- Booking on fever day + 7 (Deleted - 4 close contact)
+CALL book_room (1, 1, '2022-10-17', '01:00', '04:00', 4);
+
+CALL approve_meeting (1, 1, '2022-10-17', '01:00', '04:00', 4);
+
+-- Booking on fever day + 7 (Not Deleted - 5 Not close contact)
+CALL book_room (1, 1, '2022-10-17', '05:00', '06:00', 4);
+CALL join_meeting (1, 1, '2022-10-17', '05:00', '06:00', 5);
+CALL approve_meeting (1, 1, '2022-10-17', '05:00', '06:00', 4);
+
+-- Booking on fever day + 8 (Not Deleted - After D + 7)
+CALL book_room (1, 1, '2022-10-18', '01:00', '04:00', 4);
+
+CALL approve_meeting (1, 1, '2022-10-18', '01:00', '04:00', 4);
+
+-- Booking on fever day + 15 by primary (Deleted - 1002 primary contact)
+CALL book_room (1, 1, '2022-10-25', '01:00', '04:00', 20);
+
+-- The primary fever contact for contact tracing
+CALL declare_health (20, '2022-10-10', 37.6);
+
+SELECT contact_tracing(20);
 
 --MY FUNCTIONS
+
+--weihowe remaining functions
+SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 3); -- Testing Manual Insertion into Books + Approve 
+SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 12); -- Testing the Join Meeting/Approve Meeting Function
+
+SELECT view_manager_report(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 32);

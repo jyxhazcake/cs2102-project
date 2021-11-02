@@ -19,9 +19,9 @@ CREATE TABLE Employees (
    office_num VARCHAR(50),
    resigned_date DATE,
    role VARCHAR(50) NOT NULL CHECK(role IN ('Junior', 'Senior', 'Manager')),
-   did INTEGER NOT NULL,
+   did INTEGER NOT NULL DEFAULT 0,
    PRIMARY KEY (eid),
-   FOREIGN KEY (did) REFERENCES Departments (did) ON UPDATE CASCADE
+   FOREIGN KEY (did) REFERENCES Departments (did) ON UPDATE CASCADE ON DELETE SET DEFAULT
 );
  
 CREATE TABLE Junior (
@@ -457,11 +457,6 @@ BEFORE INSERT OR UPDATE ON Updates
 FOR EACH ROW
 EXECUTE FUNCTION check_dept_before_update_capacity();
 
-/*
-       ############################################
-       # Missing IF condition for contact_tracing #
-       ############################################
-*/
 
 CREATE OR REPLACE FUNCTION block_leaving_after_approval() RETURNS TRIGGER AS $$
 DECLARE
@@ -497,7 +492,7 @@ FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
 /*
 Jim
-*/
+
 
 --FIXES 25
 CREATE OR REPLACE FUNCTION block_book_past_meetings() 
@@ -557,6 +552,7 @@ CREATE TRIGGER cannot_approve_past_meeting
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_approve_past_meetings();
 
+*/
 
 
 --FIXES 34
@@ -615,6 +611,12 @@ BEGIN
         AND Books.date >= NEW.resigned_date;
     --Do not need to account for joins and approval as they
     --are automatically deleted under FK Constraint
+
+    DELETE FROM approves
+    WHERE approves.aid = NEW.eid
+        AND approves.date >= NEW.resigned_date;
+
+    RETURN NULL;
 END;
 $$LANGUAGE plpgsql;
 
@@ -627,6 +629,7 @@ EXECUTE FUNCTION remove_future_records();
 /* FIXES Requirement:
 Checks that all employees under the department have been removed (resign_date IS NOT NULL) when department is deleted.
 BEFORE DELETE
+-> Change the did of resigned_employees to another placeholder 
 */
 CREATE OR REPLACE FUNCTION check_remove_department()
 RETURNS TRIGGER AS $$
@@ -636,7 +639,7 @@ BEGIN
     SELECT COUNT(*) INTO count
     FROM Employees
     WHERE Employees.did = OLD.did
-        AND resigned_date IS NOT NULL;
+        AND resigned_date IS NULL;
 
     IF (count > 0) -- there is an employee which is still under the department and not resigned
         THEN RETURN NULL; -- PREVENT DELETE
@@ -683,8 +686,15 @@ FOR EACH ROW EXECUTE FUNCTION block_non_hourly_input();
 
 
 /* FIXES Requirement:
-When a meeting room has its capacity changed, any room booking after the change date with more participants 
-(including the employee who made the booking) will automatically be removed. This is regardless of whether they are approved or not.
+When a meeting room has its capacity changed --> INSERT INTO Updates,
+any room booking after the change date with more participants (including the employee who made the booking) will automatically be removed. 
+--> SELECT floor, room, date, time, COUNT(*)
+    FROM Booking as B Join Joins as J
+    ON B date, time, room, floor == J
+        AND date >= Updates
+    GROUP BY floor, room, date, time
+remove_booking;
+This is regardless of whether they are approved or not.
 */
 
 
