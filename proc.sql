@@ -51,6 +51,7 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
+-- ******************* Works *******************
 CREATE OR REPLACE FUNCTION view_future_meeting
     (IN start_date DATE, IN e_id INTEGER)
 RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER) AS $$
@@ -67,37 +68,39 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
-
+-- ******************* Works *******************
 CREATE OR REPLACE FUNCTION view_manager_report
     (IN start_date DATE, IN e_id INTEGER)
 RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
 DECLARE 
 manager_did INTEGER:= 0;
 BEGIN
+    
     -- If not manager, do nothing
     IF e_id IN (SELECT eid FROM Manager)
     THEN 
-    SELECT did INTO manager_did FROM Employee WHERE eid = m_eid;
+    SELECT did INTO manager_did FROM employees WHERE eid = e_id;
     END IF;
 
+    RETURN QUERY
     -- Get all meetings not approved yet using left join
     WITH all_na AS (
-        SELECT * 
+        SELECT b.date, b.time, b.room, b.floor, b.eid
         FROM Books b
         LEFT JOIN Approves a 
         ON b.date = a.date
         AND b.time = a.time
         AND b.room = a.room
         AND b.floor = a.floor
-        WHERE a.date = NULL
+        WHERE aid IS NULL
     )
 
-    --Only select meetings which the booker and the manager is from the same department
     SELECT all_na.date, all_na.time, all_na.room, all_na.floor, all_na.eid
-    FROM all_na, employee e
-    WHERE all_na.eid = e.eid
-    AND e.did = manager_did
-    AND all_na.date >= start_date
+    FROM all_na JOIN Meeting_Rooms mr
+    ON (all_na.room = mr.room
+    AND all_na.floor = mr.floor)
+    WHERE all_na.date >= start_date
+    AND did = manager_did
     ORDER BY all_na.date, all_na.time ASC;
 END;
 $$LANGUAGE plpgsql;
@@ -267,6 +270,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql; --this works
 
+DROP PROCEDURE remove_booking(integer,date,time without time zone,integer,integer);
+
 CREATE OR REPLACE PROCEDURE remove_booking
      (IN input_eid INTEGER, IN input_date DATE, IN start_hour TIME, IN input_room INTEGER, IN input_floor INTEGER)
 AS $$
@@ -319,6 +324,8 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql; --this works
+
+DROP PROCEDURE remove_from_meeting(integer,date,time without time zone,integer,integer);
 
 CREATE OR REPLACE PROCEDURE remove_from_meeting
     (IN input_eid INTEGER, IN input_date DATE, IN start_hour TIME, IN input_room INTEGER, IN input_floor INTEGER)
@@ -393,7 +400,7 @@ END;
 $$LANGUAGE plpgsql;
 
 
-
+DROP FUNCTION non_compliance(date,date);
 --non compliance
 /*
  Works for light testing
