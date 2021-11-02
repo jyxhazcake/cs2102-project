@@ -112,6 +112,8 @@ VALUES
   (5,6,'Ireland',6),
   (7,1,'Spain',1);
 
+insert into updates values ('2021-11-02', 7, 1, 3, 4);
+
 --Books
 insert into Books (eid, date, time, floor, room) values (1, '2022-01-01', '12:00:00', 2, 7); --junior fails to book room
 insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7); --senior books
