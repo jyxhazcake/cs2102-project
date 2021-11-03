@@ -89,7 +89,7 @@ insert into Booker (eid) values (1);
 */
 
 -- add_room(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
-CALL add_room (1, 1, 'Germany', 10, 1, 4, '2020-01-01');
+CALL add_room (1, 1, 'Germany', 10, 1, 1, '2020-01-01');
 CALL add_room (1, 2, 'Germany', 10, 1, 4, '2020-01-01');
 Call add_room(1, 3, 'France', 5, 1, 4, '1/11/2021');
 
@@ -205,7 +205,7 @@ CALL approve_meeting (1, 1, '2022-10-11', '01:00', '04:00', 11);
 CALL book_room (1, 1, '2022-10-10', '01:00', '04:00', 4);
 CALL join_meeting (1, 1, '2022-10-10', '01:00', '04:00', 20);
 CALL join_meeting(1, 1, '2022-10-10', '01:00', '04:00', 1);
-CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 55);
+CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 4);
 
 -- Booking on fever day without the fever (6 Traced)
 CALL book_room (1, 1, '2022-10-10', '08:00', '09:00', 4);

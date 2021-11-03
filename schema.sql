@@ -103,7 +103,7 @@ CREATE TABLE Approves (
    FOREIGN KEY (date, time, floor, room) REFERENCES Books (date, time, floor, room) ON DELETE CASCADE
 );
 
--- 12 Tables --> 120 
+
 /*
 
     ####################
@@ -130,7 +130,7 @@ BEFORE INSERT OR UPDATE ON Junior
 FOR EACH ROW
 EXECUTE FUNCTION check_only_junior();
 
-
+-- ************ Works in preventing insertion of senior employee into manager and junior ********************
 CREATE OR REPLACE FUNCTION check_only_senior() RETURNS TRIGGER AS $$
 BEGIN
     IF (NEW.eid IN (SELECT eid FROM Junior) 
@@ -155,6 +155,7 @@ BEFORE INSERT OR UPDATE ON Senior
 FOR EACH ROW
 EXECUTE FUNCTION check_only_senior();
 
+-- ************ Works in preventing insertion of manager employee into senior and junior ********************
 CREATE OR REPLACE FUNCTION check_only_manager() RETURNS TRIGGER AS $$
 BEGIN
     IF (NEW.eid IN (SELECT eid FROM Junior) 
@@ -187,37 +188,13 @@ When user inserts into booker directly -->
 3. add into manager/senior
 */
 
-/*
-Update weihowe: Not necessary. New trigger of help_update_role() will prevent ensures that 
-EITHER 
-1) Employee is a junior (prevent insertion)
-2) Employee is already inserted into senior/manager (duplicated insertion into Booker)
-
-Because it is not possible to insert into Booker a value that is not in Employee already. 
-Insertion in Employee will cause help_role_insert() to be run.
-*/
-
 CREATE OR REPLACE FUNCTION check_only_booker() RETURNS TRIGGER AS $$
 DECLARE
     n_role VARCHAR(50);
 BEGIN
-    IF (NEW.eid IN (SELECT eid FROM Junior) OR NEW.eid NOT IN (SELECT eid FROM Employees))
+    IF (NEW.eid IN (SELECT eid FROM Junior))
         THEN RETURN NULL;
     END IF;
-    
-    /*
-    SELECT role INTO n_role 
-    FROM Employees 
-    WHERE NEW.eid = eid;
-
-    IF (role = 'Senior')
-        THEN INSERT INTO Senior VALUES (NEW.eid);
-    END IF;
-
-    IF (role = 'Manager')
-        THEN INSERT INTO Manager VALUES (NEW.eid);
-    END IF;
-    */
 
     RETURN NEW;
 END;
@@ -326,6 +303,7 @@ BEFORE INSERT OR UPDATE ON Books
 FOR EACH ROW EXECUTE FUNCTION block_room_booking_without_capacity();
 
 --FIXES 13 & 14
+-- Prevents a junior employee from booking a meeting
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
 DECLARE
     count NUMERIC;
@@ -492,6 +470,7 @@ FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
 /*
 Jim
+*/
 
 
 --FIXES 25
@@ -552,7 +531,6 @@ CREATE TRIGGER cannot_approve_past_meeting
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_approve_past_meetings();
 
-*/
 
 
 --FIXES 34
