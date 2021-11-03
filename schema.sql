@@ -302,6 +302,77 @@ CREATE TRIGGER booking_room_with_no_capacity
 BEFORE INSERT OR UPDATE ON Books
 FOR EACH ROW EXECUTE FUNCTION block_room_booking_without_capacity();
 
+--Prevents multiple bookings on same meeting room slot
+CREATE OR REPLACE FUNCTION block_multiple_booking() RETURNS TRIGGER AS $$
+DECLARE
+    count numeric;
+BEGIN
+    SELECT COUNT(*) into count
+    FROM Books
+    WHERE NEW.floor = Books.floor
+    AND NEW.room = Books.room
+    AND NEW.date = Books.date
+    AND NEW.time = Books.time;
+
+    IF count > 0 THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER multiple_booking_on_meeting_slot
+BEFORE INSERT OR UPDATE ON Books
+FOR EACH ROW EXECUTE FUNCTION block_multiple_booking();
+
+--Prevents same guy making multiple bookings at same time
+CREATE OR REPLACE FUNCTION block_same_time_booking() RETURNS TRIGGER AS $$
+DECLARE
+    count numeric;
+BEGIN
+    SELECT COUNT(*) into count
+    FROM Books
+    WHERE NEW.eid = Books.eid
+    AND NEW.date = Books.date
+    AND NEW.time = Books.time;
+
+    IF count > 0 THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER same_guy_booking_multiple_rooms_concurrently
+BEFORE INSERT OR UPDATE ON Books
+FOR EACH ROW EXECUTE FUNCTION block_same_time_booking();
+
+--Prevents approve on empty meeting
+CREATE OR REPLACE FUNCTION block_approve_empty_meeting() RETURNS TRIGGER AS $$
+DECLARE
+    employee_count numeric;
+BEGIN
+    SELECT COUNT(*) INTO employee_count
+    FROM Joins
+    WHERE NEW.floor = Joins.floor
+    AND NEW.room = Joins.room
+    AND NEW.date = Joins.date
+    AND NEW.time = Joins.time;
+
+    IF count > 0 THEN
+        RETURN NEW;
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER approving_empty_meeting
+BEFORE INSERT OR UPDATE ON Approves
+FOR EACH ROW EXECUTE FUNCTION block_approve_empty_meeting();
+
 --FIXES 13 & 14
 -- Prevents a junior employee from booking a meeting
 CREATE OR REPLACE FUNCTION block_junior_booking() RETURNS TRIGGER AS $$
@@ -576,6 +647,13 @@ CREATE TRIGGER a_resigned_employee_cannot_approve
 BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_resigned_managers();
 
+CREATE TRIGGER a_resigned_employee_cannot_book
+BEFORE INSERT OR UPDATE ON Books
+FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
+
+CREATE TRIGGER a_resigned_employee_cannot_update
+BEFORE INSERT OR UPDATE ON Updates
+FOR EACH ROW EXECUTE FUNCTION block_resigned_employees();
 
 /* FIXES Requirement:
 All future records(Books) should be removed when employee resigns
