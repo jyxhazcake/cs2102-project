@@ -246,14 +246,19 @@ $$ LANGUAGE plpgsql;
     #    Jon Code     #
     ###################  */
 --return_latest_capacity
-CREATE OR REPLACE FUNCTION return_latest_capacity (IN input_floor INTEGER, IN input_room INTEGER)
+CREATE OR REPLACE FUNCTION return_latest_capacity_before_input_date
+(IN input_floor INTEGER, IN input_room INTEGER, IN input_date DATE)
 RETURNS TABLE(latest_capacity INTEGER) AS $$
 BEGIN
     SELECT new_cap INTO latest_capacity
     FROM Updates
-    WHERE input_floor = floor AND input_room = room AND date = (SELECT MAX(date)
-                                                                FROM Updates
-                                                                WHERE input_floor = floor AND input_room = room);
+    WHERE input_floor = floor
+    AND input_room = room
+    AND date = (SELECT MAX(date)
+                FROM Updates
+                WHERE input_floor = floor
+                AND input_room = room
+                date < input_date);
     RETURN QUERY SELECT latest_capacity;
 END;
 $$ LANGUAGE plpgsql;
