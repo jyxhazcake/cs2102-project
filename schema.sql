@@ -52,7 +52,6 @@ CREATE TABLE Health_Declaration (
     PRIMARY KEY (date, eid)
 );
 
-
  
 CREATE TABLE Meeting_Rooms (
    floor INTEGER,
@@ -361,7 +360,7 @@ BEGIN
     AND NEW.date = Joins.date
     AND NEW.time = Joins.time;
 
-    IF count > 0 THEN
+    IF employee_count > 0 THEN
         RETURN NEW;
     ELSE
         RETURN NULL;
@@ -741,6 +740,48 @@ BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_non_hourly_input();
 
 
+CREATE OR REPLACE FUNCTION block_other_days_hd()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF(NEW.date <> CURRENT_DATE)
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE TRIGGER health_declaration_only_today
+BEFORE INSERT OR UPDATE ON Health_Declaration
+FOR EACH ROW EXECUTE FUNCTION block_other_days_hd();
+
+
+
+/* FIXES Requirement:
+Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
+*/
+
+/* FIXES Requirement:
+Prevents Update on meeting_room where date is in the past as that would cause all meeting
+records to be lost.
+
+CREATE OR REPLACE FUNCTION block_past_updates()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (NEW.date < CURRENT_DATE)
+        RETURN NULL;
+    END IF
+
+    RETURN NEW;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE TRIGGER only_future_updates
+BEFORE INSERT OR UPDATE ON Updates
+FOR EACH ROW
+EXECUTE FUNCTION block_past_updates();
+
+*/
+
 /* FIXES Requirement:
 When a meeting room has its capacity changed --> INSERT INTO Updates,
 any room booking after the change date with more participants (including the employee who made the booking) will automatically be removed. 
@@ -751,9 +792,41 @@ any room booking after the change date with more participants (including the emp
     GROUP BY floor, room, date, time
 remove_booking;
 This is regardless of whether they are approved or not.
+Assumes that all updates will be made "today"
+Need to find entry in updates where updates.date > New.date
 */
 
+CREATE OR REPLACE FUNCTION delete_over_capacity_meetings()
+RETURNS TRIGGER AS $$
+DECLARE
+    upper_cap_date DATE;
+BEGIN
+    SELECT MIN(date) INTO upper_cap_date
+    FROM Updates
+    WHERE Updates.date > NEW.date;
 
-/* FIXES Requirement:
-Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
-*/
+    WITH number_of_people_booked AS (
+      SELECT floor, room, date, time, COUNT(*) as attendees
+          FROM Joins
+          WHERE Joins.date > New.date
+                AND Joins.date <= upper_cap_date
+          GROUP BY floor, room, date, time
+          HAVING COUNT(*) > NEW.new_cap
+    )
+
+    DELETE FROM Books using number_of_people_booked as N
+    WHERE Books.floor = N.floor
+        AND Books.room = N.room
+        AND Books.date = N.date
+        AND Books.time = N.time;
+    
+    RETURN NULL;
+        
+END;
+$$LANGUAGE plpgsql;
+
+
+CREATE TRIGGER enforce_meeting_capacity
+AFTER INSERT OR UPDATE ON Updates
+FOR EACH ROW
+EXECUTE FUNCTION delete_over_capacity_meetings();

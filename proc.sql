@@ -51,7 +51,7 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
--- ******************* Works *******************
+-- ******************* Works ******************* --> haven't test by 3rd party
 CREATE OR REPLACE FUNCTION view_future_meeting
     (IN start_date DATE, IN e_id INTEGER)
 RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER) AS $$
@@ -68,7 +68,7 @@ BEGIN
 END;
 $$LANGUAGE plpgsql;
 
--- ******************* Works *******************
+-- ******************* Works ******************* --> haven't test by 3rd party
 CREATE OR REPLACE FUNCTION view_manager_report
     (IN start_date DATE, IN e_id INTEGER)
 RETURNS TABLE (date DATE, start_hour TIME, room INTEGER, floor INTEGER, m_eid INTEGER) AS $$
@@ -503,18 +503,22 @@ DECLARE
     has_fever BOOLEAN;
     curr_date DATE:='2022-10-10';
 BEGIN
+    RAISE NOTICE 'Contact Tracing being carried out at: (%)', LOCALTIME;
     SELECT fever INTO has_fever FROM Health_Declaration WHERE Health_Declaration.eid = e_id;
     IF has_fever = FALSE THEN RETURN;
     END IF;
 
+    --find all meetings where employee attendecd in the past 3 days and on today where time was in the past
     WITH compromised_meetings AS (
         SELECT date, time, room, floor
         FROM Joins
         WHERE Joins.eid = e_id
             AND date >= (curr_date - INTERVAL'3 days')::date
             AND date <= curr_date
+            AND time < LOCALTIME
     ),
 
+    -- find all employees which attended the meetings
     compromised_employees AS (
         SELECT J.eid 
         FROM Joins as J, compromised_meetings as CM
@@ -524,16 +528,19 @@ BEGIN
         AND CM.floor = J.floor
     )
 
+    --Remove employees from next 7 days future meetings where time > LOCALTIME
     DELETE FROM Joins USING compromised_employees
     WHERE compromised_employees.eid = Joins.eid
     AND Joins.date >= curr_date
-    AND Joins.date <= (curr_date + INTERVAL'7 days');
+    AND Joins.date <= (curr_date + INTERVAL'7 days')
+    AND Joins.time >= LOCALTIME;
 
+    -- delete future bookings
     DELETE FROM Books USING (SELECT date, time, room, floor
                             FROM Books
                             WHERE Books.eid = e_id
                                 AND (Books.date > curr_date 
-                                OR (Books.date = curr_date AND LOCALTIME > Books.time))) AS bookings_to_cancel
+                                OR (Books.date = curr_date AND LOCALTIME < Books.time))) AS bookings_to_cancel
     WHERE Books.date = bookings_to_cancel.date
     AND Books.time = bookings_to_cancel.time
     AND Books.room = bookings_to_cancel.room
@@ -541,6 +548,7 @@ BEGIN
 
     RETURN QUERY 
 
+    -- query for approved meetings 
     WITH compromised_meetings AS (
         SELECT J.date, J.time, J.room, J.floor
         FROM Joins J JOIN Approves as a
