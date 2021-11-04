@@ -259,7 +259,7 @@ DECLARE
     current_capacity INTEGER;
     available_capacity INTEGER;
 BEGIN
-    SELECT return_latest_capacity(NEW.floor, NEW.room) INTO max_capacity;
+    SELECT return_latest_capacity_before_input_date(NEW.floor, NEW.room, NEW.date) INTO max_capacity;
     SELECT COUNT(*) INTO current_capacity
     FROM Joins
     WHERE NEW.floor = Joins.floor
