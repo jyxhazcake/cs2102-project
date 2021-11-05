@@ -74,9 +74,9 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mn
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
  
 /*
-Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
-Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
-Managers:  4 11 14 18 24 32 35 48 53 54 55
+Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 1 10 41
+Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21
+Managers:  4 11 14 18 24 32 35 48
 */
 
 --Booker
