@@ -49,7 +49,8 @@ CREATE TABLE Health_Declaration (
     date DATE,
     temp NUMERIC CHECK (temp < 43 AND temp > 34),
     fever BOOLEAN,
-    PRIMARY KEY (date, eid)
+    PRIMARY KEY (date, eid),
+    CONSTRAINT has_fever CHECK ((temp <= 37.5 AND fever = FALSE) OR (temp > 37.5 AND fever = TRUE))
 );
 
  
@@ -754,23 +755,18 @@ CREATE TRIGGER health_declaration_only_today
 BEFORE INSERT OR UPDATE ON Health_Declaration
 FOR EACH ROW EXECUTE FUNCTION block_other_days_hd();
 
-
-
-/* FIXES Requirement:
-Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
-*/
-
 /* FIXES Requirement:
 Prevents Update on meeting_room where date is in the past as that would cause all meeting
 records to be lost.
+
+*/
 
 CREATE OR REPLACE FUNCTION block_past_updates()
 RETURNS TRIGGER AS $$
 BEGIN
     IF (NEW.date < CURRENT_DATE)
-        RETURN NULL;
-    END IF
-
+        THEN RETURN NULL;
+    END IF;
     RETURN NEW;
 END;
 $$LANGUAGE plpgsql;
@@ -780,7 +776,8 @@ BEFORE INSERT OR UPDATE ON Updates
 FOR EACH ROW
 EXECUTE FUNCTION block_past_updates();
 
-*/
+
+
 
 /* FIXES Requirement:
 When a meeting room has its capacity changed --> INSERT INTO Updates,
@@ -830,3 +827,20 @@ CREATE TRIGGER enforce_meeting_capacity
 AFTER INSERT OR UPDATE ON Updates
 FOR EACH ROW
 EXECUTE FUNCTION delete_over_capacity_meetings();
+
+--Prevent users from being allocated to department 0 if they are not resigned
+CREATE OR REPLACE FUNCTION block_unresigned_employees()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF(NEW.resigned_date IS NULL
+        AND NEW.did = 0)
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE TRIGGER check_resigned_status
+BEFORE INSERT OR UPDATE ON Employees
+FOR EACH ROW
+EXECUTE FUNCTION block_unresigned_employees();

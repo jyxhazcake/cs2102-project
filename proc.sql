@@ -133,7 +133,8 @@ BEGIN
     FROM Employees
     WHERE mid = Employees.eid;
     -- Prevents insertion as the manager cannot update the capacity of the room.
-    IF (manager_did <> did)
+    IF (manager_did <> did
+        OR date < CURRENT_DATE)
         THEN RETURN;
     END IF;
 
@@ -177,7 +178,7 @@ BEGIN
     WITH latest_updates AS (
         SELECT U.floor, U.room, MAX(U.date) as date
         FROM Updates AS U
-        WHERE U.date <= query_date
+        WHERE U.date < query_date
         GROUP BY U.floor, U.room
     ),
 
@@ -258,7 +259,7 @@ BEGIN
                 FROM Updates
                 WHERE input_floor = floor
                 AND input_room = room
-                date < input_date);
+                AND date < input_date);
     RETURN QUERY SELECT latest_capacity;
 END;
 $$ LANGUAGE plpgsql;
@@ -303,8 +304,6 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql; --this works
-
-DROP PROCEDURE remove_booking(integer,date,time without time zone,integer,integer);
 
 CREATE OR REPLACE PROCEDURE remove_booking
      (IN input_eid INTEGER, IN input_date DATE, IN start_hour TIME, IN input_room INTEGER, IN input_floor INTEGER)
@@ -358,8 +357,6 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql; --this works
-
-DROP PROCEDURE remove_from_meeting(integer,date,time without time zone,integer,integer);
 
 CREATE OR REPLACE PROCEDURE remove_from_meeting
     (IN input_eid INTEGER, IN input_date DATE, IN start_hour TIME, IN input_room INTEGER, IN input_floor INTEGER)
@@ -434,11 +431,6 @@ END;
 $$LANGUAGE plpgsql;
 
 
-DROP FUNCTION non_compliance(date,date);
---non compliance
-/*
- Works for light testing
-*/
 CREATE OR REPLACE FUNCTION non_compliance
     (IN start_date date, IN end_date date)
 RETURNS TABLE(eid INTEGER, days BIGINT) AS $$
@@ -446,7 +438,8 @@ DECLARE
     total_days INTEGER:= end_date - start_date + 1;
 BEGIN
 
-    RETURN QUERY 
+    RETURN QUERY
+    -- To find employees who declared and the number of days they declared
     WITH declared_days AS (
         SELECT HD.eid, (total_days - COUNT(*)) AS days
             FROM Health_Declaration as HD
@@ -456,6 +449,7 @@ BEGIN
             ORDER BY days DESC
     ),
 
+    -- To find employees who made 0 declarations
     no_declaration AS (
         SELECT Employees.eid, total_days as days
         FROM Employees
@@ -468,7 +462,7 @@ BEGIN
     UNION 
     (SELECT declared_days.eid, declared_days.days  FROM 
     declared_days
-    WHERE declared_days.days <> 0);
+    WHERE declared_days.days <> 0); --To eliminate employees who had declared for all days
 END;
 $$LANGUAGE plpgsql;
 
@@ -476,7 +470,7 @@ $$LANGUAGE plpgsql;
 /*
 step 1: check if employee is having fever -> IF NO FEVER --> RETURN;
 ELSE:
-    step 1: remove all bookings by employee
+    step 1: remove all future bookings by employee
     step 2: check approved meeting room containing employee
     step 3: create table of all employess in those meeting rooms
     step 4: remove close contact employees from meetings for next 7 days --> check eid in JOINS and date > current_date 
@@ -540,7 +534,8 @@ BEGIN
                             FROM Books
                             WHERE Books.eid = e_id
                                 AND (Books.date > curr_date 
-                                OR (Books.date = curr_date AND LOCALTIME < Books.time))) AS bookings_to_cancel
+                                OR (Books.date = curr_date 
+                                    AND Books.time > LOCALTIME))) AS bookings_to_cancel
     WHERE Books.date = bookings_to_cancel.date
     AND Books.time = bookings_to_cancel.time
     AND Books.room = bookings_to_cancel.room
@@ -548,7 +543,7 @@ BEGIN
 
     RETURN QUERY 
 
-    -- query for approved meetings 
+    -- query for approved meetings which employee attended in the past 3 days
     WITH compromised_meetings AS (
         SELECT J.date, J.time, J.room, J.floor
         FROM Joins J JOIN Approves as a
@@ -559,8 +554,10 @@ BEGIN
         WHERE J.eid = e_id
             AND J.date >= (curr_date - INTERVAL'3 days')::date
             AND J.date <= curr_date
+            AND J.time < LOCALTIME
     ),
 
+    -- find all employees which attended the compromised meetings
     compromised_employees AS (
         SELECT distinct(J.eid )
         FROM Joins as J, compromised_meetings as CM
