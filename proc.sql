@@ -497,7 +497,7 @@ DECLARE
     has_fever BOOLEAN;
     curr_date DATE:='2022-10-10';
 BEGIN
-    RAISE NOTICE 'Contact Tracing being carried out at: (%)', LOCALTIME;
+    RAISE NOTICE 'Contact Tracing being carried out at: (%) hrs', LOCALTIME;
     SELECT fever INTO has_fever FROM Health_Declaration WHERE Health_Declaration.eid = e_id;
     IF has_fever = FALSE THEN RETURN;
     END IF;

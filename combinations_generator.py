@@ -8,4 +8,4 @@ def compute_list(list):
             print(result, end = "")
             print("}")
 
-compute_list(['a', 'b', 'c', 'd'])
+compute_list(['a', 'b', 'c'])

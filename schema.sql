@@ -23,6 +23,7 @@ CREATE TABLE Employees (
    PRIMARY KEY (eid),
    FOREIGN KEY (did) REFERENCES Departments (did) ON UPDATE CASCADE ON DELETE SET DEFAULT
 );
+
  
 CREATE TABLE Junior (
    eid INTEGER PRIMARY KEY,
@@ -70,7 +71,8 @@ CREATE TABLE Updates (
    new_cap INTEGER,
    eid INTEGER REFERENCES Manager ON DELETE CASCADE,
    PRIMARY KEY (date, room, floor),
-   FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor)
+   FOREIGN KEY (room, floor) REFERENCES Meeting_Rooms (room, floor),
+   CONSTRAINT non_negative_capacity CHECK (new_cap >= 0)
 );
  
 CREATE TABLE Books (
