@@ -404,6 +404,7 @@ EXECUTE FUNCTION check_dept_before_update_capacity();
 
 CREATE OR REPLACE FUNCTION block_leaving_after_approval() RETURNS TRIGGER AS $$
 DECLARE
+    book_count NUMERIC;
     count NUMERIC;
     is_fever BOOLEAN;
 BEGIN
@@ -411,8 +412,17 @@ BEGIN
     FROM Health_Declaration
     WHERE OLD.eid = Health_Declaration.eid;
 
+    SELECT COUNT(*) into book_count
+        FROM Books
+        WHERE OLD.date = Books.date
+        AND OLD.time = Books.time
+        AND OLD.room = Books.room
+        AND OLD.floor = Books.floor;
+
     IF is_fever = true THEN
         RETURN OLD;
+    ELSIF book_count = 0
+        THEN RETURN OLD;
     ELSE
         SELECT COUNT(*) into count
         FROM Approves
@@ -764,264 +774,264 @@ Department constraint -> Department 0 is reserved for Resigned employees whose d
 */
 
 --Departments
-insert into Departments (did, dname) values (0, 'Department deleted after Resignation');
-insert into Departments (did, dname) values (1, 'Product Management');
-insert into Departments (did, dname) values (2, 'Legal');
-insert into Departments (did, dname) values (3, 'Training');
-insert into Departments (did, dname) values (4, 'Human Resources');
-insert into Departments (did, dname) values (5, 'Services');
-insert into Departments (did, dname) values (6, 'Accounting');
-insert into Departments (did, dname) values (7, 'Product Management');
-insert into Departments (did, dname) values (8, 'Research and Development');
-insert into Departments (did, dname) values (9, 'Services');
-insert into Departments (did, dname) values (10, 'Engineering');
-insert into Departments (did, dname) values (11, 'Human Resources');
-insert into Departments (did, dname) values (12, 'Human Resources');
-insert into Departments (did, dname) values (13, 'Product Management');
-insert into Departments (did, dname) values (14, 'Sales');
-insert into Departments (did, dname) values (15, 'Research and Development');
+-- insert into Departments (did, dname) values (0, 'Department deleted after Resignation');
+-- insert into Departments (did, dname) values (1, 'Product Management');
+-- insert into Departments (did, dname) values (2, 'Legal');
+-- insert into Departments (did, dname) values (3, 'Training');
+-- insert into Departments (did, dname) values (4, 'Human Resources');
+-- insert into Departments (did, dname) values (5, 'Services');
+-- insert into Departments (did, dname) values (6, 'Accounting');
+-- insert into Departments (did, dname) values (7, 'Product Management');
+-- insert into Departments (did, dname) values (8, 'Research and Development');
+-- insert into Departments (did, dname) values (9, 'Services');
+-- insert into Departments (did, dname) values (10, 'Engineering');
+-- insert into Departments (did, dname) values (11, 'Human Resources');
+-- insert into Departments (did, dname) values (12, 'Human Resources');
+-- insert into Departments (did, dname) values (13, 'Product Management');
+-- insert into Departments (did, dname) values (14, 'Sales');
+-- insert into Departments (did, dname) values (15, 'Research and Development');
 
---Employees
-insert into Employees (ename, email, mobile_num, role, did) values ('Harmon', 'hsalmons0@about.com', '228-522-9018', 'Junior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Phelia', 'pfrain1@ustream.tv', '267-458-8830', 'Senior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Carlie', 'cchuter2@yolasite.com', '209-753-9805', 'Senior', 13);
-insert into Employees (ename, email, mobile_num, role, did) values ('Darcy', 'dgoracci3@nymag.com', '292-756-6824', 'Manager', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Carlen', 'cmcrobb4@shutterfly.com', '518-799-1538', 'Junior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Oliy', 'omcgifford5@foxnews.com', '107-139-2328', 'Senior', 8);
-insert into Employees (ename, email, mobile_num, role, did) values ('Louie', 'lvaughanhughes6@so-net.ne.jp', '972-606-7549', 'Senior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Debra', 'djane7@patch.com', '333-831-1507', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Conrado', 'cotley8@rakuten.co.jp', '670-264-7373', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Yul', 'ymacknocker9@g.co', '544-211-6100', 'Junior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Sim', 'sgrestiea@jimdo.com', '930-123-1582', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Albie', 'aalimanb@nbcnews.com', '142-157-9418', 'Junior', 8);
-insert into Employees (ename, email, mobile_num, role, did) values ('Guenevere', 'griccac@wordpress.org', '148-403-7184', 'Junior', 14);
-insert into Employees (ename, email, mobile_num, role, did) values ('Conny', 'cboerderd@github.com', '722-203-4289', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Tab', 'tvallerinee@prnewswire.com', '299-853-0573', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Rodrick', 'rizatf@wikipedia.org', '820-586-3017', 'Junior', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Leontyne', 'lpateg@yolasite.com', '426-698-5089', 'Junior', 14);
-insert into Employees (ename, email, mobile_num, role, did) values ('Estella', 'ebarnetth@engadget.com', '322-712-9156', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Elisha', 'ewandeni@reuters.com', '561-696-4695', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Gavra', 'gcommonj@prweb.com', '117-773-0040', 'Senior', 5);
-insert into Employees (ename, email, mobile_num, role, did) values ('Tonye', 'tgrunwaldk@technorati.com', '965-153-0237', 'Senior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Faunie', 'fbudnkl@slate.com', '272-701-0076', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Samantha', 'sbaudichonm@phpbb.com', '313-753-1584', 'Senior', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Abey', 'ahigbinn@domainmarket.com', '184-586-6133', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Adrian', 'astandbrookeo@weibo.com', '808-667-8434', 'Junior', 5);
-insert into Employees (ename, email, mobile_num, role, did) values ('Hanson', 'hventomp@theatlantic.com', '963-790-0271', 'Senior', 13);
-insert into Employees (ename, email, mobile_num, role, did) values ('Guillaume', 'gcatheeq@shutterfly.com', '205-699-9944', 'Junior', 4);
-insert into Employees (ename, email, mobile_num, role, did) values ('Sonnie', 'sdevonsr@last.fm', '820-459-8958', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Thia', 'tkillwicks@reverbnation.com', '559-109-0662', 'Senior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Scottie', 'solubyt@fc2.com', '872-427-7550', 'Junior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Kelvin', 'kbulpittu@businessweek.com', '162-758-4470', 'Senior', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Porty', 'pfullerlovev@jalbum.net', '237-149-0621', 'Manager', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Misti', 'mhurstw@desdev.cn', '184-941-8179', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Nowell', 'njorisx@yellowpages.com', '732-279-7175', 'Junior', 15);
-insert into Employees (ename, email, mobile_num, role, did) values ('Danika', 'dcraggy@marketwatch.com', '363-495-9170', 'Manager', 7);
-insert into Employees (ename, email, mobile_num, role, did) values ('Marysa', 'mgreatbankz@paginegialle.it', '984-738-4096', 'Junior', 8);
-insert into Employees (ename, email, mobile_num, role, did) values ('Astrix', 'akinson10@answers.com', '939-705-0389', 'Senior', 10);
-insert into Employees (ename, email, mobile_num, role, did) values ('Mile', 'mclempton11@istockphoto.com', '440-254-1188', 'Senior', 4);
-insert into Employees (ename, email, mobile_num, role, did) values ('Ted', 'tfabb12@thetimes.co.uk', '604-383-2945', 'Junior', 10);
-insert into Employees (ename, email, mobile_num, role, did) values ('Ailbert', 'amarlon13@latimes.com', '618-542-3680', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Mabel', 'mcheake14@google.es', '632-240-3577', 'Junior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Eyde', 'enowakowski15@prlog.org', '609-148-7900', 'Junior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Dion', 'dsouthway16@tinyurl.com', '518-521-4318', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Bondy', 'brubenovic17@reddit.com', '395-331-8144', 'Junior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Linzy', 'lmcgettrick18@joomla.org', '890-109-7554', 'Junior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Gabriel', 'ginold19@jalbum.net', '158-407-5909', 'Senior', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Boony', 'bdot1a@odnoklassniki.ru', '303-402-9208', 'Senior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Manager', 11);
+-- --Employees
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Harmon', 'hsalmons0@about.com', '228-522-9018', 'Junior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Phelia', 'pfrain1@ustream.tv', '267-458-8830', 'Senior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Carlie', 'cchuter2@yolasite.com', '209-753-9805', 'Senior', 13);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Darcy', 'dgoracci3@nymag.com', '292-756-6824', 'Manager', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Carlen', 'cmcrobb4@shutterfly.com', '518-799-1538', 'Junior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Oliy', 'omcgifford5@foxnews.com', '107-139-2328', 'Senior', 8);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Louie', 'lvaughanhughes6@so-net.ne.jp', '972-606-7549', 'Senior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Debra', 'djane7@patch.com', '333-831-1507', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Conrado', 'cotley8@rakuten.co.jp', '670-264-7373', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Yul', 'ymacknocker9@g.co', '544-211-6100', 'Junior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Sim', 'sgrestiea@jimdo.com', '930-123-1582', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Albie', 'aalimanb@nbcnews.com', '142-157-9418', 'Junior', 8);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Guenevere', 'griccac@wordpress.org', '148-403-7184', 'Junior', 14);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Conny', 'cboerderd@github.com', '722-203-4289', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Tab', 'tvallerinee@prnewswire.com', '299-853-0573', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Rodrick', 'rizatf@wikipedia.org', '820-586-3017', 'Junior', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Leontyne', 'lpateg@yolasite.com', '426-698-5089', 'Junior', 14);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Estella', 'ebarnetth@engadget.com', '322-712-9156', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Elisha', 'ewandeni@reuters.com', '561-696-4695', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Gavra', 'gcommonj@prweb.com', '117-773-0040', 'Senior', 5);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Tonye', 'tgrunwaldk@technorati.com', '965-153-0237', 'Senior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Faunie', 'fbudnkl@slate.com', '272-701-0076', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Samantha', 'sbaudichonm@phpbb.com', '313-753-1584', 'Senior', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Abey', 'ahigbinn@domainmarket.com', '184-586-6133', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Adrian', 'astandbrookeo@weibo.com', '808-667-8434', 'Junior', 5);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Hanson', 'hventomp@theatlantic.com', '963-790-0271', 'Senior', 13);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Guillaume', 'gcatheeq@shutterfly.com', '205-699-9944', 'Junior', 4);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Sonnie', 'sdevonsr@last.fm', '820-459-8958', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Thia', 'tkillwicks@reverbnation.com', '559-109-0662', 'Senior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Scottie', 'solubyt@fc2.com', '872-427-7550', 'Junior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Kelvin', 'kbulpittu@businessweek.com', '162-758-4470', 'Senior', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Porty', 'pfullerlovev@jalbum.net', '237-149-0621', 'Manager', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Misti', 'mhurstw@desdev.cn', '184-941-8179', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Nowell', 'njorisx@yellowpages.com', '732-279-7175', 'Junior', 15);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Danika', 'dcraggy@marketwatch.com', '363-495-9170', 'Manager', 7);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Marysa', 'mgreatbankz@paginegialle.it', '984-738-4096', 'Junior', 8);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Astrix', 'akinson10@answers.com', '939-705-0389', 'Senior', 10);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Mile', 'mclempton11@istockphoto.com', '440-254-1188', 'Senior', 4);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Ted', 'tfabb12@thetimes.co.uk', '604-383-2945', 'Junior', 10);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Ailbert', 'amarlon13@latimes.com', '618-542-3680', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Mabel', 'mcheake14@google.es', '632-240-3577', 'Junior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Eyde', 'enowakowski15@prlog.org', '609-148-7900', 'Junior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Dion', 'dsouthway16@tinyurl.com', '518-521-4318', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Bondy', 'brubenovic17@reddit.com', '395-331-8144', 'Junior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Linzy', 'lmcgettrick18@joomla.org', '890-109-7554', 'Junior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Gabriel', 'ginold19@jalbum.net', '158-407-5909', 'Senior', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Boony', 'bdot1a@odnoklassniki.ru', '303-402-9208', 'Senior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Manager', 11);
  
-/*
-Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 1 10 41
-Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 21
-Managers:  4 11 14 18 24 32 35 48 49 50
-*/
+-- /*
+-- Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 1 10 41
+-- Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 21
+-- Managers:  4 11 14 18 24 32 35 48 49 50
+-- */
 
---Booker
+-- --Booker
 
---To test if Junior employee can be inserted into Booker --> Should show "INSERT 0 0"
---insert into Booker (eid) values (1);
-
-/*
-       Wei Xuan's Functions
-*/
-
--- add_room(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
-CALL add_room (1, 1, 'Germany', 10, 1, 4, '2020-01-01'); --non-manager eid
-CALL add_room (1, 2, 'Germany', 10, 1, 4, '2020-01-01');
-Call add_room(1, 3, 'France', 5, 1, 4, '1/11/2021');
-
--- change_capacity(floor INTEGER, room INTEGER, new_capacity INTEGER, date DATE, mid INTEGER)
-CALL change_capacity(1, 1, 20, '2021-11-01', 4);
-CALL change_capacity(1, 2, 16, '2021-11-01', 4);
-
-
---Checks Trigger #24
-INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 4); -- Manager same department
-INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 2); -- Non-manager
-INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 11); --Manager from different department
-
---Meeting_Rooms
-/*
-Cannot allow them to book/join/approves these meetings*/
-INSERT INTO Meeting_Rooms (floor,room, rname ,did)
-VALUES
-  (2,6,'Ireland',4),
-  (2,7,'France',5),
-  (4,7,'Sweden',12),
-  (5,6,'Ireland',6),
-  (7,1,'Spain',1);
-
-insert into updates values ('2021-11-02', 7, 1, 3, 4);
-
--- --Books
--- insert into Books (eid, date, time, floor, room) values (1, '2022-01-01', '12:00:00', 2, 7); --junior fails to book room
--- insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7); --senior books
--- insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 5, 6); --manager books
--- insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 2, 6); --senior books
--- insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 7, 1); --senior books
--- --auto join trigger works for bookers
-
--- --Joins
--- --insert into Joins (eid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 2, 7);
--- insert into Joins (eid, date, time, floor, room) values (8, '2022-01-01', '01:00:00', 4, 7);
--- insert into Joins (eid, date, time, floor, room) values (9, '2022-01-01', '01:00:00', 5, 6);
--- insert into Joins (eid, date, time, floor, room) values (10, '2022-01-01', '01:00:00', 2, 6);
--- insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 7, 1);
-
--- --Approves
--- insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7); --manager approves
--- --insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
--- --insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
--- --insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
--- --insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
--- --insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
-
--- --Functions
--- Call add_employee('weihowe', '87222555', 'Junior', 1);
--- Call add_employee('yap', '1919192-3', 'Senior', 2);
--- Call add_employee('jim', '1111112333', 'Manager', 3);
--- Call add_employee('jon', '11112233', 'Manager', 4);
--- Call add_employee('FrenchGuy', '00000', 'Manager', 5);
-
--- --Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
-
--- --jon functions
--- Call book_room(2, 7, '2022-01-01', '01:00:00', '10:00:00', 2); --should work and it does
--- Call unbook_room(2, 7, '2022-01-01', '02:00:00', '04:00:00', 2); --should work and it does
--- Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work and it does
--- --Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
--- Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
--- Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
-
--- --wx functions
--- -- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
--- SELECT search_room(10, '2021-12-01', '00:00', '01:00');
--- SELECT view_booking_report('2021-01-01', 2);
-
-
--- --zh functions
--- --add and remove department works
--- Call add_department(369, 'salakau');
--- Call add_department(108, 'an soon tong');
--- Call add_department(555, 'hahaha');
--- Call remove_department(555);
-
--- Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
--- Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
--- Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
--- -- Call declare_health(4, '3/11/2021', 37.7);
--- Call declare_health(4, '9/11/2021', 37.2);
-
--- SELECT non_compliance('17/12/2015', '17/12/2015'); --should have 55-3 = 52rows
+-- --To test if Junior employee can be inserted into Booker --> Should show "INSERT 0 0"
+-- --insert into Booker (eid) values (1);
 
 -- /*
--- Check remove_department
--- - remove all employees under department 2
--- - remove department 2
+--        Wei Xuan's Functions
 -- */
--- CALL remove_employee(1, '2021-11-01');
--- CALL remove_employee(10, '2021-11-01');
--- CALL remove_employee(21, '2021-11-01');
--- CALL remove_employee(41, '2021-11-01');
--- CALL remove_employee(52, '2021-11-01');
--- CALL remove_department(2);
+
+-- -- add_room(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
+-- CALL add_room (1, 1, 'Germany', 10, 1, 4, '2020-01-01'); --non-manager eid
+-- CALL add_room (1, 2, 'Germany', 10, 1, 4, '2020-01-01');
+-- Call add_room(1, 3, 'France', 5, 1, 4, '1/11/2021');
+
+-- -- change_capacity(floor INTEGER, room INTEGER, new_capacity INTEGER, date DATE, mid INTEGER)
+-- CALL change_capacity(1, 1, 20, '2021-11-01', 4);
+-- CALL change_capacity(1, 2, 16, '2021-11-01', 4);
 
 
-/* 
-Check contact_Tracing
+-- --Checks Trigger #24
+-- INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 4); -- Manager same department
+-- INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 2); -- Non-manager
+-- INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 11); --Manager from different department
 
-Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
-Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
-Managers:  4 11 14 18 24 32 35 48 53 54 55
+-- --Meeting_Rooms
+-- /*
+-- Cannot allow them to book/join/approves these meetings*/
+-- INSERT INTO Meeting_Rooms (floor,room, rname ,did)
+-- VALUES
+--   (2,6,'Ireland',4),
+--   (2,7,'France',5),
+--   (4,7,'Sweden',12),
+--   (5,6,'Ireland',6),
+--   (7,1,'Spain',1);
 
-*/
+-- insert into updates values ('2021-11-02', 7, 1, 3, 4);
 
--- Booking after fever day (5 Not Traced)
-CALL book_room (1, 1, '2022-10-11', '01:00', '04:00', 4);
-CALL join_meeting(1, 1, '2022-10-11', '01:00', '04:00', 5);
-CALL approve_meeting (1, 1, '2022-10-11', '01:00', '04:00', 11);
+-- -- --Books
+-- -- insert into Books (eid, date, time, floor, room) values (1, '2022-01-01', '12:00:00', 2, 7); --junior fails to book room
+-- -- insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7); --senior books
+-- -- insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 5, 6); --manager books
+-- -- insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 2, 6); --senior books
+-- -- insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 7, 1); --senior books
+-- -- --auto join trigger works for bookers
 
--- Booking on fever day with the fever (BEFORE CURRENT TIME) (1, 4 Traced)
-CALL book_room (1, 1, '2022-10-10', '01:00', '04:00', 4);
-CALL join_meeting (1, 1, '2022-10-10', '01:00', '04:00', 20);
-CALL join_meeting(1, 1, '2022-10-10', '01:00', '04:00', 1);
-CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 4);
+-- -- --Joins
+-- -- --insert into Joins (eid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 2, 7);
+-- -- insert into Joins (eid, date, time, floor, room) values (8, '2022-01-01', '01:00:00', 4, 7);
+-- -- insert into Joins (eid, date, time, floor, room) values (9, '2022-01-01', '01:00:00', 5, 6);
+-- -- insert into Joins (eid, date, time, floor, room) values (10, '2022-01-01', '01:00:00', 2, 6);
+-- -- insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 7, 1);
 
--- Booking on fever day with the fever (AFTER CURRENT TIME) (1, 4 Not Traced)
-CALL book_room (1, 1, '2022-10-10', '22:00', '23:00', 4);
-CALL join_meeting (1, 1, '2022-10-10', '22:00', '23:00', 20);
-CALL join_meeting(1, 1, '2022-10-10', '22:00', '23:00', 1);
-CALL approve_meeting (1, 1, '2022-10-10', '22:00', '23:00', 4);
+-- -- --Approves
+-- -- insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7); --manager approves
+-- -- --insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
+-- -- --insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
+-- -- --insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
+-- -- --insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
+-- -- --insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
 
--- Booking on fever day without the fever (6 Traced)
-CALL book_room (1, 1, '2022-10-10', '08:00', '09:00', 4);
-CALL join_meeting(1, 1, '2022-10-10', '08:00', '09:00', 6);
-CALL approve_meeting (1, 1, '2022-10-10', '08:00', '09:00', 4);
+-- -- --Functions
+-- -- Call add_employee('weihowe', '87222555', 'Junior', 1);
+-- -- Call add_employee('yap', '1919192-3', 'Senior', 2);
+-- -- Call add_employee('jim', '1111112333', 'Manager', 3);
+-- -- Call add_employee('jon', '11112233', 'Manager', 4);
+-- -- Call add_employee('FrenchGuy', '00000', 'Manager', 5);
 
--- Booking on fever day in another room (7 Not Traced)
-CALL book_room (7, 1, '2022-10-10', '01:00', '04:00', 4);
-CALL join_meeting(7, 1, '2022-10-10', '01:00', '04:00', 7);
-CALL approve_meeting (7, 1, '2022-10-10', '01:00', '04:00', 4);
+-- -- --Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
--- Booking on fever day not approved (8 Not Traced)
-CALL book_room (1, 1, '2022-10-10', '06:00', '07:00', 4);
-CALL join_meeting(1, 1, '2022-10-10', '06:00', '07:00', 8);
+-- -- --jon functions
+-- -- Call book_room(2, 7, '2022-01-01', '01:00:00', '10:00:00', 2); --should work and it does
+-- -- Call unbook_room(2, 7, '2022-01-01', '02:00:00', '04:00:00', 2); --should work and it does
+-- -- Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work and it does
+-- -- --Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
+-- -- Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
+-- -- Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
 
--- Booking on fever day - 3 (11 Not Traced)
-CALL book_room (1, 1, '2022-10-07', '01:00', '04:00', 4);
-CALL join_meeting(1, 1, '2022-10-07', '01:00', '04:00', 11);
-CALL approve_meeting (1, 1, '2022-10-07', '01:00', '04:00', 4);
+-- -- --wx functions
+-- -- -- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
+-- -- SELECT search_room(10, '2021-12-01', '00:00', '01:00');
+-- -- SELECT view_booking_report('2021-01-01', 2);
 
--- Booking on fever day + 7 (Deleted - 4 close contact)
-CALL book_room (1, 1, '2022-10-17', '01:00', '04:00', 4);
 
-CALL approve_meeting (1, 1, '2022-10-17', '01:00', '04:00', 4);
+-- -- --zh functions
+-- -- --add and remove department works
+-- -- Call add_department(369, 'salakau');
+-- -- Call add_department(108, 'an soon tong');
+-- -- Call add_department(555, 'hahaha');
+-- -- Call remove_department(555);
 
--- Booking on fever day + 7 (Not Deleted - 5 Not close contact)
-CALL book_room (1, 1, '2022-10-17', '05:00', '06:00', 4);
-CALL join_meeting (1, 1, '2022-10-17', '05:00', '06:00', 5);
-CALL approve_meeting (1, 1, '2022-10-17', '05:00', '06:00', 4);
+-- -- Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
+-- -- Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
+-- -- Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
+-- -- -- Call declare_health(4, '3/11/2021', 37.7);
+-- -- Call declare_health(4, '9/11/2021', 37.2);
 
--- Booking on fever day + 8 (Not Deleted - After D + 7)
-CALL book_room (1, 1, '2022-10-18', '01:00', '04:00', 4);
+-- -- SELECT non_compliance('17/12/2015', '17/12/2015'); --should have 55-3 = 52rows
 
-CALL approve_meeting (1, 1, '2022-10-18', '01:00', '04:00', 4);
+-- -- /*
+-- -- Check remove_department
+-- -- - remove all employees under department 2
+-- -- - remove department 2
+-- -- */
+-- -- CALL remove_employee(1, '2021-11-01');
+-- -- CALL remove_employee(10, '2021-11-01');
+-- -- CALL remove_employee(21, '2021-11-01');
+-- -- CALL remove_employee(41, '2021-11-01');
+-- -- CALL remove_employee(52, '2021-11-01');
+-- -- CALL remove_department(2);
 
--- Booking on fever day + 15 by primary (Deleted - 1002 primary contact)
-CALL book_room (1, 1, '2022-10-25', '01:00', '04:00', 20);
 
--- The primary fever contact for contact tracing
-CALL declare_health (20, '2022-10-10', 37.6);
+-- /* 
+-- Check contact_Tracing
 
-SELECT contact_tracing(20);
+-- Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
+-- Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
+-- Managers:  4 11 14 18 24 32 35 48 53 54 55
 
---MY FUNCTIONS
+-- */
 
---weihowe remaining functions
-SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 3); -- Testing Manual Insertion into Books + Approve 
-SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 12); -- Testing the Join Meeting/Approve Meeting Function
+-- -- Booking after fever day (5 Not Traced)
+-- CALL book_room (1, 1, '2022-10-11', '01:00', '04:00', 4);
+-- CALL join_meeting(1, 1, '2022-10-11', '01:00', '04:00', 5);
+-- CALL approve_meeting (1, 1, '2022-10-11', '01:00', '04:00', 11);
 
-SELECT view_manager_report(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 32);
+-- -- Booking on fever day with the fever (BEFORE CURRENT TIME) (1, 4 Traced)
+-- CALL book_room (1, 1, '2022-10-10', '01:00', '04:00', 4);
+-- CALL join_meeting (1, 1, '2022-10-10', '01:00', '04:00', 20);
+-- CALL join_meeting(1, 1, '2022-10-10', '01:00', '04:00', 1);
+-- CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 4);
+
+-- -- Booking on fever day with the fever (AFTER CURRENT TIME) (1, 4 Not Traced)
+-- CALL book_room (1, 1, '2022-10-10', '22:00', '23:00', 4);
+-- CALL join_meeting (1, 1, '2022-10-10', '22:00', '23:00', 20);
+-- CALL join_meeting(1, 1, '2022-10-10', '22:00', '23:00', 1);
+-- CALL approve_meeting (1, 1, '2022-10-10', '22:00', '23:00', 4);
+
+-- -- Booking on fever day without the fever (6 Traced)
+-- CALL book_room (1, 1, '2022-10-10', '08:00', '09:00', 4);
+-- CALL join_meeting(1, 1, '2022-10-10', '08:00', '09:00', 6);
+-- CALL approve_meeting (1, 1, '2022-10-10', '08:00', '09:00', 4);
+
+-- -- Booking on fever day in another room (7 Not Traced)
+-- CALL book_room (7, 1, '2022-10-10', '01:00', '04:00', 4);
+-- CALL join_meeting(7, 1, '2022-10-10', '01:00', '04:00', 7);
+-- CALL approve_meeting (7, 1, '2022-10-10', '01:00', '04:00', 4);
+
+-- -- Booking on fever day not approved (8 Not Traced)
+-- CALL book_room (1, 1, '2022-10-10', '06:00', '07:00', 4);
+-- CALL join_meeting(1, 1, '2022-10-10', '06:00', '07:00', 8);
+
+-- -- Booking on fever day - 3 (11 Not Traced)
+-- CALL book_room (1, 1, '2022-10-07', '01:00', '04:00', 4);
+-- CALL join_meeting(1, 1, '2022-10-07', '01:00', '04:00', 11);
+-- CALL approve_meeting (1, 1, '2022-10-07', '01:00', '04:00', 4);
+
+-- -- Booking on fever day + 7 (Deleted - 4 close contact)
+-- CALL book_room (1, 1, '2022-10-17', '01:00', '04:00', 4);
+
+-- CALL approve_meeting (1, 1, '2022-10-17', '01:00', '04:00', 4);
+
+-- -- Booking on fever day + 7 (Not Deleted - 5 Not close contact)
+-- CALL book_room (1, 1, '2022-10-17', '05:00', '06:00', 4);
+-- CALL join_meeting (1, 1, '2022-10-17', '05:00', '06:00', 5);
+-- CALL approve_meeting (1, 1, '2022-10-17', '05:00', '06:00', 4);
+
+-- -- Booking on fever day + 8 (Not Deleted - After D + 7)
+-- CALL book_room (1, 1, '2022-10-18', '01:00', '04:00', 4);
+
+-- CALL approve_meeting (1, 1, '2022-10-18', '01:00', '04:00', 4);
+
+-- -- Booking on fever day + 15 by primary (Deleted - 1002 primary contact)
+-- CALL book_room (1, 1, '2022-10-25', '01:00', '04:00', 20);
+
+-- -- The primary fever contact for contact tracing
+-- CALL declare_health (20, '2022-10-10', 37.6);
+
+-- SELECT contact_tracing(20);
+
+-- --MY FUNCTIONS
+
+-- --weihowe remaining functions
+-- SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 3); -- Testing Manual Insertion into Books + Approve 
+-- SELECT view_future_meeting(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 12); -- Testing the Join Meeting/Approve Meeting Function
+
+-- SELECT view_manager_report(TO_DATE('17/12/2015', 'DD/MM/YYYY'), 32);

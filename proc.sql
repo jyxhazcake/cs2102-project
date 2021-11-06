@@ -437,7 +437,9 @@ RETURNS TABLE(eid INTEGER, days BIGINT) AS $$
 DECLARE
     total_days INTEGER:= end_date - start_date + 1;
 BEGIN
-
+    IF (start_date > end_date)
+        THEN RAISE EXCEPTION 'start_date should be before end_date';
+    END IF;
     RETURN QUERY
     -- To find employees who declared and the number of days they declared
     WITH declared_days AS (
@@ -487,7 +489,13 @@ Possible implementation:
 */
 
 /*
-Constraint: If the health_declaration is not assumed to be in the morning --> 
+SELECT date, time, room, floor
+        FROM Joins
+        WHERE Joins.eid = 3
+            AND date >= (CURRENT_DATE - 3)
+            AND date < CURRENT_DATE
+            OR (date = CURRENT_DATE 
+            AND time < LOCALTIME)
 */
 
 CREATE OR REPLACE FUNCTION contact_tracing
@@ -495,9 +503,9 @@ CREATE OR REPLACE FUNCTION contact_tracing
 RETURNS TABLE(eid INTEGER) AS $$
 DECLARE 
     has_fever BOOLEAN;
-    curr_date DATE:='2022-10-10';
+    curr_date DATE:=CURRENT_DATE;
 BEGIN
-    RAISE NOTICE 'Contact Tracing being carried out at: (%) hrs', LOCALTIME;
+    RAISE NOTICE 'Contact Tracing being carried out at: % hrs', LOCALTIME;
     SELECT fever INTO has_fever FROM Health_Declaration WHERE Health_Declaration.eid = e_id;
     IF has_fever = FALSE THEN RETURN;
     END IF;
@@ -508,8 +516,9 @@ BEGIN
         FROM Joins
         WHERE Joins.eid = e_id
             AND date >= (curr_date - INTERVAL'3 days')::date
-            AND date <= curr_date
-            AND time < LOCALTIME
+            AND date < curr_date
+            OR (date = curr_date 
+            AND time < LOCALTIME)
     ),
 
     -- find all employees which attended the meetings
@@ -525,21 +534,25 @@ BEGIN
     --Remove employees from next 7 days future meetings where time > LOCALTIME
     DELETE FROM Joins USING compromised_employees
     WHERE compromised_employees.eid = Joins.eid
-    AND Joins.date >= curr_date
-    AND Joins.date <= (curr_date + INTERVAL'7 days')
-    AND Joins.time >= LOCALTIME;
+    AND Joins.date > curr_date
+    AND Joins.date <= (curr_date + INTERVAL'7 days')::date
+    OR (Joins.date = curr_date
+    AND Joins.time >= LOCALTIME);
 
-    -- delete future bookings
-    DELETE FROM Books USING (SELECT date, time, room, floor
-                            FROM Books
-                            WHERE Books.eid = e_id
-                                AND (Books.date > curr_date 
-                                OR (Books.date = curr_date 
-                                    AND Books.time > LOCALTIME))) AS bookings_to_cancel
-    WHERE Books.date = bookings_to_cancel.date
-    AND Books.time = bookings_to_cancel.time
-    AND Books.room = bookings_to_cancel.room
-    AND Books.floor = bookings_to_cancel.floor;
+    -- delete future bookings for employee e_id
+    DELETE FROM Books
+    WHERE Books.eid = e_id
+        AND (Books.date > curr_date 
+        OR (Books.date = curr_date 
+            AND Books.time > LOCALTIME));
+
+    -- delete future joins for employee e_id
+    DELETE FROM Joins 
+    WHERE Joins.eid = e_id
+    AND Joins.date > curr_date
+    AND Joins.date <= (curr_date + INTERVAL'7 days')::date
+    OR (Joins.date = curr_date
+    AND Joins.time >= LOCALTIME);
 
     RETURN QUERY 
 
