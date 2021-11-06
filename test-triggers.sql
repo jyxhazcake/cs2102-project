@@ -207,8 +207,19 @@ SELECT * FROM Departments;
 --Block non-hourly-input
 INSERT INTO Books VALUES (2, '2020-01-04', '22:30:00', 1, 3); -- Try booking a room at 1030pm 
 
---Last 2nd trigger
+--Block other days hd
+Call declare_health(25, TO_DATE('01/01/2020', 'DD/MM/YYYY'), 37.9); -- FEVER EMPLOYEE 
+SELECT * FROM Health_Declaration;
+--Block past updates
+INSERT INTO UPDATES VALUES (TO_DATE('01/01/2020', 'DD/MM/YYYY'), 1, 1, 10, 4);
+--Delete Over Capcity Meetings
 
---Last trigger
+--Block Unresigned Employees
+insert into Employees (ename, email, mobile_num, role, did) values ('Harmon', 'hahaha@about.com', '228-522-9018', 'Junior', 0);
 
+--Prevent Joining meeting (assumption that booking = joining)
+CALL add_room (1, 1, 'Germany', 1, 6, 11, '2023-10-01');
+INSERT INTO Books VALUES (2, '2023-10-02', '12:00:00', 1, 1); 
+CALL add_room (1, 3, 'France', 1, 6, 11, '2023-10-01');
+INSERT INTO Books VALUES (2, '2023-10-02', '12:00:00', 1, 3); 
 
