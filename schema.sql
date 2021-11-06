@@ -49,9 +49,9 @@ CREATE TABLE Health_Declaration (
     date DATE,
     temp NUMERIC CHECK (temp < 43 AND temp > 34),
     fever BOOLEAN,
-    PRIMARY KEY (date, eid)
+    PRIMARY KEY (date, eid),
+    CONSTRAINT has_fever CHECK ((temp <= 37.5 AND fever = FALSE) OR (temp > 37.5 AND fever = TRUE))
 );
-
 
  
 CREATE TABLE Meeting_Rooms (
@@ -362,7 +362,7 @@ BEGIN
     AND NEW.date = Joins.date
     AND NEW.time = Joins.time;
 
-    IF count > 0 THEN
+    IF employee_count > 0 THEN
         RETURN NEW;
     ELSE
         RETURN NULL;
@@ -742,6 +742,44 @@ BEFORE INSERT OR UPDATE ON Approves
 FOR EACH ROW EXECUTE FUNCTION block_non_hourly_input();
 
 
+CREATE OR REPLACE FUNCTION block_other_days_hd()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF(NEW.date <> CURRENT_DATE)
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE TRIGGER health_declaration_only_today
+BEFORE INSERT OR UPDATE ON Health_Declaration
+FOR EACH ROW EXECUTE FUNCTION block_other_days_hd();
+
+/* FIXES Requirement:
+Prevents Update on meeting_room where date is in the past as that would cause all meeting
+records to be lost.
+
+*/
+
+CREATE OR REPLACE FUNCTION block_past_updates()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (NEW.date < CURRENT_DATE)
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE TRIGGER only_future_updates
+BEFORE INSERT OR UPDATE ON Updates
+FOR EACH ROW
+EXECUTE FUNCTION block_past_updates();
+
+
+
+
 /* FIXES Requirement:
 When a meeting room has its capacity changed --> INSERT INTO Updates,
 any room booking after the change date with more participants (including the employee who made the booking) will automatically be removed. 
@@ -752,9 +790,76 @@ any room booking after the change date with more participants (including the emp
     GROUP BY floor, room, date, time
 remove_booking;
 This is regardless of whether they are approved or not.
+Assumes that all updates will be made "today"
+Need to find entry in updates where updates.date > New.date
 */
 
+CREATE OR REPLACE FUNCTION delete_over_capacity_meetings()
+RETURNS TRIGGER AS $$
+DECLARE
+    upper_cap_date DATE;
+BEGIN
+    SELECT MIN(date) INTO upper_cap_date
+    FROM Updates
+    WHERE Updates.date > NEW.date;
+
+    WITH number_of_people_booked AS (
+      SELECT floor, room, date, time, COUNT(*) as attendees
+          FROM Joins
+          WHERE Joins.date > New.date
+                AND Joins.date <= upper_cap_date
+          GROUP BY floor, room, date, time
+          HAVING COUNT(*) > NEW.new_cap
+    )
+
+    DELETE FROM Books using number_of_people_booked as N
+    WHERE Books.floor = N.floor
+        AND Books.room = N.room
+        AND Books.date = N.date
+        AND Books.time = N.time;
+    
+    RETURN NULL;
+        
+END;
+$$LANGUAGE plpgsql;
+
+
+CREATE TRIGGER enforce_meeting_capacity
+AFTER INSERT OR UPDATE ON Updates
+FOR EACH ROW
+EXECUTE FUNCTION delete_over_capacity_meetings();
+
+--Prevent users from being allocated to department 0 if they are not resigned
+CREATE OR REPLACE FUNCTION block_unresigned_employees()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF(NEW.resigned_date IS NULL
+        AND NEW.did = 0)
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE TRIGGER check_resigned_status
+BEFORE INSERT OR UPDATE ON Employees
+FOR EACH ROW
+EXECUTE FUNCTION block_unresigned_employees();
 
 /* FIXES Requirement:
 Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
 */
+CREATE OR REPLACE FUNCTION prevent_joining_meeting() RETURNS TRIGGER AS $$
+BEGIN
+    -- Already in another meeting
+    IF ((NEW.eid, NEW.date, NEW.time) IN (SELECT eid, date, time FROM Joins)) 
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_multiple_meetings
+BEFORE INSERT OR UPDATE ON JOINS
+FOR EACH ROW
+EXECUTE FUNCTION prevent_joining_meeting();

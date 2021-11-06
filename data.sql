@@ -74,9 +74,9 @@ insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mn
 insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Senior', 11);
  
 /*
-Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 51 1 10 41
-Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
-Managers:  4 11 14 18 24 32 35 48 53 54 55
+Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 1 10 41
+Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21
+Managers:  4 11 14 18 24 32 35 48
 */
 
 --Booker
@@ -89,7 +89,7 @@ insert into Booker (eid) values (1);
 */
 
 -- add_room(floor INTEGER, room INTEGER, rname VARCHAR(50), room_capacity INTEGER, did INTEGER, mid INTEGER, date DATE)
-CALL add_room (1, 1, 'Germany', 10, 1, 1, '2020-01-01');
+CALL add_room (1, 1, 'Germany', 10, 1, 4, '2020-01-01'); --non-manager eid
 CALL add_room (1, 2, 'Germany', 10, 1, 4, '2020-01-01');
 Call add_room(1, 3, 'France', 5, 1, 4, '1/11/2021');
 
@@ -104,6 +104,8 @@ INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 2); -- Non-manager
 INSERT INTO UPDATES VALUES('2021-11-02', 1, 1, 18, 11); --Manager from different department
 
 --Meeting_Rooms
+/*
+Cannot allow them to book/join/approves these meetings*/
 INSERT INTO Meeting_Rooms (floor,room, rname ,did)
 VALUES
   (2,6,'Ireland',4),
@@ -114,78 +116,78 @@ VALUES
 
 insert into updates values ('2021-11-02', 7, 1, 3, 4);
 
---Books
-insert into Books (eid, date, time, floor, room) values (1, '2022-01-01', '12:00:00', 2, 7); --junior fails to book room
-insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7); --senior books
-insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 5, 6); --manager books
-insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 2, 6); --senior books
-insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 7, 1); --senior books
---auto join trigger works for bookers
+-- --Books
+-- insert into Books (eid, date, time, floor, room) values (1, '2022-01-01', '12:00:00', 2, 7); --junior fails to book room
+-- insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 4, 7); --senior books
+-- insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 5, 6); --manager books
+-- insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 2, 6); --senior books
+-- insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 7, 1); --senior books
+-- --auto join trigger works for bookers
 
---Joins
---insert into Joins (eid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 2, 7);
-insert into Joins (eid, date, time, floor, room) values (8, '2022-01-01', '01:00:00', 4, 7);
-insert into Joins (eid, date, time, floor, room) values (9, '2022-01-01', '01:00:00', 5, 6);
-insert into Joins (eid, date, time, floor, room) values (10, '2022-01-01', '01:00:00', 2, 6);
-insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 7, 1);
+-- --Joins
+-- --insert into Joins (eid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 2, 7);
+-- insert into Joins (eid, date, time, floor, room) values (8, '2022-01-01', '01:00:00', 4, 7);
+-- insert into Joins (eid, date, time, floor, room) values (9, '2022-01-01', '01:00:00', 5, 6);
+-- insert into Joins (eid, date, time, floor, room) values (10, '2022-01-01', '01:00:00', 2, 6);
+-- insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 7, 1);
 
---Approves
-insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7); --manager approves
---insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
---insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
---insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
---insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
---insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
+-- --Approves
+-- insert into Approves (aid, date, time, floor, room) values (32, '2022-01-01', '01:00:00', 4, 7); --manager approves
+-- --insert into Approves (aid, date, time, floor, room) values (1, '2022-01-01', '01:00:00', 4, 7); --junior cannot approve
+-- --insert into Approves (aid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 4, 7); --senior cannot approve
+-- --insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 4, 7); --different dpt cannot approve
+-- --insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
+-- --insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
 
---Functions
-Call add_employee('weihowe', '87222555', 'Junior', 1);
-Call add_employee('yap', '1919192-3', 'Senior', 2);
-Call add_employee('jim', '1111112333', 'Manager', 3);
-Call add_employee('jon', '11112233', 'Manager', 4);
-Call add_employee('FrenchGuy', '00000', 'Manager', 5);
+-- --Functions
+-- Call add_employee('weihowe', '87222555', 'Junior', 1);
+-- Call add_employee('yap', '1919192-3', 'Senior', 2);
+-- Call add_employee('jim', '1111112333', 'Manager', 3);
+-- Call add_employee('jon', '11112233', 'Manager', 4);
+-- Call add_employee('FrenchGuy', '00000', 'Manager', 5);
 
---Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
+-- --Call remove_employee(51, TO_DATE('17/12/2015', 'DD/MM/YYYY')); -- weihowe RESIGNS
 
---jon functions
-Call book_room(2, 7, '2022-01-01', '01:00:00', '10:00:00', 2); --should work and it does
-Call unbook_room(2, 7, '2022-01-01', '02:00:00', '04:00:00', 2); --should work and it does
-Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work and it does
---Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
-Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
-Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
+-- --jon functions
+-- Call book_room(2, 7, '2022-01-01', '01:00:00', '10:00:00', 2); --should work and it does
+-- Call unbook_room(2, 7, '2022-01-01', '02:00:00', '04:00:00', 2); --should work and it does
+-- Call join_meeting(2, 7, '2022-01-01', '04:00:00', '08:00:00', 12); --should work and it does
+-- --Call leave_meeting(2, 7, '2022-01-01', '05:00:00', '07:00:00', 12); --should work and it does
+-- Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 2); --should not work (not manager) and it doesn't
+-- Call approve_meeting(2, 7, '2022-01-01', '04:00:00', '10:00:00', 55); --should work and it does
 
---wx functions
--- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
-SELECT search_room(10, '2021-12-01', '00:00', '01:00');
-SELECT view_booking_report('2021-01-01', 2);
+-- --wx functions
+-- -- search_room(IN required_cap INTEGER, IN query_date DATE, IN start_hour TIME, IN end_hour TIME)
+-- SELECT search_room(10, '2021-12-01', '00:00', '01:00');
+-- SELECT view_booking_report('2021-01-01', 2);
 
 
---zh functions
---add and remove department works
-Call add_department(369, 'salakau');
-Call add_department(108, 'an soon tong');
-Call add_department(555, 'hahaha');
-Call remove_department(555);
+-- --zh functions
+-- --add and remove department works
+-- Call add_department(369, 'salakau');
+-- Call add_department(108, 'an soon tong');
+-- Call add_department(555, 'hahaha');
+-- Call remove_department(555);
 
-Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
-Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
-Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
--- Call declare_health(4, '3/11/2021', 37.7);
-Call declare_health(4, '9/11/2021', 37.2);
+-- Call declare_health(1, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.4);
+-- Call declare_health(11, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 37.7);
+-- Call declare_health(8, TO_DATE('17/12/2015', 'DD/MM/YYYY'), 34.7);
+-- -- Call declare_health(4, '3/11/2021', 37.7);
+-- Call declare_health(4, '9/11/2021', 37.2);
 
-SELECT non_compliance('17/12/2015', '17/12/2015'); --should have 55-3 = 52rows
+-- SELECT non_compliance('17/12/2015', '17/12/2015'); --should have 55-3 = 52rows
 
-/*
-Check remove_department
-- remove all employees under department 2
-- remove department 2
-*/
-CALL remove_employee(1, '2021-11-01');
-CALL remove_employee(10, '2021-11-01');
-CALL remove_employee(21, '2021-11-01');
-CALL remove_employee(41, '2021-11-01');
-CALL remove_employee(52, '2021-11-01');
-CALL remove_department(2);
+-- /*
+-- Check remove_department
+-- - remove all employees under department 2
+-- - remove department 2
+-- */
+-- CALL remove_employee(1, '2021-11-01');
+-- CALL remove_employee(10, '2021-11-01');
+-- CALL remove_employee(21, '2021-11-01');
+-- CALL remove_employee(41, '2021-11-01');
+-- CALL remove_employee(52, '2021-11-01');
+-- CALL remove_department(2);
 
 
 /* 
@@ -196,16 +198,23 @@ Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 49 50 21 52
 Managers:  4 11 14 18 24 32 35 48 53 54 55
 
 */
+
 -- Booking after fever day (5 Not Traced)
 CALL book_room (1, 1, '2022-10-11', '01:00', '04:00', 4);
 CALL join_meeting(1, 1, '2022-10-11', '01:00', '04:00', 5);
 CALL approve_meeting (1, 1, '2022-10-11', '01:00', '04:00', 11);
 
--- Booking on fever day with the fever (1, 4 Traced)
+-- Booking on fever day with the fever (BEFORE CURRENT TIME) (1, 4 Traced)
 CALL book_room (1, 1, '2022-10-10', '01:00', '04:00', 4);
 CALL join_meeting (1, 1, '2022-10-10', '01:00', '04:00', 20);
 CALL join_meeting(1, 1, '2022-10-10', '01:00', '04:00', 1);
 CALL approve_meeting (1, 1, '2022-10-10', '01:00', '04:00', 4);
+
+-- Booking on fever day with the fever (AFTER CURRENT TIME) (1, 4 Not Traced)
+CALL book_room (1, 1, '2022-10-10', '22:00', '23:00', 4);
+CALL join_meeting (1, 1, '2022-10-10', '22:00', '23:00', 20);
+CALL join_meeting(1, 1, '2022-10-10', '22:00', '23:00', 1);
+CALL approve_meeting (1, 1, '2022-10-10', '22:00', '23:00', 4);
 
 -- Booking on fever day without the fever (6 Traced)
 CALL book_room (1, 1, '2022-10-10', '08:00', '09:00', 4);
@@ -221,7 +230,7 @@ CALL approve_meeting (7, 1, '2022-10-10', '01:00', '04:00', 4);
 CALL book_room (1, 1, '2022-10-10', '06:00', '07:00', 4);
 CALL join_meeting(1, 1, '2022-10-10', '06:00', '07:00', 8);
 
--- Booking on fever day - 3 (11 Traced)
+-- Booking on fever day - 3 (11 Not Traced)
 CALL book_room (1, 1, '2022-10-07', '01:00', '04:00', 4);
 CALL join_meeting(1, 1, '2022-10-07', '01:00', '04:00', 11);
 CALL approve_meeting (1, 1, '2022-10-07', '01:00', '04:00', 4);
