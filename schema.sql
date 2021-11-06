@@ -288,7 +288,8 @@ BEGIN
     SELECT COUNT(*) into capacity_declared
     FROM Updates
     WHERE Updates.floor = NEW.floor
-    AND Updates.room = NEW.room;
+    AND Updates.room = NEW.room
+    AND Updates.date < NEW.date;
 
     IF capacity_declared > 0 THEN
         RETURN NEW;
