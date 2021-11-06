@@ -844,3 +844,21 @@ CREATE TRIGGER check_resigned_status
 BEFORE INSERT OR UPDATE ON Employees
 FOR EACH ROW
 EXECUTE FUNCTION block_unresigned_employees();
+
+/* FIXES Requirement:
+Prevents Employees from joining multiple meetings at the same time if it complicates contact tracing
+*/
+CREATE OR REPLACE FUNCTION prevent_joining_meeting() RETURNS TRIGGER AS $$
+BEGIN
+    -- Already in another meeting
+    IF ((NEW.eid, NEW.date, NEW.time) IN (SELECT eid, date, time FROM Joins)) 
+        THEN RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_multiple_meetings
+BEFORE INSERT OR UPDATE ON JOINS
+FOR EACH ROW
+EXECUTE FUNCTION prevent_joining_meeting();
