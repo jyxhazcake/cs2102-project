@@ -440,7 +440,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER no_deletes_on_joins_after_approval_unless_fever
+CREATE TRIGGER no_deletes_on_joins_after_approval_unless_exceptions
 BEFORE DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION block_leaving_after_approval();
 
