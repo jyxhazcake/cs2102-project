@@ -74,6 +74,9 @@ CALL change_capacity(2, 2, 15, (CURRENT_DATE+1), 12);
 
 SELECT * FROM Updates;
 
+CALL book_room(1, 1, (CURRENT_DATE + 1), '1:00', '4:00', 10);
+
+CALL book_room(2, 1, CURRENT_DATE, '1:00', '4:00', 10); -- negative test case: manager from different department
 CALL book_room(2, 1, CURRENT_DATE, '1:00', '4:00', 12); --neg test case: unable to book room on newly added/updated rooms
 CALL book_room(2, 1, (CURRENT_DATE + 1), '1:00', '4:00', 12);
 CALL book_room(2, 1, (CURRENT_DATE + 1), '0:00', '4:00', 13); -- overlap, cannot book
@@ -83,10 +86,11 @@ CALL book_room(2, 1, (CURRENT_DATE + 1), '4:00', '5:00', 13); -- can book
 SELECT * FROM BOOKS;
 SELECT * FROM JOINS;
 
-SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '24:00'); -- all rooms apart from 2,1
-SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '1:00'); -- all rooms
-SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '2:00'); -- all rooms apart from 2, 1
-SELECT * FROM search_room(5, (CURRENT_DATE + 1), '4:00', '24:00'); -- all rooms
+SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '24:00'); -- all rooms apart from 2,1 and 1,1
+SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '1:00'); -- all rooms apart from 2,1
+SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '2:00'); -- all rooms apart from 2, 1 and 1,1
+SELECT * FROM search_room(5, (CURRENT_DATE + 1), '4:00', '24:00'); -- all rooms apart from 2,1
+SELECT * FROM search_room(5, (CURRENT_DATE + 1), '5:00', '24:00'); -- all rooms
 
 CALL unbook_room(2, 1, CURRENT_DATE, '1:00', '4:00', 12); -- no effect
 CALL unbook_room(2, 1, (CURRENT_DATE + 1), '1:00', '4:00', 11); -- no sabotage rule
@@ -96,14 +100,18 @@ CALL unbook_room(2, 1, (CURRENT_DATE + 1), '1:00', '4:00', 13); -- no sabotage r
 SELECT * FROM BOOKS;
 SELECT * FROM JOINS;
 
-SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '24:00'); -- all rooms apart from 2,1
+SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '24:00'); -- all rooms apart from 2,1 and 1,1
 SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '1:00'); -- all rooms
-SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '2:00'); -- all rooms apart from 2,1
+SELECT * FROM search_room(5, (CURRENT_DATE + 1), '00:00', '2:00'); -- all rooms apart from 2,1 and 1,1
 SELECT * FROM search_room(5, (CURRENT_DATE + 1), '4:00', '24:00'); -- all rooms
 
 SELECT view_booking_report(CURRENT_DATE, 11);
 SELECT * FROM view_booking_report(CURRENT_DATE, 12);
+SELECT * FROM view_booking_report((CURRENT_DATE+1), 12);
 SELECT * FROM view_booking_report((CURRENT_DATE+2), 12);
+
+SELECT view_manager_report(CURRENT_DATE, 1); --neg test case: employee is not a manager
+SELECT * FROM view_manager_report((CURRENT_DATE+1), 13);
 
 CALL join_meeting(2, 1, (CURRENT_DATE + 1), '0:00', '1:00', 1);
 CALL join_meeting(2, 1, (CURRENT_DATE + 1), '0:00', '5:00', 1); -- 0:00 to 1:00 is not recorded due to repeat
@@ -113,6 +121,9 @@ CALL join_meeting(2, 1, (CURRENT_DATE + 1), '0:00', '5:00', 4); -- neg test case
 CALL join_meeting(2, 1, (CURRENT_DATE + 1), '0:00', '5:00', 6);
 CALL join_meeting(2, 1, (CURRENT_DATE + 1), '0:00', '5:00', 7); --neg test case: capacity exceeded
 
+
+SELECT view_future_meeting(CURRENT_DATE, 1);
+SELECT * FROM view_future_meeting((CURRENT_DATE+1), 1);
 
 SELECT * FROM JOINS WHERE DATE = (CURRENT_DATE + 1) 
                         AND TIME = '0:00' 
@@ -152,6 +163,12 @@ CALL approve_meeting(2, 1, (CURRENT_DATE + 1), '0:00', '2:00', 13); --time range
 SELECT * FROM Approves;
 SELECT * FROM view_booking_report(CURRENT_DATE, 13);
 
+SELECT view_future_meeting(CURRENT_DATE, 1);
+SELECT * FROM view_future_meeting((CURRENT_DATE+1), 1);
+
+SELECT view_manager_report(CURRENT_DATE, 13);
+SELECT * FROM view_manager_report((CURRENT_DATE+1), 13);
+
 CALL leave_meeting(2, 1, (CURRENT_DATE + 1), '0:00', '1:00', 1); --neg test case: cannot leave approved meeting
 
 SELECT * FROM JOINS WHERE DATE = (CURRENT_DATE + 1) 
@@ -166,4 +183,8 @@ SELECT * FROM Joins;
 SELECT * FROM Approves;
 SELECT * FROM Books;
 
-SELECT non_compliance(CURRENT_DATE, (CURRENT_DATE+2));
+SELECT non_compliance(CURRENT_DATE-1, (CURRENT_DATE+1));
+SELECT non_compliance(CURRENT_DATE, CURRENT_DATE);
+SELECT non_compliance(CURRENT_DATE+1, (CURRENT_DATE+1));
+SELECT non_compliance(CURRENT_DATE+2, (CURRENT_DATE+2));
+SELECT non_compliance(CURRENT_DATE, (CURRENT_DATE+1));
