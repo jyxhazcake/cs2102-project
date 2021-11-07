@@ -876,7 +876,7 @@ VALUES
     (CURRENT_DATE, 4, 7, 5, 50),
     (CURRENT_DATE, 7, 1, 10, 4);
 
--- --Books
+--Books
 insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 1, 1); --senior books
 insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 1, 2); --manager books
 insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 1, 3); --senior books
@@ -887,9 +887,9 @@ insert into Books (eid, date, time, floor, room) values (14, '2022-01-01', '01:0
 insert into Books (eid, date, time, floor, room) values (18, '2022-01-01', '01:00:00', 4, 7); --manager books
 insert into Books (eid, date, time, floor, room) values (20, '2022-01-01', '01:00:00', 5, 6); --senior books
 insert into Books (eid, date, time, floor, room) values (23, '2022-01-01', '01:00:00', 7, 1); --senior books
--- --auto join trigger works for bookers
+--auto join trigger works for bookers
 
--- --Joins
+--Joins (all juniors)
 insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 1, 1);
 insert into Joins (eid, date, time, floor, room) values (8, '2022-01-01', '01:00:00', 1, 2);
 insert into Joins (eid, date, time, floor, room) values (12, '2022-01-01', '01:00:00', 1, 3);
@@ -913,4 +913,14 @@ insert into Approves (aid, date, time, floor, room) values (50, '2022-01-01', '0
 insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
 insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
 
-
+--Health Declaration
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (1, CURRENT_DATE, 36.6, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (2, CURRENT_DATE, 36.2, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (3, CURRENT_DATE, 36.3, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (4, CURRENT_DATE, 36.1, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (5, CURRENT_DATE, 36.6, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (6, CURRENT_DATE, 36.0, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (7, CURRENT_DATE, 37.1, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (8, CURRENT_DATE, 36.9, false);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (9, CURRENT_DATE, 38.6, true);
+INSERT INTO Health_Declaration (eid, date, temp, fever) values (10, CURRENT_DATE, 39.6, true);
