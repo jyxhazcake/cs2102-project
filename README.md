@@ -30,9 +30,20 @@ You will need to create an `.env` file to hide database credentials - This can b
 * DB_PORT=5432            //default I believe is 5432
 
 
-** Using Postman (For BE testing of API calls)
+## Using Postman (For BE testing of API calls)
 You can download [Postman](https://www.postman.com/downloads/) here.
 A sample query is shown below: 
 ![Sample Postman Query](/img/Postman-sample.png)
 
+This occurs cause of this line, and is just an example:
+```
+app.post('/user', (req, res) => {
+    pool.query('SELECT * FROM departments', (error, results) => {
+        if (error) {
+          throw error
+        }
+        res.status(200).json(results.rows)
+    })
+})
+```
 
