@@ -22,9 +22,17 @@ Extra requirements
 ==================
 Run `npm install` to get required packages. Run `npm start` and point `localhost:3000` to view development server.
 
-You will need to create an `.env` file to hide database credentials. In the `.env` file:
+You will need to create an `.env` file to hide database credentials - This can be a new database, or if you still have the 2102 database you can just use that one. In the `.env` file:
 * DB_USER=YOUR_USER       // should be postgres
 * DB_HOST=127.0.0.1       // this represents localhost, we will migrate to an online db later
 * DATABASE=YOUR_OWN_DB
 * DB_PASSWORD=YOUR_OWN_PASSWORD
 * DB_PORT=5432            //default I believe is 5432
+
+
+** Using Postman (For BE testing of API calls)
+You can download [Postman](https://www.postman.com/downloads/) here.
+A sample query is shown below: 
+![Sample Postman Query](/img/Postman-sample.png)
+
+
