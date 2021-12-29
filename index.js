@@ -61,3 +61,33 @@ app.delete('/departments/:id', (req, res) => {
       res.send(data) 
     })
 })
+
+//Get all rooms (use Postman or just go to http://localhost:3000/rooms)
+app.get('/rooms', (req, res) => {
+
+  
+  db.query('SELECT * FROM Meeting_Rooms')
+    .then(data => {
+      res.send(data)
+    })
+})
+
+//Add a new room (You must use postman to test this)
+app.post('/rooms', (req, res) => {
+
+  console.log(req.body)
+  db.proc('add_room', [req.body.floor, req.body.room, req.body.rname, req.body.room_capacity, req.body.did, req.body.mid, req.body.date])
+    .then(data => {
+      res.send(data) 
+    })
+})
+
+//Change capacity
+app.post('/rooms', (req, res) => {
+
+  console.log(req.body)
+  db.proc('change_capacity', [req.body.floor, req.body.room, req.body.new_capacity, req.body.date, req.body.mid])
+    .then(data => {
+      res.send(data) 
+    })
+})
