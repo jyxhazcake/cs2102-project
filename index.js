@@ -10,7 +10,7 @@ const cors = require('cors')
 app.use(cors())
 app.use(express.json())
 
-const port = 3000
+const port =  process.env.PORT || 3000
 
 const db = pgp({
   user: process.env.DB_USER,
