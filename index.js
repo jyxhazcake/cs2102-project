@@ -83,7 +83,8 @@ app.post('/rooms', (req, res) => {
 })
 
 //Change capacity
-app.post('/rooms', (req, res) => {
+app.post('/roomscapacity', (req, res) => {
+
   console.log(req.body)
   db.proc('change_capacity', [
     req.body.floor,
