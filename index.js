@@ -14,13 +14,18 @@ app.use(express.static(path.resolve(__dirname, 'client/build')));
 
 const port =  process.env.PORT || 3001
 
-const db = pgp({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-})
+//UNCOMMENT THIS IF YOU WANT TO USE LOCAL DB
+
+// const db = pgp({
+//   user: process.env.DB_USER,
+//   host: process.env.DB_HOST,
+//   database: process.env.DATABASE,
+//   password: process.env.DB_PASSWORD,
+//   port: process.env.DB_PORT,
+// })
+
+// THIS DB is used for production, its the heroku DB and will automatically switch urls.
+const db = pgp(process.env.DATABASE_URL)
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
