@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+const path = require('path');
 const pgp = require('pg-promise')()
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -9,8 +10,9 @@ const cors = require('cors')
 
 app.use(cors())
 app.use(express.json())
+app.use(express.static(path.resolve(__dirname, 'client/build')));
 
-const port =  process.env.PORT || 3000
+const port =  process.env.PORT || 3001
 
 const db = pgp({
   user: process.env.DB_USER,
@@ -21,7 +23,7 @@ const db = pgp({
 })
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
 })
 
 app.listen(port, () => {
