@@ -6,7 +6,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { json } = require('express/lib/response')
 const app = express()
-const cors = require('cors')
+const cors = require('cors');
+const { ssl } = require('pg/lib/defaults');
 
 app.use(cors())
 app.use(express.json())
@@ -25,7 +26,15 @@ const port =  process.env.PORT || 3001
 // })
 
 // THIS DB is used for production, its the heroku DB and will automatically switch urls.
-const db = pgp(process.env.DATABASE_URL)
+const cn = {
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+};
+
+const db = pgp(cn);
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
