@@ -12,7 +12,7 @@ export default function Input() {
         did: did,
         dname: dname,
       }
-      const response = await fetch('https://cs2102-project-demo.herokuapp.com/departments', {
+      const response = await fetch('/departments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -29,7 +29,7 @@ export default function Input() {
   //Deleting a department with id
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`https://cs2102-project-demo.herokuapp.com/departments/${id}`, {
+      const response = await fetch(`/departments/${id}`, {
         method: 'DELETE',
       })
       console.log(response)
