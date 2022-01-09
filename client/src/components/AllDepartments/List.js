@@ -5,7 +5,7 @@ export default function List() {
 
   const getDepartments = async () => {
     try {
-      const response = await fetch('http://localhost:3000/departments')
+      const response = await fetch('/departments')
       const jsonData = await response.json()
 
       setDepartments(jsonData)

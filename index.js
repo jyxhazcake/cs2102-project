@@ -6,26 +6,35 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { json } = require('express/lib/response')
 const app = express()
-const cors = require('cors')
+const cors = require('cors');
+const { ssl } = require('pg/lib/defaults');
 
 app.use(cors())
 app.use(express.json())
 app.use(express.static(path.resolve(__dirname, 'client/build')));
 
-const port =  process.env.PORT || 3001
+const port =  process.env.PORT || 3000
 
 //UNCOMMENT THIS IF YOU WANT TO USE LOCAL DB
 
-// const db = pgp({
-//   user: process.env.DB_USER,
-//   host: process.env.DB_HOST,
-//   database: process.env.DATABASE,
-//   password: process.env.DB_PASSWORD,
-//   port: process.env.DB_PORT,
-// })
+const db = pgp({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+})
 
 // THIS DB is used for production, its the heroku DB and will automatically switch urls.
-const db = pgp(process.env.DATABASE_URL)
+// const cn = {
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: {
+//     rejectUnauthorized: false
+//   }
+// };
+
+// const db = pgp(cn);
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
@@ -90,7 +99,7 @@ app.post('/rooms', (req, res) => {
 })
 
 //Change capacity
-app.post('/rooms', (req, res) => {
+app.post('/rooms1', (req, res) => {
   console.log(req.body)
   db.proc('change_capacity', [
     req.body.floor,
@@ -98,6 +107,75 @@ app.post('/rooms', (req, res) => {
     req.body.new_capacity,
     req.body.date,
     req.body.mid,
+  ]).then((data) => {
+    res.send(data)
+  })
+})
+
+// Select specifc employee (wh-working)
+app.get('/employees/:id', (req, res) => {
+  db.query('SELECT * FROM Employees WHERE eid = $1', [req.params.id]).then((data) => {
+    res.send(data)
+  })
+})
+
+// View future meeting of particular employee (wh-working)
+/*
+Note: Returns Date somehow in UTC+8 TimeZone. Sample return
+[
+    {
+        "date": "2021-12-31T16:00:00.000Z",
+        "start_hour": "01:00:00",
+        "room": 1,
+        "floor": 1
+    }
+]
+We need to display the Date as 2021-01-01 in the FrontEnd! This possibly due to timezone conversion
+*/
+app.get('/employees/:id/:date/view-future-meeting/', (req, res) => {
+  db.func('view_future_meeting', [req.params.date, req.params.id]).then((data) => {
+    res.send(data)
+  })
+})
+
+// View manager report if the employee is a manager - Datetime issue same as above (wh-working)
+app.get('/employees/:id/:date/view-manager-report', (req, res) => {
+  db.func('view_manager_report', [req.params.date, req.params.id]).then((data) => {
+    res.send(data)
+  })
+})
+
+//Join meeting (wh-working)
+app.post('/employees/join-meeting', (req, res) => {
+  db.proc('join_meeting', [
+    req.body.floor, 
+    req.body.room,
+    req.body.date,
+    req.body.start_hour,
+    req.body.end_hour,
+    req.body.eid
+  ]).then((data) => {
+    res.send(data)
+  })
+})
+
+//Leave Meeting (wh-working)
+app.delete('/employees/:floor/:room/:date/:start_hour/:end_hour/:eid/leave-meeting', (req, res) => {
+  db.proc('leave_meeting', [req.params.floor, req.params.room, req.params.date, req.params.start_hour,
+  req.params.end_hour, req.params.eid]).then((data) => {
+    res.send(data)
+  })
+})
+
+//Approve meeting (wh-working)
+app.post('/employees/approve-meeting', (req, res) => {
+  db.proc('approve_meeting', [
+    req.body.floor, 
+    req.body.room,
+    req.body.date,
+    req.body.start_hour,
+    req.body.end_hour,
+    req.body.eid
   ]).then((data) => {
     res.send(data)
   })
