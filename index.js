@@ -75,15 +75,65 @@ app.delete('/departments/:id', (req, res) => {
   })
 })
 
+/* #################################################
+############ Wei Xuan's components #################
+#################################################### */
+
+//Get all Employees
+app.get('/employees', (req, res) => {
+  db.query('SELECT * FROM Employees').then((data) => {
+    res.send(data)
+  })
+})
+
+//Add a new Employee
+app.post('/employees', (req, res) => {
+  console.log(req.body)
+  db.proc('add_room', [
+    req.body.name,
+    req.body.mobilenum,
+    req.body.kind,
+    req.body.did,
+    req.body.homenum,
+    req.body.officenum
+  ]).then((data) => {
+    res.send(data)
+  })
+})
+
+//Simulate an employee resigning
+app.post('/employees', (req, res) => {
+  console.log(req.body)
+  db.proc('remove_employee', [
+    req.body.eid
+  ])
+})
+
+//non_compliance function
+app.post('/employees', (req, res) => {
+  console.log(req.body)
+  db.function('non_compliance', [
+    req.body.start_date, req.body.end_date
+  ])
+})
+
+//Contact_tracing function
+app.get('/employees/:id', (req, res) => {
+  db.func('contact_tracing', [req.params.id]).then((data) => {
+    res.send(data)
+  })
+})
+
+
 //Get all rooms (use Postman or just go to http://localhost:3000/rooms)
-app.get('/rooms', (req, res) => {
+app.get('//employees/:id/rooms', (req, res) => {
   db.query('SELECT * FROM Meeting_Rooms').then((data) => {
     res.send(data)
   })
 })
 
 //Add a new room (You must use postman to test this)
-app.post('/rooms', (req, res) => {
+app.post('/employees/:id/rooms', (req, res) => {
   console.log(req.body)
   db.proc('add_room', [
     req.body.floor,
@@ -99,7 +149,8 @@ app.post('/rooms', (req, res) => {
 })
 
 //Change capacity
-app.post('/rooms1', (req, res) => {
+//Should the /rooms be changed to something else??
+app.post('/employees/:id/rooms', (req, res) => {
   console.log(req.body)
   db.proc('change_capacity', [
     req.body.floor,
@@ -112,7 +163,45 @@ app.post('/rooms1', (req, res) => {
   })
 })
 
-// Select specifc employee (wh-working)
+/* 
+Wei Xuan - I think it is necessary to create an interface to display the booking status
+of the rooms as well to facilitate the booking/unbooking process
+*/
+
+//Book a room
+app.post('/employees/:id/rooms', (req, res) => {
+  console.log(req.body)
+  db.proc('book_room', [
+    req.body.floor,
+    req.body.room,
+    req.body.date,
+    req.body.start_hour,
+    req.body.end_hour,
+    req.params.id
+  ]).then((data) => {
+    res.send(data)
+  })
+})
+
+//Unbook a room
+app.post('/employees/:id/rooms', (req, res) => {
+  console.log(req.body)
+  db.proc('unbook_room', [
+    req.body.floor,
+    req.body.room,
+    req.body.date,
+    req.body.start_hour,
+    req.body.end_hour,
+    req.params.id
+  ]).then((data) => {
+    res.send(data)
+  })
+})
+
+
+
+
+// Select specific employee (wh-working)
 app.get('/employees/:id', (req, res) => {
   db.query('SELECT * FROM Employees WHERE eid = $1', [req.params.id]).then((data) => {
     res.send(data)
