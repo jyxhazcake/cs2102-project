@@ -1,10 +1,14 @@
 import './App.css'
-import AllDepartments from './pages/AllDepartments'
+import { BrowserRouter as Router } from 'react-router-dom'
+
+import { Routes } from './routes/Routes'
 
 function App() {
   return (
     <div className="App">
-      <AllDepartments />
+      <Router>
+        <Routes />
+      </Router>
     </div>
   )
 }

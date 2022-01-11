@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 
 export default function Input() {
-  const [dname, setDname] = useState('')
-  const [did, setDid] = useState('')
+  const [ename, setEname] = useState('')
+  const [eid, setEid] = useState('')
 
-  //Adding a department
+  //Adding an employee
   const handleAdd = async (e) => {
     e.preventDefault()
     try {
       const body = {
-        did: did,
-        dname: dname,
+        eid: eid,
+        ename: ename,
       }
-      const response = await fetch('http://localhost:3000/departments', {
+      const response = await fetch('http://localhost:3000/employees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -26,10 +26,10 @@ export default function Input() {
     }
   }
 
-  //Deleting a department with id
+  //Removing an employee with id
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/departments/${id}`, {
+      const response = await fetch(`http://localhost:3000/employees/${id}`, {
         method: 'DELETE',
       })
       console.log(response)
@@ -44,19 +44,19 @@ export default function Input() {
     <>
       <form>
         <input
-          placeholder="Department ID"
+          placeholder="Employee ID"
           type="text"
-          value={did}
-          onChange={(e) => setDid(e.target.value)}
+          value={eid}
+          onChange={(e) => setEid(e.target.value)}
         />
         <input
-          placeholder="Department Name"
+          placeholder="Employee Name"
           type="text"
-          value={dname}
-          onChange={(e) => setDname(e.target.value)}
+          value={ename}
+          onChange={(e) => setEname(e.target.value)}
         />
         <button onClick={handleAdd}> Add </button>
-        <button onClick={() => handleDelete(did)}> Delete </button>
+        <button onClick={() => handleDelete(eid)}> Delete </button>
       </form>
     </>
   )
