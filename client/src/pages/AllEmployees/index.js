@@ -1,11 +1,11 @@
 import React from 'react'
-import Input from '../../components/AllDepartments/Input'
-import List from '../../components/AllDepartments/List'
+import Input from '../../components/AllEmployees/Input'
+import List from '../../components/AllEmployees/List'
 
-export default function AllDepartments() {
+export default function AllEmployees() {
   return (
     <>
-      <h1>All Departments</h1>
+      <h1>All Employees</h1>
       <List />
       <Input />
     </>

@@ -7,13 +7,22 @@ export default function LandingPage() {
   return (
     <div>
       <h1> Landing Page </h1>
-      <button
-        type="button"
-        className="btn btn-dark"
-        onClick={() => navigate('/departments')}
-      >
-        All Departments
-      </button>
+      <div className="">
+        <button
+          type="button"
+          className="btn btn-dark"
+          onClick={() => navigate('/departments')}
+        >
+          Departments
+        </button>
+        <button
+          type="button"
+          className="btn btn-dark"
+          onClick={() => navigate('/employees')}
+        >
+          Employees
+        </button>
+      </div>
     </div>
   )
 }

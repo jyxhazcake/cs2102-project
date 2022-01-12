@@ -5,7 +5,7 @@ export default function List() {
 
   const getDepartments = async () => {
     try {
-      const response = await fetch('http://localhost:3000/departments')
+      const response = await fetch('http://localhost:3000/employees')
       const jsonData = await response.json()
 
       console.log(jsonData)
@@ -25,15 +25,15 @@ export default function List() {
       <table className="table table-dark">
         <thead className="thead-light">
           <tr>
-            <th scope="col">Department ID</th>
-            <th scope="col">Department Name</th>
+            <th scope="col">Employee ID</th>
+            <th scope="col">Employee Name</th>
           </tr>
         </thead>
         <tbody>
           {departments.map((dept) => (
             <tr key={dept.did}>
               <td>{dept.did}</td>
-              <td>{dept.dname}</td>
+              <td>{dept.name}</td>
             </tr>
           ))}
         </tbody>

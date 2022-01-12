@@ -20,7 +20,7 @@ export default function Input() {
 
       console.log(response)
 
-      window.location.reload()
+      // window.location.reload()
     } catch (err) {
       console.error(err.message)
     }

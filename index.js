@@ -1,19 +1,19 @@
 require('dotenv').config()
 
-const path = require('path');
+const path = require('path')
 const pgp = require('pg-promise')()
 const express = require('express')
 const bodyParser = require('body-parser')
 const { json } = require('express/lib/response')
 const app = express()
-const cors = require('cors');
-const { ssl } = require('pg/lib/defaults');
+const cors = require('cors')
+const { ssl } = require('pg/lib/defaults')
 
 app.use(cors())
 app.use(express.json())
-app.use(express.static(path.resolve(__dirname, 'client/build')));
+app.use(express.static(path.resolve(__dirname, 'client/build')))
 
-const port =  process.env.PORT || 3000
+const port = process.env.PORT || 3000
 
 //UNCOMMENT THIS IF YOU WANT TO USE LOCAL DB
 
@@ -35,9 +35,8 @@ const db = pgp({
 
 // const db = pgp(cn);
 
-
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'))
 })
 
 app.listen(port, () => {
@@ -86,35 +85,31 @@ app.get('/employees', (req, res) => {
   })
 })
 
+//Simulate an employee resigning
+app.post('/employees', (req, res) => {
+  console.log(req.body)
+  db.proc('remove_employee', [req.body.eid])
+})
+
 //Add a new Employee
 app.post('/employees', (req, res) => {
   console.log(req.body)
-  db.proc('add_room', [
+  db.proc('add_employee', [
     req.body.name,
     req.body.mobilenum,
     req.body.kind,
     req.body.did,
     req.body.homenum,
-    req.body.officenum
+    req.body.officenum,
   ]).then((data) => {
     res.send(data)
   })
 })
 
-//Simulate an employee resigning
-app.post('/employees', (req, res) => {
-  console.log(req.body)
-  db.proc('remove_employee', [
-    req.body.eid
-  ])
-})
-
 //non_compliance function
 app.post('/employees', (req, res) => {
   console.log(req.body)
-  db.function('non_compliance', [
-    req.body.start_date, req.body.end_date
-  ])
+  db.function('non_compliance', [req.body.start_date, req.body.end_date])
 })
 
 //Contact_tracing function
@@ -123,7 +118,6 @@ app.get('/employees/:id', (req, res) => {
     res.send(data)
   })
 })
-
 
 //Get all rooms (use Postman or just go to http://localhost:3000/rooms)
 app.get('//employees/:id/rooms', (req, res) => {
@@ -177,7 +171,7 @@ app.post('/employees/:id/rooms', (req, res) => {
     req.body.date,
     req.body.start_hour,
     req.body.end_hour,
-    req.params.id
+    req.params.id,
   ]).then((data) => {
     res.send(data)
   })
@@ -192,20 +186,19 @@ app.post('/employees/:id/rooms', (req, res) => {
     req.body.date,
     req.body.start_hour,
     req.body.end_hour,
-    req.params.id
+    req.params.id,
   ]).then((data) => {
     res.send(data)
   })
 })
 
-
-
-
 // Select specific employee (wh-working)
 app.get('/employees/:id', (req, res) => {
-  db.query('SELECT * FROM Employees WHERE eid = $1', [req.params.id]).then((data) => {
-    res.send(data)
-  })
+  db.query('SELECT * FROM Employees WHERE eid = $1', [req.params.id]).then(
+    (data) => {
+      res.send(data)
+    }
+  )
 })
 
 // View future meeting of particular employee (wh-working)
@@ -222,49 +215,62 @@ Note: Returns Date somehow in UTC+8 TimeZone. Sample return
 We need to display the Date as 2021-01-01 in the FrontEnd! This possibly due to timezone conversion
 */
 app.get('/employees/:id/:date/view-future-meeting/', (req, res) => {
-  db.func('view_future_meeting', [req.params.date, req.params.id]).then((data) => {
-    res.send(data)
-  })
+  db.func('view_future_meeting', [req.params.date, req.params.id]).then(
+    (data) => {
+      res.send(data)
+    }
+  )
 })
 
 // View manager report if the employee is a manager - Datetime issue same as above (wh-working)
 app.get('/employees/:id/:date/view-manager-report', (req, res) => {
-  db.func('view_manager_report', [req.params.date, req.params.id]).then((data) => {
-    res.send(data)
-  })
+  db.func('view_manager_report', [req.params.date, req.params.id]).then(
+    (data) => {
+      res.send(data)
+    }
+  )
 })
 
 //Join meeting (wh-working)
 app.post('/employees/join-meeting', (req, res) => {
   db.proc('join_meeting', [
-    req.body.floor, 
+    req.body.floor,
     req.body.room,
     req.body.date,
     req.body.start_hour,
     req.body.end_hour,
-    req.body.eid
+    req.body.eid,
   ]).then((data) => {
     res.send(data)
   })
 })
 
 //Leave Meeting (wh-working)
-app.delete('/employees/:floor/:room/:date/:start_hour/:end_hour/:eid/leave-meeting', (req, res) => {
-  db.proc('leave_meeting', [req.params.floor, req.params.room, req.params.date, req.params.start_hour,
-  req.params.end_hour, req.params.eid]).then((data) => {
-    res.send(data)
-  })
-})
+app.delete(
+  '/employees/:floor/:room/:date/:start_hour/:end_hour/:eid/leave-meeting',
+  (req, res) => {
+    db.proc('leave_meeting', [
+      req.params.floor,
+      req.params.room,
+      req.params.date,
+      req.params.start_hour,
+      req.params.end_hour,
+      req.params.eid,
+    ]).then((data) => {
+      res.send(data)
+    })
+  }
+)
 
 //Approve meeting (wh-working)
 app.post('/employees/approve-meeting', (req, res) => {
   db.proc('approve_meeting', [
-    req.body.floor, 
+    req.body.floor,
     req.body.room,
     req.body.date,
     req.body.start_hour,
     req.body.end_hour,
-    req.body.eid
+    req.body.eid,
   ]).then((data) => {
     res.send(data)
   })
