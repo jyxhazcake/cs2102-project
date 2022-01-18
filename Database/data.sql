@@ -877,41 +877,41 @@ VALUES
     (CURRENT_DATE, 7, 1, 10, 4);
 
 --Books
-insert into Books (eid, date, time, floor, room) values (3, '2022-01-01', '01:00:00', 1, 1); --senior books
-insert into Books (eid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 1, 2); --manager books
-insert into Books (eid, date, time, floor, room) values (6, '2022-01-01', '01:00:00', 1, 3); --senior books
-insert into Books (eid, date, time, floor, room) values (7, '2022-01-01', '01:00:00', 2, 1); --senior books
-insert into Books (eid, date, time, floor, room) values (9, '2022-01-01', '01:00:00', 2, 2); --senior books
-insert into Books (eid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 2, 6); --manager books
-insert into Books (eid, date, time, floor, room) values (14, '2022-01-01', '01:00:00', 2, 7); --manager books
-insert into Books (eid, date, time, floor, room) values (18, '2022-01-01', '01:00:00', 4, 7); --manager books
-insert into Books (eid, date, time, floor, room) values (20, '2022-01-01', '01:00:00', 5, 6); --senior books
-insert into Books (eid, date, time, floor, room) values (23, '2022-01-01', '01:00:00', 7, 1); --senior books
+insert into Books (eid, date, time, floor, room) values (3, '2023-01-01', '01:00:00', 1, 1); --senior books
+insert into Books (eid, date, time, floor, room) values (4, '2023-01-01', '01:00:00', 1, 2); --manager books
+insert into Books (eid, date, time, floor, room) values (6, '2023-01-01', '01:00:00', 1, 3); --senior books
+insert into Books (eid, date, time, floor, room) values (7, '2023-01-01', '01:00:00', 2, 1); --senior books
+insert into Books (eid, date, time, floor, room) values (9, '2023-01-01', '01:00:00', 2, 2); --senior books
+insert into Books (eid, date, time, floor, room) values (11, '2023-01-01', '01:00:00', 2, 6); --manager books
+insert into Books (eid, date, time, floor, room) values (14, '2023-01-01', '01:00:00', 2, 7); --manager books
+insert into Books (eid, date, time, floor, room) values (18, '2023-01-01', '01:00:00', 4, 7); --manager books
+insert into Books (eid, date, time, floor, room) values (20, '2023-01-01', '01:00:00', 5, 6); --senior books
+insert into Books (eid, date, time, floor, room) values (23, '2023-01-01', '01:00:00', 7, 1); --senior books
 --auto join trigger works for bookers
 
 --Joins (all juniors)
-insert into Joins (eid, date, time, floor, room) values (5, '2022-01-01', '01:00:00', 1, 1);
-insert into Joins (eid, date, time, floor, room) values (8, '2022-01-01', '01:00:00', 1, 2);
-insert into Joins (eid, date, time, floor, room) values (12, '2022-01-01', '01:00:00', 1, 3);
-insert into Joins (eid, date, time, floor, room) values (13, '2022-01-01', '01:00:00', 2, 1);
-insert into Joins (eid, date, time, floor, room) values (15, '2022-01-01', '01:00:00', 2, 2);
-insert into Joins (eid, date, time, floor, room) values (16, '2022-01-01', '01:00:00', 2, 6);
-insert into Joins (eid, date, time, floor, room) values (17, '2022-01-01', '01:00:00', 2, 7);
-insert into Joins (eid, date, time, floor, room) values (19, '2022-01-01', '01:00:00', 4, 7);
-insert into Joins (eid, date, time, floor, room) values (22, '2022-01-01', '01:00:00', 5, 6);
-insert into Joins (eid, date, time, floor, room) values (25, '2022-01-01', '01:00:00', 7, 1);
+insert into Joins (eid, date, time, floor, room) values (5, '2023-01-01', '01:00:00', 1, 1);
+insert into Joins (eid, date, time, floor, room) values (8, '2023-01-01', '01:00:00', 1, 2);
+insert into Joins (eid, date, time, floor, room) values (12, '2023-01-01', '01:00:00', 1, 3);
+insert into Joins (eid, date, time, floor, room) values (13, '2023-01-01', '01:00:00', 2, 1);
+insert into Joins (eid, date, time, floor, room) values (15, '2023-01-01', '01:00:00', 2, 2);
+insert into Joins (eid, date, time, floor, room) values (16, '2023-01-01', '01:00:00', 2, 6);
+insert into Joins (eid, date, time, floor, room) values (17, '2023-01-01', '01:00:00', 2, 7);
+insert into Joins (eid, date, time, floor, room) values (19, '2023-01-01', '01:00:00', 4, 7);
+insert into Joins (eid, date, time, floor, room) values (22, '2023-01-01', '01:00:00', 5, 6);
+insert into Joins (eid, date, time, floor, room) values (25, '2023-01-01', '01:00:00', 7, 1);
 
 --Approves
-insert into Approves (aid, date, time, floor, room) values (48, '2022-01-01', '01:00:00', 1, 1); --manager approves
-insert into Approves (aid, date, time, floor, room) values (49, '2022-01-01', '01:00:00', 1, 2); --manager approves
-insert into Approves (aid, date, time, floor, room) values (24, '2022-01-01', '01:00:00', 1, 3); --manager approves
-insert into Approves (aid, date, time, floor, room) values (35, '2022-01-01', '01:00:00', 2, 1); --manager approves
-insert into Approves (aid, date, time, floor, room) values (50, '2022-01-01', '01:00:00', 2, 2); --manager approves
-insert into Approves (aid, date, time, floor, room) values (35, '2022-01-01', '01:00:00', 2, 6); --manager approves
-insert into Approves (aid, date, time, floor, room) values (35, '2022-01-01', '01:00:00', 2, 7); --manager approves
-insert into Approves (aid, date, time, floor, room) values (50, '2022-01-01', '01:00:00', 4, 7); --manager approves
-insert into Approves (aid, date, time, floor, room) values (11, '2022-01-01', '01:00:00', 5, 6); --manager approves
-insert into Approves (aid, date, time, floor, room) values (4, '2022-01-01', '01:00:00', 7, 1); --manager approves
+insert into Approves (aid, date, time, floor, room) values (48, '2023-01-01', '01:00:00', 1, 1); --manager approves
+insert into Approves (aid, date, time, floor, room) values (49, '2023-01-01', '01:00:00', 1, 2); --manager approves
+insert into Approves (aid, date, time, floor, room) values (24, '2023-01-01', '01:00:00', 1, 3); --manager approves
+insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 1); --manager approves
+insert into Approves (aid, date, time, floor, room) values (50, '2023-01-01', '01:00:00', 2, 2); --manager approves
+insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 6); --manager approves
+insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 7); --manager approves
+insert into Approves (aid, date, time, floor, room) values (50, '2023-01-01', '01:00:00', 4, 7); --manager approves
+insert into Approves (aid, date, time, floor, room) values (11, '2023-01-01', '01:00:00', 5, 6); --manager approves
+insert into Approves (aid, date, time, floor, room) values (4, '2023-01-01', '01:00:00', 7, 1); --manager approves
 
 --Health Declaration
 INSERT INTO Health_Declaration (eid, date, temp, fever) values (1, CURRENT_DATE, 36.6, false);
