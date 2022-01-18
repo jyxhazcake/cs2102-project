@@ -81,13 +81,6 @@ app.get('/employees', (req, res) => {
     res.send(data)
   })
 })
-
-//Simulate an employee resigning
-app.post('/employees', (req, res) => {
-  console.log(req.body)
-  db.proc('remove_employee', [req.body.eid, req.body.date])
-})
-
 //Add a new Employee
 app.post('/employees', (req, res) => {
   console.log(req.body)
@@ -101,6 +94,12 @@ app.post('/employees', (req, res) => {
   ]).then((data) => {
     res.send(data)
   })
+})
+
+//Simulate an employee resigning
+app.post('/employees', (req, res) => {
+  console.log(req.body)
+  db.proc('remove_employee', [req.body.eid, req.body.date])
 })
 
 //non_compliance function

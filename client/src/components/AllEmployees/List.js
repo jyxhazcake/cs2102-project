@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function List() {
+  const navigate = useNavigate()
   const [employees, setEmployees] = useState([])
 
   const getEmployees = async () => {
@@ -31,7 +33,7 @@ export default function List() {
         </thead>
         <tbody>
           {employees.map((dept) => (
-            <tr key={dept.eid}>
+            <tr key={dept.eid} onClick={() => navigate(`/profile/${dept.eid}`)}>
               <td>{dept.eid}</td>
               <td>{dept.ename}</td>
             </tr>
