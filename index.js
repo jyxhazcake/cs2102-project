@@ -43,31 +43,28 @@ app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
 
-// //SELECT ALL DEPARTMENTS -json object
-// db.proc('add_employee', ["test1", "9811-1220", "Junior", 2]), (error, results) => {
-//       if (error) {
-//         throw error
-//       }
-//       res.send(json)
-// }
-
-//Get all departments (use Postman or just go to http://localhost:3000/departments)
+//Get all departments
 app.get('/departments', (req, res) => {
   db.query('SELECT * FROM departments').then((data) => {
     res.send(data)
   })
 })
 
-//Add a new deparment (You must use postman to test this)
+/**
+ * Add a new deparment
+ * DID - Integer
+ * dname - String up to 50 characters
+ */
 app.post('/departments', (req, res) => {
-  //console.log(req.body)
-  console.log(req.body.did)
   db.proc('add_department', [req.body.did, req.body.dname]).then((data) => {
     res.send(data)
   })
 })
 
-//Delete an existing department (You must use postman to test this)
+/**
+ * Delete an existing department
+ * ID - Integer
+ */
 app.delete('/departments/:id', (req, res) => {
   db.proc('remove_department', [req.params.id]).then((data) => {
     res.send(data)
@@ -88,7 +85,7 @@ app.get('/employees', (req, res) => {
 //Simulate an employee resigning
 app.post('/employees', (req, res) => {
   console.log(req.body)
-  db.proc('remove_employee', [req.body.eid])
+  db.proc('remove_employee', [req.body.eid, req.body.date])
 })
 
 //Add a new Employee
@@ -192,7 +189,10 @@ app.post('/employees/:id/rooms', (req, res) => {
   })
 })
 
-// Select specific employee (wh-working)
+/**
+ * Select specific employee
+ * ID - Integer
+ */
 app.get('/employees/:id', (req, res) => {
   db.query('SELECT * FROM Employees WHERE eid = $1', [req.params.id]).then(
     (data) => {
@@ -214,6 +214,12 @@ Note: Returns Date somehow in UTC+8 TimeZone. Sample return
 ]
 We need to display the Date as 2021-01-01 in the FrontEnd! This possibly due to timezone conversion
 */
+
+/**
+ * View future meeting of particular employee from particular date
+ * Date - Date Object, future meeting from this date
+ * ID - Integer, Employee ID
+ */
 app.get('/employees/:id/:date/view-future-meeting/', (req, res) => {
   db.func('view_future_meeting', [req.params.date, req.params.id]).then(
     (data) => {
@@ -223,6 +229,11 @@ app.get('/employees/:id/:date/view-future-meeting/', (req, res) => {
 })
 
 // View manager report if the employee is a manager - Datetime issue same as above (wh-working)
+/**
+ * View manager report of rooms to be approved if person is manager
+ * Date - Date Object, all meeting rooms that needs to be approved from this date
+ * ID - Employee ID
+ */
 app.get('/employees/:id/:date/view-manager-report', (req, res) => {
   db.func('view_manager_report', [req.params.date, req.params.id]).then(
     (data) => {
@@ -231,7 +242,15 @@ app.get('/employees/:id/:date/view-manager-report', (req, res) => {
   )
 })
 
-//Join meeting (wh-working)
+/**
+ * Join meeting for specific employee
+ * floor - Integer
+ * room - Integer
+ * date - Date object
+ * start_hour - Time object
+ * end_hour - Time object
+ * eid - Employee ID
+ */
 app.post('/employees/join-meeting', (req, res) => {
   db.proc('join_meeting', [
     req.body.floor,
@@ -245,7 +264,15 @@ app.post('/employees/join-meeting', (req, res) => {
   })
 })
 
-//Leave Meeting (wh-working)
+/**
+ * Leave meeting for specific employee
+ * floor - Integer
+ * room - Integer
+ * date - Date object
+ * start_hour - Time object
+ * end_hour - Time object
+ * eid - Employee ID
+ */
 app.delete(
   '/employees/:floor/:room/:date/:start_hour/:end_hour/:eid/leave-meeting',
   (req, res) => {
@@ -262,7 +289,15 @@ app.delete(
   }
 )
 
-//Approve meeting (wh-working)
+/**
+ * Approve meeting if person is manager, else do nothing
+ * floor - Integer
+ * room - Integer
+ * date - Date object
+ * start_hour - Time object
+ * end_hour - Time object
+ * eid - Employee ID
+ */
 app.post('/employees/approve-meeting', (req, res) => {
   db.proc('approve_meeting', [
     req.body.floor,
