@@ -87,7 +87,7 @@ app.get('/employees', (req, res) => {
 //Add a new Employee
 app.post('/employees', (req, res) => {
   console.log(req.body)
-  db.proc('add_room', [
+  db.proc('add_employee', [
     req.body.name,
     req.body.mobilenum,
     req.body.kind,
@@ -100,15 +100,16 @@ app.post('/employees', (req, res) => {
 })
 
 //Simulate an employee resigning
-app.post('/employees', (req, res) => {
+app.post('/employees/resign', (req, res) => {
   console.log(req.body)
   db.proc('remove_employee', [
-    req.body.eid
+    req.body.eid,
+    req.body.date
   ])
 })
 
 //non_compliance function
-app.post('/employees', (req, res) => {
+app.post('/employees/non_compliance', (req, res) => {
   console.log(req.body)
   db.function('non_compliance', [
     req.body.start_date, req.body.end_date
@@ -147,8 +148,8 @@ app.post('/employees/:id/rooms', (req, res) => {
 })
 
 //Change capacity
-//Should the /rooms be changed to something else??
-app.post('/employees/:id/rooms', (req, res) => {
+//Should the /rooms be changed to something else?? --YES
+app.post('/employees/:id/rooms/change_capacity', (req, res) => {
   console.log(req.body)
   db.proc('change_capacity', [
     req.body.floor,
@@ -167,7 +168,7 @@ of the rooms as well to facilitate the booking/unbooking process
 */
 
 //Book a room
-app.post('/employees/:id/rooms', (req, res) => {
+app.post('/employees/:id/rooms/book', (req, res) => {
   console.log(req.body)
   db.proc('book_room', [
     req.body.floor,
@@ -182,7 +183,7 @@ app.post('/employees/:id/rooms', (req, res) => {
 })
 
 //Unbook a room
-app.post('/employees/:id/rooms', (req, res) => {
+app.post('/employees/:id/rooms/unbook', (req, res) => {
   console.log(req.body)
   db.proc('unbook_room', [
     req.body.floor,
