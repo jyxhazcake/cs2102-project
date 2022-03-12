@@ -8,10 +8,30 @@ export default function LandingPage() {
     return (
       <div>
         <h1> Landing Page </h1>
-        <div className="">
-          <input type = "text" name = "Username" />
-          <input type = "text" name = "Password" />
-        </div>
+        <form action="/" method="POST">
+          <div>
+            <input 
+            type="text" 
+            id="username" 
+            name="username"
+            placeholder="Username" 
+            required/>
+          </div>
+          <div>
+            <input 
+            type="text" 
+            id="password" 
+            name="password" 
+            placeholder="Password"
+            required/>
+          </div>
+          <div>
+            <input
+            type="submit"
+            value="Log in"
+            />
+          </div>
+        </form>
       </div>
     )
 }
