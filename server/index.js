@@ -13,6 +13,31 @@ app.use(cors())
 app.use(express.json())
 app.use(express.static(path.resolve(__dirname, 'client/build')))
 
+/* const session = require('express-session');
+const flash = require('express-flash');
+const passport = require("passport");
+
+const initializePassport = require('./passportConfig')
+
+initializePassport(passport);
+
+
+//allows storing of session data
+app.use(session({
+  secret:'secret', //encrypt the session
+
+  resave: false, //should we resave our session information if nothing has changed
+
+  saveUninitialized: false //should we save our session if there is no information
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+//displays flash messages
+app.use(flash()); */
+
 const port = process.env.PORT || 3000
 
 //UNCOMMENT THIS IF YOU WANT TO USE LOCAL DB
@@ -35,13 +60,23 @@ const db = pgp({
 
 // const db = pgp(cn);
 
-app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'))
-})
-
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
+
+app.listen(8080, () => console.log('API is running on http://localhost:8080/'));
+
+app.use('/', (req, res) => {
+  res.send({
+    token: 'test123'
+  });
+});
+
+// app.post('/', passport.authenticate('local', {
+//     successRedirect: "/employees",
+//     failureRedirect: "/",
+//   })
+// );
 
 //Get all departments
 app.get('/departments', (req, res) => {
