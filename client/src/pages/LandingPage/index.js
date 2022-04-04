@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import PropTypes from 'prop-types';
 
 async function loginUser(credentials) {
-  return fetch('http://localhost:8080/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(credentials)
-  })
-    .then(data => data.json())
- }
+  try {
+    return fetch('http://localhost:8080/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(credentials)
+    })
+      .then(data => data.json())
+  } catch (err) {
+    console.log(err)
+  }
+}
 
 export default function LandingPage({ setToken }) {
   const [username, setUsername] = useState();

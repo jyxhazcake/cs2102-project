@@ -1,10 +1,8 @@
 import './App.css'
-import React, { useState } from 'react';
 import LandingPage from './pages/LandingPage'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Routes } from './routes/Routes'
 import useToken from './useToken';
-
 
 function App() {
 

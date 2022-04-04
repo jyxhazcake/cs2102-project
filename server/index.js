@@ -8,6 +8,7 @@ const { json } = require('express/lib/response')
 const app = express()
 const cors = require('cors')
 const { ssl } = require('pg/lib/defaults')
+const { nextTick } = require('process')
 
 app.use(cors())
 app.use(express.json())
@@ -64,12 +65,13 @@ app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
 
-app.listen(8080, () => console.log('API is running on http://localhost:8080/'));
+app.listen(8080, () => console.log('API is running on http://localhost:8080'));
 
-app.use('/', (req, res) => {
+app.use('/login', (req, res) => {
   res.send({
     token: 'test123'
   });
+  next();
 });
 
 // app.post('/', passport.authenticate('local', {
