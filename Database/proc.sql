@@ -12,6 +12,7 @@ AS $$
 DECLARE 
 new_eid INTEGER:= 0;
 new_email VARCHAR(50);
+new_password VARCHAR(200);
 BEGIN
 
     SELECT max(eid) INTO new_eid FROM Employees;
@@ -21,8 +22,8 @@ BEGIN
         new_eid:= new_eid + 1;
     END IF;
 
-    SELECT CONCAT(CAST(new_eid AS VARCHAR(50)), '@demo_company.com') into new_email;
-
+    SELECT CONCAT(LOWER(REGEXP_REPLACE(e_name, '\s', '')), CAST(new_eid AS VARCHAR(50)), '@demo_company.com') into new_email;
+    SELECT CONCAT('password', CAST(new_eid AS VARCHAR(50))) into new_password;
     /*
     SELECT max(eid) INTO new_eid FROM Employees;
     IF (last_eid IS NULL)
@@ -33,8 +34,8 @@ BEGIN
     END IF;*/
     
     -- Is there a better way of generating the eid than using AUTOINCREMENT?
-    INSERT INTO Employees(ename, mobile_num, home_num, office_num, email, role, did)
-    VALUES (e_name, mobilenum, homenum, officenum, new_email, kind, d_id);
+    INSERT INTO Employees(ename, mobile_num, home_num, office_num, email, role, did, password)
+    VALUES (e_name, mobilenum, homenum, officenum, new_email, kind, d_id, new_password);
 
     -- Removed insertion of junior/manager/senior here and instead put in trigger help_insert_role()
 END;
