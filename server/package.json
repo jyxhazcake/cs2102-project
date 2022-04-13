@@ -2,9 +2,9 @@
   "name": "extra-project",
   "version": "1.0.0",
   "description": "An app to book meetings and conduct contact tracing if necessary",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node server/index.js",
     "build": "cd client && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,7 +28,9 @@
     "express-session": "^1.17.2",
     "nodemon": "^2.0.15",
     "passport": "^0.5.2",
+    "path": "^0.12.7",
     "pg": "^8.7.1",
-    "pg-promise": "^10.11.1"
+    "pg-promise": "^10.11.1",
+    "process": "^0.11.10"
   }
 }

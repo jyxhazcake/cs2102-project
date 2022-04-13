@@ -27,7 +27,10 @@
     "express-flash": "0.0.2",
     "express-session": "^1.17.2",
     "nodemon": "^2.0.15",
+    "passport": "^0.5.2",
+    "path": "^0.12.7",
     "pg": "^8.7.1",
-    "pg-promise": "^10.11.1"
+    "pg-promise": "^10.11.1",
+    "process": "^0.11.10"
   }
 }
