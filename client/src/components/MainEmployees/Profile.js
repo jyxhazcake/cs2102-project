@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Header, Data, ProfileBox } from './styles/Profile.styled'
+import { Header, Data, ProfileBox, StyledImg } from './styles/Profile.styled'
+import DefaultAvatar from '../../assets/Default_Avatar.png'
 
 export default function Profile() {
   const { id } = useParams()
@@ -29,6 +30,7 @@ export default function Profile() {
         .map((employee) => (
           <div key={employee.eid}>
             <Header> Profile Picture </Header>
+            <StyledImg src={DefaultAvatar} alt="default_avatar" />
             <Header> Name </Header>
             <Data> {employee.ename}</Data>
             <Header> Employee ID </Header>
