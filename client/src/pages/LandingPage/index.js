@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 
 async function loginUser(credentials) {
   try {
-    return fetch('http://localhost:8080/login', {
+    const response = await fetch('http://localhost:3000/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(credentials)
     })
-      .then(data => data.json())
+    console.log(response);
   } catch (err) {
     console.log(err)
   }
@@ -22,11 +22,12 @@ export default function LandingPage({ setToken }) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const token = await loginUser({
+    const response = await loginUser({
       username,
       password
     });
-    setToken(token);
+    console.log(response)
+    //setToken(token);
   }
 
   return (
@@ -61,6 +62,6 @@ export default function LandingPage({ setToken }) {
   );
 }
 
-LandingPage.propTypes = {
+/*LandingPage.propTypes = {
   setToken: PropTypes.func.isRequired
-}
+}*/

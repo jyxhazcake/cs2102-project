@@ -17,6 +17,7 @@ function initialize(passport) {
                 }
 
                 console.log(results.rows);
+                console.log("you have reached this stage")
 
                 //check if there is a match for username
                 if (results.rows.length > 0) {

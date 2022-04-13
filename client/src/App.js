@@ -6,11 +6,11 @@ import useToken from './useToken';
 
 function App() {
 
-  const { token, setToken } = useToken();
+  /*const { token, setToken } = useToken();
   
   if(!token) {
     return <LandingPage setToken={setToken} />
-  }
+  }*/
 
   return (
     <div className="App">
