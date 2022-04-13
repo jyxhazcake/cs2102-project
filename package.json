@@ -2,7 +2,7 @@
   "name": "extra-project",
   "version": "1.0.0",
   "description": "An app to book meetings and conduct contact tracing if necessary",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "build": "cd client && npm install && npm run build",
