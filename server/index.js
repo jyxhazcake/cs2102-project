@@ -70,7 +70,7 @@ app.listen(port, () => {
 })
 
 app.get('/', (req, res) => {
-  res.send("Hello World");
+  res.sendFile(path.resolve(__dirname, 'client/build', 'index.js'));
 })
 
 /*app.use('/login', (req, res) => {
