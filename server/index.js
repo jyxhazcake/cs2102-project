@@ -3,28 +3,23 @@ require('dotenv').config()
 const path = require('path')
 const pgp = require('pg-promise')()
 const express = require('express')
-const bodyParser = require('body-parser')
 const { json } = require('express/lib/response')
 const app = express()
 const cors = require('cors')
 const { ssl } = require('pg/lib/defaults')
 const { nextTick } = require('process')
+const cookieParser = require("cookie-parser")
 
 app.use(cors())
+app.use(express.static(path.resolve(__dirname, '../client/build')))
+app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(express.json())
-app.use(express.static(path.resolve(__dirname, 'client/build')))
 
 /*##################
   # Authentication #
   ################## */
 
 const session = require('express-session');
-const flash = require('express-flash');
-const passport = require('passport');
-
-const initializePassport = require('./passportConfig')
-
-initializePassport(passport);
 
 
 //allows storing of session data
@@ -37,11 +32,21 @@ app.use(session({
   })
 );
 
+/*const flash = require('express-flash');
+const passport = require('passport');
+
+const initializePassport = require('./passportConfig')
+
+initializePassport(passport);
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 //displays flash messages
-app.use(flash());
+app.use(flash());*/
+
+const jwt = require('jsonwebtoken');
 
 const port = process.env.PORT || 3000
 
@@ -55,7 +60,7 @@ const db = pgp({
   port: process.env.DB_PORT,
 })
 
-// THIS DB is used for production, its the heroku DB and will automatically switch urls.
+//THIS DB is used for production, its the heroku DB and will automatically switch urls.
 // const cn = {
 //   connectionString: process.env.DATABASE_URL,
 //   ssl: {
@@ -63,15 +68,15 @@ const db = pgp({
 //   }
 // };
 
-// const db = pgp(cn);
+//const db = pgp(cn);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
 
-/*app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
-})*/
+app.get('/', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+})
 
 /*app.use('/login', (req, res) => {
   res.send({
@@ -80,7 +85,7 @@ app.listen(port, () => {
   next();
 });*/
 
-function checkAuthenticated(req, res, next) {
+/*function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next()
   }
@@ -95,12 +100,70 @@ function checkNotAuthenticated(req, res, next) {
   next()
 }
 
-app.post('/login', passport.authenticate('local', {
-    successRedirect: "/employees",
-    failureRedirect: "/",
-    failureFlash: true
-  })
-);
+//Authenticate using passport-local
+app.post('/login', passport.authenticate('local'), (req, res) => {
+  console.log(req);
+}
+);*/
+
+//Authenticate using JWT
+
+const verifyJWT = (req, res, next) => {
+  const token = req.header("jwt_token")
+
+  if (!token) {
+    res.send("Token required");
+  } else {
+    jwt.verify(token, "jwtSecret", (err, decoded) => {
+      if (err) { //token is invalid
+        res.json({auth:false, message: "Failed to authenticate"});
+      } else { //token is valid
+        req.userID = decoded.id;
+        next();
+      }
+    });
+  }
+}
+
+app.post("/verify", verifyJWT, (req, res) => {
+  try {
+    res.json(true);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+app.post('/login', (req, res) => {
+  //1. destructure req.body
+  const username = req.body.username;
+  const password = req.body.password;
+
+  db.query(
+    'SELECT * FROM Employees WHERE email = $1', [username]).then((results) => {
+      //check if there is a match for username/email
+      if (results.length > 0) {
+          const user = results[0];
+
+          if (password == user.password) {
+              req.session.user = user;
+
+              const id = user.eid;
+              const token = jwt.sign( {id}, "jwtSecret", {
+                expiresIn: 300, //token expires in 5 minutes
+              })
+              res.json({auth:true, id:id, jwtToken:token});
+
+          } else {
+              res.json({auth: false, message: "Incorrect username/password"}); //returns false value if password does not match
+          }
+      } else {
+          res.json({auth: false, message: "Email is not registered"});
+      }
+
+      
+  }) 
+})
 
 //Get all departments
 app.get('/departments', (req, res) => {

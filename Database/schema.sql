@@ -9,6 +9,11 @@ CREATE TABLE Departments (
    did INTEGER PRIMARY KEY,
    dname varchar(50)
 );
+
+CREATE TABLE Admin (
+   eid INTEGER PRIMARY KEY,
+   FOREIGN KEY (eid) REFERENCES Employees (eid)
+)
   
 CREATE TABLE Employees (
    eid SERIAL,
