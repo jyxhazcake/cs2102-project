@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+
 
 async function loginUser(credentials) {
   try {
@@ -10,24 +11,40 @@ async function loginUser(credentials) {
       },
       body: JSON.stringify(credentials)
     })
-    console.log(response);
+    return response;
   } catch (err) {
     console.log(err)
   }
 }
 
-export default function LandingPage({ setToken }) {
+export default function LandingPage({ setAuth }) {
+  const navigate = useNavigate();
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
 
   const handleSubmit = async e => {
     e.preventDefault();
+    try {
     const response = await loginUser({
-      username,
-      password
+      username: username,
+      password: password
     });
-    console.log(response)
-    //setToken(token);
+
+    const parseRes = await response.json();
+    console.log(parseRes.id);
+
+      if (parseRes.jwtToken) {
+        localStorage.setItem("token", parseRes.jwtToken);
+        setAuth = true;
+        console.log("Logged in Successfully");
+        navigate(`/profile/${parseRes.id}`)
+      } else {
+        setAuth = false;
+        console.log(parseRes);
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
   }
 
   return (
@@ -61,7 +78,3 @@ export default function LandingPage({ setToken }) {
     </div>
   );
 }
-
-/*LandingPage.propTypes = {
-  setToken: PropTypes.func.isRequired
-}*/
