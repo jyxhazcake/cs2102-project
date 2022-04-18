@@ -23,7 +23,7 @@ export default function List() {
   }, [])
 
   return (
-    <>
+    <div>
       <table className="table table-dark">
         <thead className="thead-light">
           <tr>
@@ -40,6 +40,6 @@ export default function List() {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   )
 }

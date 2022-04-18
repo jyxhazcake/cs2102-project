@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text, Container } from './styles/Button.styled'
 
-export default function Button(props) {
+export default function SidebarButton(props) {
   return (
     <Container
       onClick={props.onClick}

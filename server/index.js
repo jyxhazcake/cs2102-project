@@ -152,7 +152,7 @@ app.post('/login', (req, res) => {
 
           const id = user.eid
           const token = jwt.sign({ id }, 'jwtSecret', {
-            expiresIn: 300, //token expires in 5 minutes
+            expiresIn: 3000, //token expires in 50 minutes
           })
           res.json({ auth: true, id: id, jwtToken: token })
         } else {
