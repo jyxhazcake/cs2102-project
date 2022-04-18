@@ -8,10 +8,10 @@ export const Container = styled.div`
   padding: 10px;
 
   &:hover {
-    background: #e3f2fd;
+    background: #b0e0e6;
   }
 
-  background: ${(props) => (props.isSelected ? 'red' : 'white')};
+  background: ${(props) => (props.isSelected ? '#B0E0E6' : 'white')};
 `
 export const Text = styled.div`
   font-family: 'Roboto';

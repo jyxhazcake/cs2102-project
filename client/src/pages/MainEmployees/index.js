@@ -11,6 +11,12 @@ export default function MainEmployees() {
     switch (tabID) {
       case 1:
         return <Profile />
+      case 2:
+        return <h1> Meetings </h1>
+      case 3:
+        return <h1> Bookings </h1>
+      default:
+        return <h1> Default </h1>
     }
   }
   return (
