@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 
 
 async function loginUser(credentials) {
@@ -18,7 +18,7 @@ async function loginUser(credentials) {
 }
 
 export default function LandingPage({ setAuth }) {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
 
@@ -37,7 +37,7 @@ export default function LandingPage({ setAuth }) {
         localStorage.setItem("token", parseRes.jwtToken);
         setAuth = true;
         console.log("Logged in Successfully");
-        navigate(`/profile/${parseRes.id}`)
+        //navigate(`/profile/${parseRes.id}`)
       } else {
         setAuth = false;
         console.log(parseRes);

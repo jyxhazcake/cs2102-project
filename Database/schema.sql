@@ -10,10 +10,6 @@ CREATE TABLE Departments (
    dname varchar(50)
 );
 
-CREATE TABLE Admin (
-   eid INTEGER PRIMARY KEY,
-   FOREIGN KEY (eid) REFERENCES Employees (eid)
-)
   
 CREATE TABLE Employees (
    eid SERIAL,
@@ -23,11 +19,17 @@ CREATE TABLE Employees (
    mobile_num VARCHAR(50),
    office_num VARCHAR(50),
    resigned_date DATE,
-   role VARCHAR(50) NOT NULL CHECK(role IN ('Junior', 'Senior', 'Manager')),
+   role VARCHAR(50) NOT NULL CHECK(role IN ('Junior', 'Senior', 'Manager', 'Admin')),
    did INTEGER NOT NULL DEFAULT 0,
    password VARCHAR(200) NOT NULL,
    PRIMARY KEY (eid),
    FOREIGN KEY (did) REFERENCES Departments (did) ON UPDATE CASCADE ON DELETE SET DEFAULT
+);
+
+
+CREATE TABLE Admin (
+   eid INTEGER PRIMARY KEY,
+   FOREIGN KEY (eid) REFERENCES Employees (eid)
 );
 
  
