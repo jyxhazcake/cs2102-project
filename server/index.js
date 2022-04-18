@@ -8,7 +8,7 @@ const app = express()
 const cors = require('cors')
 const { ssl } = require('pg/lib/defaults')
 const { nextTick } = require('process')
-const cookieParser = require("cookie-parser")
+const cookieParser = require('cookie-parser')
 
 app.use(cors())
 app.use(express.static(path.resolve(__dirname, '../client/build')))
@@ -19,18 +19,18 @@ app.use(express.json())
   # Authentication #
   ################## */
 
-const session = require('express-session');
-
+const session = require('express-session')
 
 //allows storing of session data
-app.use(session({
-  secret:'secret', //encrypt the session
+app.use(
+  session({
+    secret: 'secret', //encrypt the session
 
-  resave: false, //should we resave our session information if nothing has changed
+    resave: false, //should we resave our session information if nothing has changed
 
-  saveUninitialized: true //should we save our session if there is no information
+    saveUninitialized: true, //should we save our session if there is no information
   })
-);
+)
 
 /*const flash = require('express-flash');
 const passport = require('passport');
@@ -46,7 +46,7 @@ app.use(passport.session());
 //displays flash messages
 app.use(flash());*/
 
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken')
 
 const port = process.env.PORT || 3000
 
@@ -75,7 +75,7 @@ app.listen(port, () => {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'))
 })
 
 /*app.use('/login', (req, res) => {
@@ -109,60 +109,60 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
 //Authenticate using JWT
 
 const verifyJWT = (req, res, next) => {
-  const token = req.header("jwt_token")
+  const token = req.header('jwt_token')
 
   if (!token) {
-    res.send("Token required");
+    res.send('Token required')
   } else {
-    jwt.verify(token, "jwtSecret", (err, decoded) => {
-      if (err) { //token is invalid
-        res.json({auth:false, message: "Failed to authenticate"});
-      } else { //token is valid
-        req.userID = decoded.id;
-        next();
+    jwt.verify(token, 'jwtSecret', (err, decoded) => {
+      if (err) {
+        //token is invalid
+        res.json({ auth: false, message: 'Failed to authenticate' })
+      } else {
+        //token is valid
+        req.userID = decoded.id
+        next()
       }
-    });
+    })
   }
 }
 
-app.post("/verify", verifyJWT, (req, res) => {
+app.post('/verify', verifyJWT, (req, res) => {
   try {
-    res.json(true);
+    res.json(true)
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+    console.error(err.message)
+    res.status(500).send('Server error')
   }
-});
+})
 
 app.post('/login', (req, res) => {
   //1. destructure req.body
-  const username = req.body.username;
-  const password = req.body.password;
+  const username = req.body.username
+  const password = req.body.password
 
-  db.query(
-    'SELECT * FROM Employees WHERE email = $1', [username]).then((results) => {
+  db.query('SELECT * FROM Employees WHERE email = $1', [username]).then(
+    (results) => {
       //check if there is a match for username/email
       if (results.length > 0) {
-          const user = results[0];
+        const user = results[0]
 
-          if (password == user.password) {
-              req.session.user = user;
+        if (password == user.password) {
+          req.session.user = user
 
-              const id = user.eid;
-              const token = jwt.sign( {id}, "jwtSecret", {
-                expiresIn: 300, //token expires in 5 minutes
-              })
-              res.json({auth:true, id:id, jwtToken:token});
-
-          } else {
-              res.json({auth: false, message: "Incorrect username/password"}); //returns false value if password does not match
-          }
+          const id = user.eid
+          const token = jwt.sign({ id }, 'jwtSecret', {
+            expiresIn: 300, //token expires in 5 minutes
+          })
+          res.json({ auth: true, id: id, jwtToken: token })
+        } else {
+          res.json({ auth: false, message: 'Incorrect username/password' }) //returns false value if password does not match
+        }
       } else {
-          res.json({auth: false, message: "Email is not registered"});
+        res.json({ auth: false, message: 'Email is not registered' })
       }
-
-      
-  }) 
+    }
+  )
 })
 
 //Get all departments
@@ -221,10 +221,7 @@ app.post('/employees', (req, res) => {
 //Simulate an employee resigning
 app.post('/employees/resign', (req, res) => {
   console.log(req.body)
-  db.proc('remove_employee', [
-    req.body.eid,
-    req.body.date
-  ])
+  db.proc('remove_employee', [req.body.eid, req.body.date])
 })
 
 //non_compliance function
@@ -237,13 +234,13 @@ app.post('/employees/non_compliance', (req, res) => {
  * Select specific employee
  * ID - Integer
  */
- app.get('/employees/:id', (req, res) => {
-    db.query('SELECT * FROM Employees WHERE eid = $1', [req.params.id]).then(
-      (data) => {
-        res.send(data)
-      }
-    )
-  })
+app.get('/employees/:id', (req, res) => {
+  db.query('SELECT * FROM Employees WHERE eid = $1', [req.params.id]).then(
+    (data) => {
+      res.send(data)
+    }
+  )
+})
 
 //Contact_tracing function
 app.get('/employees/:id/contact_tracing', (req, res) => {
@@ -283,7 +280,6 @@ app.post('/employees/:id/rooms', (req, res) => {
     res.send(data)
   })
 })
-
 
 /**
  * Change capacity of the room

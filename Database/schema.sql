@@ -9,12 +9,7 @@ CREATE TABLE Departments (
    did INTEGER PRIMARY KEY,
    dname varchar(50)
 );
-
-CREATE TABLE Admin (
-   eid INTEGER PRIMARY KEY,
-   FOREIGN KEY (eid) REFERENCES Employees (eid)
-)
-  
+ 
 CREATE TABLE Employees (
    eid SERIAL,
    ename VARCHAR(50),
@@ -30,6 +25,10 @@ CREATE TABLE Employees (
    FOREIGN KEY (did) REFERENCES Departments (did) ON UPDATE CASCADE ON DELETE SET DEFAULT
 );
 
+CREATE TABLE Admin (
+   eid INTEGER PRIMARY KEY,
+   FOREIGN KEY (eid) REFERENCES Employees (eid)
+);
  
 CREATE TABLE Junior (
    eid INTEGER PRIMARY KEY,

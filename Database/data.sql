@@ -792,135 +792,135 @@ insert into Departments (did, dname) values (14, 'Sales');
 insert into Departments (did, dname) values (15, 'Research and Development');
 
 --Employees
-insert into Employees (ename, email, mobile_num, role, did) values ('Harmon', 'hsalmons0@about.com', '228-522-9018', 'Junior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Phelia', 'pfrain1@ustream.tv', '267-458-8830', 'Senior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Carlie', 'cchuter2@yolasite.com', '209-753-9805', 'Senior', 13);
-insert into Employees (ename, email, mobile_num, role, did) values ('Darcy', 'dgoracci3@nymag.com', '292-756-6824', 'Manager', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Carlen', 'cmcrobb4@shutterfly.com', '518-799-1538', 'Junior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Oliy', 'omcgifford5@foxnews.com', '107-139-2328', 'Senior', 8);
-insert into Employees (ename, email, mobile_num, role, did) values ('Louie', 'lvaughanhughes6@so-net.ne.jp', '972-606-7549', 'Senior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Debra', 'djane7@patch.com', '333-831-1507', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Conrado', 'cotley8@rakuten.co.jp', '670-264-7373', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Yul', 'ymacknocker9@g.co', '544-211-6100', 'Junior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Sim', 'sgrestiea@jimdo.com', '930-123-1582', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Albie', 'aalimanb@nbcnews.com', '142-157-9418', 'Junior', 8);
-insert into Employees (ename, email, mobile_num, role, did) values ('Guenevere', 'griccac@wordpress.org', '148-403-7184', 'Junior', 14);
-insert into Employees (ename, email, mobile_num, role, did) values ('Conny', 'cboerderd@github.com', '722-203-4289', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Tab', 'tvallerinee@prnewswire.com', '299-853-0573', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Rodrick', 'rizatf@wikipedia.org', '820-586-3017', 'Junior', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Leontyne', 'lpateg@yolasite.com', '426-698-5089', 'Junior', 14);
-insert into Employees (ename, email, mobile_num, role, did) values ('Estella', 'ebarnetth@engadget.com', '322-712-9156', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Elisha', 'ewandeni@reuters.com', '561-696-4695', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Gavra', 'gcommonj@prweb.com', '117-773-0040', 'Senior', 5);
-insert into Employees (ename, email, mobile_num, role, did) values ('Tonye', 'tgrunwaldk@technorati.com', '965-153-0237', 'Senior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Faunie', 'fbudnkl@slate.com', '272-701-0076', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Samantha', 'sbaudichonm@phpbb.com', '313-753-1584', 'Senior', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Abey', 'ahigbinn@domainmarket.com', '184-586-6133', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Adrian', 'astandbrookeo@weibo.com', '808-667-8434', 'Junior', 5);
-insert into Employees (ename, email, mobile_num, role, did) values ('Hanson', 'hventomp@theatlantic.com', '963-790-0271', 'Senior', 13);
-insert into Employees (ename, email, mobile_num, role, did) values ('Guillaume', 'gcatheeq@shutterfly.com', '205-699-9944', 'Junior', 4);
-insert into Employees (ename, email, mobile_num, role, did) values ('Sonnie', 'sdevonsr@last.fm', '820-459-8958', 'Junior', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Thia', 'tkillwicks@reverbnation.com', '559-109-0662', 'Senior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Scottie', 'solubyt@fc2.com', '872-427-7550', 'Junior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Kelvin', 'kbulpittu@businessweek.com', '162-758-4470', 'Senior', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Porty', 'pfullerlovev@jalbum.net', '237-149-0621', 'Manager', 12);
-insert into Employees (ename, email, mobile_num, role, did) values ('Misti', 'mhurstw@desdev.cn', '184-941-8179', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Nowell', 'njorisx@yellowpages.com', '732-279-7175', 'Junior', 15);
-insert into Employees (ename, email, mobile_num, role, did) values ('Danika', 'dcraggy@marketwatch.com', '363-495-9170', 'Manager', 7);
-insert into Employees (ename, email, mobile_num, role, did) values ('Marysa', 'mgreatbankz@paginegialle.it', '984-738-4096', 'Junior', 8);
-insert into Employees (ename, email, mobile_num, role, did) values ('Astrix', 'akinson10@answers.com', '939-705-0389', 'Senior', 10);
-insert into Employees (ename, email, mobile_num, role, did) values ('Mile', 'mclempton11@istockphoto.com', '440-254-1188', 'Senior', 4);
-insert into Employees (ename, email, mobile_num, role, did) values ('Ted', 'tfabb12@thetimes.co.uk', '604-383-2945', 'Junior', 10);
-insert into Employees (ename, email, mobile_num, role, did) values ('Ailbert', 'amarlon13@latimes.com', '618-542-3680', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Mabel', 'mcheake14@google.es', '632-240-3577', 'Junior', 2);
-insert into Employees (ename, email, mobile_num, role, did) values ('Eyde', 'enowakowski15@prlog.org', '609-148-7900', 'Junior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Dion', 'dsouthway16@tinyurl.com', '518-521-4318', 'Senior', 11);
-insert into Employees (ename, email, mobile_num, role, did) values ('Bondy', 'brubenovic17@reddit.com', '395-331-8144', 'Junior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Linzy', 'lmcgettrick18@joomla.org', '890-109-7554', 'Junior', 9);
-insert into Employees (ename, email, mobile_num, role, did) values ('Gabriel', 'ginold19@jalbum.net', '158-407-5909', 'Senior', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Boony', 'bdot1a@odnoklassniki.ru', '303-402-9208', 'Senior', 3);
-insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 1);
-insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Manager', 6);
-insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Manager', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Harmon', 'hsalmons0@about.com', '228-522-9018', 'Junior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Phelia', 'pfrain1@ustream.tv', '267-458-8830', 'Senior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Carlie', 'cchuter2@yolasite.com', '209-753-9805', 'Senior', 13);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Darcy', 'dgoracci3@nymag.com', '292-756-6824', 'Manager', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Carlen', 'cmcrobb4@shutterfly.com', '518-799-1538', 'Junior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Oliy', 'omcgifford5@foxnews.com', '107-139-2328', 'Senior', 8);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Louie', 'lvaughanhughes6@so-net.ne.jp', '972-606-7549', 'Senior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Debra', 'djane7@patch.com', '333-831-1507', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Conrado', 'cotley8@rakuten.co.jp', '670-264-7373', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Yul', 'ymacknocker9@g.co', '544-211-6100', 'Junior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Sim', 'sgrestiea@jimdo.com', '930-123-1582', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Albie', 'aalimanb@nbcnews.com', '142-157-9418', 'Junior', 8);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Guenevere', 'griccac@wordpress.org', '148-403-7184', 'Junior', 14);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Conny', 'cboerderd@github.com', '722-203-4289', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Tab', 'tvallerinee@prnewswire.com', '299-853-0573', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Rodrick', 'rizatf@wikipedia.org', '820-586-3017', 'Junior', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Leontyne', 'lpateg@yolasite.com', '426-698-5089', 'Junior', 14);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Estella', 'ebarnetth@engadget.com', '322-712-9156', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Elisha', 'ewandeni@reuters.com', '561-696-4695', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Gavra', 'gcommonj@prweb.com', '117-773-0040', 'Senior', 5);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Tonye', 'tgrunwaldk@technorati.com', '965-153-0237', 'Senior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Faunie', 'fbudnkl@slate.com', '272-701-0076', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Samantha', 'sbaudichonm@phpbb.com', '313-753-1584', 'Senior', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Abey', 'ahigbinn@domainmarket.com', '184-586-6133', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Adrian', 'astandbrookeo@weibo.com', '808-667-8434', 'Junior', 5);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Hanson', 'hventomp@theatlantic.com', '963-790-0271', 'Senior', 13);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Guillaume', 'gcatheeq@shutterfly.com', '205-699-9944', 'Junior', 4);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Sonnie', 'sdevonsr@last.fm', '820-459-8958', 'Junior', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Thia', 'tkillwicks@reverbnation.com', '559-109-0662', 'Senior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Scottie', 'solubyt@fc2.com', '872-427-7550', 'Junior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Kelvin', 'kbulpittu@businessweek.com', '162-758-4470', 'Senior', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Porty', 'pfullerlovev@jalbum.net', '237-149-0621', 'Manager', 12);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Misti', 'mhurstw@desdev.cn', '184-941-8179', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Nowell', 'njorisx@yellowpages.com', '732-279-7175', 'Junior', 15);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Danika', 'dcraggy@marketwatch.com', '363-495-9170', 'Manager', 7);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Marysa', 'mgreatbankz@paginegialle.it', '984-738-4096', 'Junior', 8);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Astrix', 'akinson10@answers.com', '939-705-0389', 'Senior', 10);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Mile', 'mclempton11@istockphoto.com', '440-254-1188', 'Senior', 4);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Ted', 'tfabb12@thetimes.co.uk', '604-383-2945', 'Junior', 10);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Ailbert', 'amarlon13@latimes.com', '618-542-3680', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Mabel', 'mcheake14@google.es', '632-240-3577', 'Junior', 2);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Eyde', 'enowakowski15@prlog.org', '609-148-7900', 'Junior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Dion', 'dsouthway16@tinyurl.com', '518-521-4318', 'Senior', 11);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Bondy', 'brubenovic17@reddit.com', '395-331-8144', 'Junior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Linzy', 'lmcgettrick18@joomla.org', '890-109-7554', 'Junior', 9);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Gabriel', 'ginold19@jalbum.net', '158-407-5909', 'Senior', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Boony', 'bdot1a@odnoklassniki.ru', '303-402-9208', 'Senior', 3);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Rem', 'rkemson1b@oakley.com', '442-660-0095', 'Manager', 1);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Meryl', 'mnorbury1c@bluehost.com', '183-753-4531', 'Manager', 6);
+-- insert into Employees (ename, email, mobile_num, role, did) values ('Julieta', 'jebourne1d@ning.com', '620-542-6070', 'Manager', 11);
  
-/*
-Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 1 10 41
-Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 21
-Managers:  4 11 14 18 24 32 35 48 49 50
-*/
+-- /*
+-- Juniors:  5 8 12 13 15 16 17 19 22 25 27 28 30 34 36 39 42 44 45 1 10 41
+-- Seniors:  2 3 6 7 9 20 23 26 29 31 33 37 38 40 43 46 47 21
+-- Managers:  4 11 14 18 24 32 35 48 49 50
+-- */
 
---Meeting_Rooms
-INSERT INTO Meeting_Rooms (floor,room, rname ,did)
-VALUES
-  (1,1,'Germany',1),
-  (1,2,'Portugal',6),
-  (1,3,'Zimbabwe',6),
-  (2,1,'Italy',7),
-  (2,2,'United States',11),
-  (2,6,'Ireland',7),
-  (2,7,'France',7),
-  (4,7,'Sweden',11),
-  (5,6,'Ireland',6),
-  (7,1,'Spain',1);
+-- --Meeting_Rooms
+-- INSERT INTO Meeting_Rooms (floor,room, rname ,did)
+-- VALUES
+--   (1,1,'Germany',1),
+--   (1,2,'Portugal',6),
+--   (1,3,'Zimbabwe',6),
+--   (2,1,'Italy',7),
+--   (2,2,'United States',11),
+--   (2,6,'Ireland',7),
+--   (2,7,'France',7),
+--   (4,7,'Sweden',11),
+--   (5,6,'Ireland',6),
+--   (7,1,'Spain',1);
 
-INSERT INTO Updates (date, floor, room, new_cap, eid)
-VALUES
-    (CURRENT_DATE, 1, 1, 10, 4),
-    (CURRENT_DATE, 1, 2, 5, 11),
-    (CURRENT_DATE, 1, 3, 5, 11),
-    (CURRENT_DATE, 2, 1, 5, 35),
-    (CURRENT_DATE, 2, 2, 5, 50),
-    (CURRENT_DATE, 2, 6, 5, 35),
-    (CURRENT_DATE, 2, 7, 5, 35),
-    (CURRENT_DATE, 5, 6, 5, 11),
-    (CURRENT_DATE, 4, 7, 5, 50),
-    (CURRENT_DATE, 7, 1, 10, 4);
+-- INSERT INTO Updates (date, floor, room, new_cap, eid)
+-- VALUES
+--     (CURRENT_DATE, 1, 1, 10, 4),
+--     (CURRENT_DATE, 1, 2, 5, 11),
+--     (CURRENT_DATE, 1, 3, 5, 11),
+--     (CURRENT_DATE, 2, 1, 5, 35),
+--     (CURRENT_DATE, 2, 2, 5, 50),
+--     (CURRENT_DATE, 2, 6, 5, 35),
+--     (CURRENT_DATE, 2, 7, 5, 35),
+--     (CURRENT_DATE, 5, 6, 5, 11),
+--     (CURRENT_DATE, 4, 7, 5, 50),
+--     (CURRENT_DATE, 7, 1, 10, 4);
 
---Books
-insert into Books (eid, date, time, floor, room) values (3, '2023-01-01', '01:00:00', 1, 1); --senior books
-insert into Books (eid, date, time, floor, room) values (4, '2023-01-01', '01:00:00', 1, 2); --manager books
-insert into Books (eid, date, time, floor, room) values (6, '2023-01-01', '01:00:00', 1, 3); --senior books
-insert into Books (eid, date, time, floor, room) values (7, '2023-01-01', '01:00:00', 2, 1); --senior books
-insert into Books (eid, date, time, floor, room) values (9, '2023-01-01', '01:00:00', 2, 2); --senior books
-insert into Books (eid, date, time, floor, room) values (11, '2023-01-01', '01:00:00', 2, 6); --manager books
-insert into Books (eid, date, time, floor, room) values (14, '2023-01-01', '01:00:00', 2, 7); --manager books
-insert into Books (eid, date, time, floor, room) values (18, '2023-01-01', '01:00:00', 4, 7); --manager books
-insert into Books (eid, date, time, floor, room) values (20, '2023-01-01', '01:00:00', 5, 6); --senior books
-insert into Books (eid, date, time, floor, room) values (23, '2023-01-01', '01:00:00', 7, 1); --senior books
---auto join trigger works for bookers
+-- --Books
+-- insert into Books (eid, date, time, floor, room) values (3, '2023-01-01', '01:00:00', 1, 1); --senior books
+-- insert into Books (eid, date, time, floor, room) values (4, '2023-01-01', '01:00:00', 1, 2); --manager books
+-- insert into Books (eid, date, time, floor, room) values (6, '2023-01-01', '01:00:00', 1, 3); --senior books
+-- insert into Books (eid, date, time, floor, room) values (7, '2023-01-01', '01:00:00', 2, 1); --senior books
+-- insert into Books (eid, date, time, floor, room) values (9, '2023-01-01', '01:00:00', 2, 2); --senior books
+-- insert into Books (eid, date, time, floor, room) values (11, '2023-01-01', '01:00:00', 2, 6); --manager books
+-- insert into Books (eid, date, time, floor, room) values (14, '2023-01-01', '01:00:00', 2, 7); --manager books
+-- insert into Books (eid, date, time, floor, room) values (18, '2023-01-01', '01:00:00', 4, 7); --manager books
+-- insert into Books (eid, date, time, floor, room) values (20, '2023-01-01', '01:00:00', 5, 6); --senior books
+-- insert into Books (eid, date, time, floor, room) values (23, '2023-01-01', '01:00:00', 7, 1); --senior books
+-- --auto join trigger works for bookers
 
---Joins (all juniors)
-insert into Joins (eid, date, time, floor, room) values (5, '2023-01-01', '01:00:00', 1, 1);
-insert into Joins (eid, date, time, floor, room) values (8, '2023-01-01', '01:00:00', 1, 2);
-insert into Joins (eid, date, time, floor, room) values (12, '2023-01-01', '01:00:00', 1, 3);
-insert into Joins (eid, date, time, floor, room) values (13, '2023-01-01', '01:00:00', 2, 1);
-insert into Joins (eid, date, time, floor, room) values (15, '2023-01-01', '01:00:00', 2, 2);
-insert into Joins (eid, date, time, floor, room) values (16, '2023-01-01', '01:00:00', 2, 6);
-insert into Joins (eid, date, time, floor, room) values (17, '2023-01-01', '01:00:00', 2, 7);
-insert into Joins (eid, date, time, floor, room) values (19, '2023-01-01', '01:00:00', 4, 7);
-insert into Joins (eid, date, time, floor, room) values (22, '2023-01-01', '01:00:00', 5, 6);
-insert into Joins (eid, date, time, floor, room) values (25, '2023-01-01', '01:00:00', 7, 1);
+-- --Joins (all juniors)
+-- insert into Joins (eid, date, time, floor, room) values (5, '2023-01-01', '01:00:00', 1, 1);
+-- insert into Joins (eid, date, time, floor, room) values (8, '2023-01-01', '01:00:00', 1, 2);
+-- insert into Joins (eid, date, time, floor, room) values (12, '2023-01-01', '01:00:00', 1, 3);
+-- insert into Joins (eid, date, time, floor, room) values (13, '2023-01-01', '01:00:00', 2, 1);
+-- insert into Joins (eid, date, time, floor, room) values (15, '2023-01-01', '01:00:00', 2, 2);
+-- insert into Joins (eid, date, time, floor, room) values (16, '2023-01-01', '01:00:00', 2, 6);
+-- insert into Joins (eid, date, time, floor, room) values (17, '2023-01-01', '01:00:00', 2, 7);
+-- insert into Joins (eid, date, time, floor, room) values (19, '2023-01-01', '01:00:00', 4, 7);
+-- insert into Joins (eid, date, time, floor, room) values (22, '2023-01-01', '01:00:00', 5, 6);
+-- insert into Joins (eid, date, time, floor, room) values (25, '2023-01-01', '01:00:00', 7, 1);
 
---Approves
-insert into Approves (aid, date, time, floor, room) values (48, '2023-01-01', '01:00:00', 1, 1); --manager approves
-insert into Approves (aid, date, time, floor, room) values (49, '2023-01-01', '01:00:00', 1, 2); --manager approves
-insert into Approves (aid, date, time, floor, room) values (24, '2023-01-01', '01:00:00', 1, 3); --manager approves
-insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 1); --manager approves
-insert into Approves (aid, date, time, floor, room) values (50, '2023-01-01', '01:00:00', 2, 2); --manager approves
-insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 6); --manager approves
-insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 7); --manager approves
-insert into Approves (aid, date, time, floor, room) values (50, '2023-01-01', '01:00:00', 4, 7); --manager approves
-insert into Approves (aid, date, time, floor, room) values (11, '2023-01-01', '01:00:00', 5, 6); --manager approves
-insert into Approves (aid, date, time, floor, room) values (4, '2023-01-01', '01:00:00', 7, 1); --manager approves
+-- --Approves
+-- insert into Approves (aid, date, time, floor, room) values (48, '2023-01-01', '01:00:00', 1, 1); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (49, '2023-01-01', '01:00:00', 1, 2); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (24, '2023-01-01', '01:00:00', 1, 3); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 1); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (50, '2023-01-01', '01:00:00', 2, 2); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 6); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (35, '2023-01-01', '01:00:00', 2, 7); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (50, '2023-01-01', '01:00:00', 4, 7); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (11, '2023-01-01', '01:00:00', 5, 6); --manager approves
+-- insert into Approves (aid, date, time, floor, room) values (4, '2023-01-01', '01:00:00', 7, 1); --manager approves
 
---Health Declaration
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (1, CURRENT_DATE, 36.6, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (2, CURRENT_DATE, 36.2, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (3, CURRENT_DATE, 36.3, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (4, CURRENT_DATE, 36.1, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (5, CURRENT_DATE, 36.6, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (6, CURRENT_DATE, 36.0, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (7, CURRENT_DATE, 37.1, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (8, CURRENT_DATE, 36.9, false);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (9, CURRENT_DATE, 38.6, true);
-INSERT INTO Health_Declaration (eid, date, temp, fever) values (10, CURRENT_DATE, 39.6, true);
+-- --Health Declaration
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (1, CURRENT_DATE, 36.6, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (2, CURRENT_DATE, 36.2, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (3, CURRENT_DATE, 36.3, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (4, CURRENT_DATE, 36.1, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (5, CURRENT_DATE, 36.6, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (6, CURRENT_DATE, 36.0, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (7, CURRENT_DATE, 37.1, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (8, CURRENT_DATE, 36.9, false);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (9, CURRENT_DATE, 38.6, true);
+-- INSERT INTO Health_Declaration (eid, date, temp, fever) values (10, CURRENT_DATE, 39.6, true);
