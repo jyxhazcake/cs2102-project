@@ -54,3 +54,8 @@ export const ProfileBox = styled.div`
     0px 2px 4px rgba(0, 0, 0, 0.14);
   border-radius: 4px;
 `
+
+export const StyledImg = styled.img`
+  display: flex;
+  padding: 15px;
+`
