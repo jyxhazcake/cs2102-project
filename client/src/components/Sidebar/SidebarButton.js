@@ -8,8 +8,12 @@ export default function SidebarButton(props) {
       isSelected={props.isSelected}
       type={props.type ?? 'button'}
     >
-      <img src={props.icon} alt="temp" />
-      <Text> {props.text} </Text>
+      {props.isSelected ? (
+        <img src={props.iconSelected} alt="highlighted icon" />
+      ) : (
+        <img src={props.iconDefault} alt="default icon" />
+      )}
+      <Text isSelected={props.isSelected}> {props.text} </Text>
     </Container>
   )
 }

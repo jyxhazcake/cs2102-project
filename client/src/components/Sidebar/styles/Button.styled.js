@@ -27,7 +27,11 @@ export const Text = styled.div`
 
   /* Black / High Emphasis */
 
-  color: rgba(0, 0, 0, 0.87);
+  color: ${(props) => (props.isSelected ? '#2196F3' : 'rgba(0, 0, 0, 0.87)')};
 
   padding-left: 25px;
+
+  &:hover {
+    color: #2196f3;
+  }
 `

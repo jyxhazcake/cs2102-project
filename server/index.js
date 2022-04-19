@@ -20,7 +20,6 @@ app.use(express.json())
   ################## */
 
 const session = require('express-session')
-
 //allows storing of session data
 app.use(
   session({
@@ -199,7 +198,9 @@ app.delete('/departments/:id', (req, res) => {
 
 //Get all Employees
 app.get('/employees', (req, res) => {
-  db.query('SELECT * FROM Employees').then((data) => {
+  db.query(
+    'SELECT * FROM Employees ORDER BY resigned_date NULLS FIRST, eid ASC'
+  ).then((data) => {
     res.send(data)
   })
 })
@@ -221,13 +222,19 @@ app.post('/employees', (req, res) => {
 //Simulate an employee resigning
 app.post('/employees/resign', (req, res) => {
   console.log(req.body)
-  db.proc('remove_employee', [req.body.eid, req.body.date])
+  db.proc('remove_employee', [req.body.eid, req.body.date]).then((data) => {
+    res.send(data)
+  })
 })
 
 //non_compliance function
 app.post('/employees/non_compliance', (req, res) => {
   console.log(req.body)
-  db.function('non_compliance', [req.body.start_date, req.body.end_date])
+  db.function('non_compliance', [req.body.start_date, req.body.end_date]).then(
+    (data) => {
+      res.send(data)
+    }
+  )
 })
 
 /**
