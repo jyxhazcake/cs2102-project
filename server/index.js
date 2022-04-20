@@ -61,8 +61,7 @@ const port = process.env.PORT || 8080
 
 //THIS DB is used for production, its the heroku DB and will automatically switch urls.
 const cn = {
-  connectionString:
-    'postgres://kgonemtugtlmcd:f971c7166a3dc05817d733842487151671c8858a3f6490069a4dfb5a818b41ef@ec2-52-73-155-171.compute-1.amazonaws.com:5432/de3jffhlhdus17',
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
   },
