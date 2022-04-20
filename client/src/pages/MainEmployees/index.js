@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Profile from '../../components/MainEmployees/Profile'
 import Button from '../../components/Sidebar/Button'
 import Sidebar from '../../components/Sidebar/Sidebar'
+import Booking from '../../components/Bookings/DateAndTime'
 
 export default function MainEmployees() {
   const [currentTab, setCurrentTab] = useState(1)
@@ -14,7 +15,7 @@ export default function MainEmployees() {
       case 2:
         return <h1> Meetings </h1>
       case 3:
-        return <h1> Bookings </h1>
+        return <Booking />
       default:
         return <h1> Default </h1>
     }
