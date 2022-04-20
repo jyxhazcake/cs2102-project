@@ -20,7 +20,6 @@ app.use(express.json())
   ################## */
 
 const session = require('express-session')
-
 //allows storing of session data
 app.use(
   session({
@@ -152,7 +151,7 @@ app.post('/login', (req, res) => {
 
           const id = user.eid
           const token = jwt.sign({ id }, 'jwtSecret', {
-            expiresIn: 300, //token expires in 5 minutes
+            expiresIn: 3000, //token expires in 50 minutes
           })
           res.json({ auth: true, id: id, jwtToken: token })
         } else {
@@ -200,7 +199,9 @@ app.delete('/departments/:id', (req, res) => {
 //Get all Employees
 //employees which are not resigned will be displayed first
 app.get('/employees', (req, res) => {
-  db.query('SELECT * FROM Employees ORDER BY resigned_date NULLS FIRST, eid ASC').then((data) => {
+  db.query(
+    'SELECT * FROM Employees ORDER BY resigned_date NULLS FIRST, eid ASC'
+  ).then((data) => {
     res.send(data)
   })
 })
@@ -222,9 +223,9 @@ app.post('/employees', (req, res) => {
 //Simulate an employee resigning
 app.post('/employees/resign', (req, res) => {
   console.log(req.body)
-  db.proc('remove_employee', [req.body.eid, req.body.date]).then(
-    (data) => {
-      res.send(data)
+  db.proc('remove_employee', [req.body.eid, req.body.date]).then((data) => {
+    res.send(data)
+  })
 })
 
 //non_compliance function
@@ -233,6 +234,8 @@ app.post('/employees/non_compliance', (req, res) => {
   db.function('non_compliance', [req.body.start_date, req.body.end_date]).then(
     (data) => {
       res.send(data)
+    }
+  )
 })
 
 /**
