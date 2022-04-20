@@ -47,7 +47,7 @@ app.use(flash());*/
 
 const jwt = require('jsonwebtoken')
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 8080
 
 //UNCOMMENT THIS IF YOU WANT TO USE LOCAL DB
 
@@ -257,7 +257,7 @@ app.get('/employees/:id/contact_tracing', (req, res) => {
   })
 })
 
-//Get all rooms (use Postman or just go to http://localhost:3000/rooms)
+//Get all rooms (use Postman or just go to http://localhost:8080/rooms)
 app.get('/employees/:id/rooms', (req, res) => {
   db.query('SELECT * FROM Meeting_Rooms').then((data) => {
     res.send(data)
