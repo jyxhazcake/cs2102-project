@@ -52,3 +52,7 @@ export const SmallText = styled.div`
   margin-top: -5px;
   color: #000000;
 `
+
+export const MainDiv = styled.div`
+  margin-left: 200px;
+`

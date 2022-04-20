@@ -133,6 +133,15 @@ BEGIN
         INSERT INTO Manager VALUES (NEW.eid);
         END;
     END IF;
+    IF (NEW.role = 'Admin' 
+        AND NEW.EID NOT IN (SELECT eid FROM Booker)
+        AND NEW.EID NOT IN (SELECT eid FROM Admin))
+    THEN
+        BEGIN
+        INSERT INTO Booker VALUES (NEW.eid);
+        INSERT INTO Admin VALUES (NEW.eid);
+        END;
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -775,7 +784,7 @@ Department constraint -> Department 0 is reserved for Resigned employees whose d
 
 --Departments
 insert into Departments (did, dname) values (0, 'Department deleted after Resignation');
-insert into Departments (did, dname) values (1, 'Product Management');
+insert into Departments (did, dname) values (1, 'Admin');
 insert into Departments (did, dname) values (2, 'Legal');
 insert into Departments (did, dname) values (3, 'Training');
 insert into Departments (did, dname) values (4, 'Human Resources');
@@ -791,7 +800,9 @@ insert into Departments (did, dname) values (13, 'Product Management');
 insert into Departments (did, dname) values (14, 'Sales');
 insert into Departments (did, dname) values (15, 'Research and Development');
 
---Employees
+CALL add_employee('Admin', '228-522-9018', 'Admin', 1); --eid 1
+
+-- --Employees
 -- insert into Employees (ename, email, mobile_num, role, did) values ('Harmon', 'hsalmons0@about.com', '228-522-9018', 'Junior', 2);
 -- insert into Employees (ename, email, mobile_num, role, did) values ('Phelia', 'pfrain1@ustream.tv', '267-458-8830', 'Senior', 12);
 -- insert into Employees (ename, email, mobile_num, role, did) values ('Carlie', 'cchuter2@yolasite.com', '209-753-9805', 'Senior', 13);
@@ -924,3 +935,4 @@ insert into Departments (did, dname) values (15, 'Research and Development');
 -- INSERT INTO Health_Declaration (eid, date, temp, fever) values (8, CURRENT_DATE, 36.9, false);
 -- INSERT INTO Health_Declaration (eid, date, temp, fever) values (9, CURRENT_DATE, 38.6, true);
 -- INSERT INTO Health_Declaration (eid, date, temp, fever) values (10, CURRENT_DATE, 39.6, true);
+

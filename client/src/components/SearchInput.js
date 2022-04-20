@@ -12,7 +12,7 @@ const StyledInput = styled.input`
 
 export default function SearchInput(props) {
   return (
-    <div>
+    <div style={{ paddingTop: '100px' }}>
       <StyledInput placeholder={props.placeholder} onChange={props.onChange} />
     </div>
   )

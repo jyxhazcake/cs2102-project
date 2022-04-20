@@ -60,14 +60,14 @@ const db = pgp({
 })
 
 //THIS DB is used for production, its the heroku DB and will automatically switch urls.
-// const cn = {
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: {
-//     rejectUnauthorized: false
-//   }
-// };
+/*const cn = {
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+};
 
-//const db = pgp(cn);
+const db = pgp(cn);*/
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
@@ -197,6 +197,7 @@ app.delete('/departments/:id', (req, res) => {
 #################################################### */
 
 //Get all Employees
+//employees which are not resigned will be displayed first
 app.get('/employees', (req, res) => {
   db.query(
     'SELECT * FROM Employees ORDER BY resigned_date NULLS FIRST, eid ASC'

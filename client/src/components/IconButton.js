@@ -10,7 +10,7 @@ const Text = styled.div`
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
-  font-size: 14px;
+  font-size: ${(props) => props.size ?? '14px'};
   line-height: 21px;
   /* or 150% */
 
@@ -24,15 +24,19 @@ const Text = styled.div`
 
 const ButtonContainer = styled.button`
   all: unset;
-  padding: 10px;
+  padding: ${(props) => props.padding ?? '20px'};
   cursor: pointer;
 `
 
 export default function IconButton(props) {
   return (
-    <ButtonContainer type={props.type ?? 'button'} onClick={props.onClick}>
+    <ButtonContainer
+      padding={props.padding}
+      type={props.type ?? 'button'}
+      onClick={props.onClick}
+    >
       <Icon src={props.src} alt="img" />
-      <Text> {props.children} </Text>
+      <Text size={props.size}> {props.children} </Text>
     </ButtonContainer>
   )
 }

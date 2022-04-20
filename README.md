@@ -122,6 +122,23 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+## Local PSQL DB instructions
+
+Step 1: Create a new database
+
+Log into PostgreSQL (e.g., with psql) and create a new database, e.g.
+
+CREATE DATABASE cs2102_project;  -- Feel free to pick your own name
+
+
+
+Step 2: Import dump into the newly create database, e.g.:
+
+psql  -d cs2102_project  -f schema.sql  -U postgres  -- you might need to add the full path where schema.sql is located
+psql  -d cs2102_project  -f proc.sql  -U postgres
+psql  -d cs2102_project  -f data.sql  -U postgres
+
+
 ## Acknowledgments
 
 * []()
